@@ -52,7 +52,9 @@ services:
 
   worker:
     <<: *backend
-    command: ["python", "manage.py", "db_worker"]
+    # No auto-reload: a code reload would kill a running generation. `just restart worker` to pick
+    # up code changes; jobs interrupted by a restart are requeued at startup.
+    command: ["sh", "-c", "python manage.py recover_jobs && exec python manage.py db_worker --no-reload"]
     depends_on:
       db:
         condition: service_healthy

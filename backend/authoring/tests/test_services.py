@@ -118,3 +118,18 @@ def test_failures_are_recorded(root: Path) -> None:
     ):
         job = run_job(job.pk)
     assert job.status == GenerationJob.Status.FAILED and "LLM exploded" in job.error
+
+
+def test_recover_jobs_requeues_interrupted_jobs(
+    root: Path, django_capture_on_commit_callbacks: Callable[..., Any]
+) -> None:
+    from django.core.management import call_command
+
+    job = create_job(Lesson.objects.get(slug="a2-passe-compose-er"), enqueue=False)
+    GenerationJob.objects.filter(pk=job.pk).update(status=GenerationJob.Status.RUNNING)
+    with django_capture_on_commit_callbacks(execute=False) as callbacks:
+        call_command("recover_jobs")
+    job.refresh_from_db()
+    assert job.status == GenerationJob.Status.QUEUED and len(callbacks) == 1
+    assert "Interrupted" in job.progress[-1]["message"]
+    assert run_job(job.pk).status == GenerationJob.Status.NEEDS_REVIEW  # runs normally again

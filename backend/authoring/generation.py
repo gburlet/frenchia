@@ -491,6 +491,11 @@ class LessonReviser:
             for d in base["exercises"]
             if (item := self._item(d, EXERCISE_TYPES, notes, d["id"] in wanted, droppable=True))
         ]
+        topics = list(base.get("grammar_topics", []))
+        exercises = [
+            e if e.grammar_topics or not topics else e.model_copy(update={"grammar_topics": topics})
+            for e in exercises
+        ]
         data = {
             **{k: v for k, v in base.items() if k != "provenance"},
             "content_version": content_version,

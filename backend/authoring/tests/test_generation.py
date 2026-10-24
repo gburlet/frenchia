@@ -233,3 +233,17 @@ def test_reviser_keeps_exercise_metadata() -> None:
         data, "Simplify", ["ex-01"], content_version=1, job_id=None
     )
     assert result.lesson.exercises[0].grammar_topics == ["passe-compose-avoir"]
+
+
+def test_reviser_fills_missing_exercise_topics_from_the_lesson() -> None:
+    lesson = (
+        LessonGenerator(ScriptedChat(), reference(), critic=False)
+        .generate(brief(), content_version=1, job_id=None)
+        .lesson
+    )
+    data = lesson.model_dump(mode="json", exclude_none=True)
+    data["exercises"][1]["grammar_topics"] = []
+    result = LessonReviser(ScriptedChat(), reference(), critic=False).revise(
+        data, "Tidy", ["table"], content_version=1, job_id=None
+    )
+    assert result.lesson.exercises[1].grammar_topics == ["passe-compose-avoir"]
