@@ -1,0 +1,25 @@
+{
+  "word_count_rule": "whitespace-separated tokens",
+  "samples": {
+    "A": {
+      "text": "Bonjour, comment ça va aujourd'hui ?",
+      "chars": 36,
+      "words": 6
+    },
+    "B": {
+      "text": "Salut ! Je suis allé au marché ce matin pour acheter du pain et du fromage. Ensuite, j'ai retrouvé un ami pour prendre un café.",
+      "chars": 127,
+      "words": 25
+    },
+    "C": {
+      "text": "Hier soir, après avoir terminé ma journée de travail, j'ai décidé de sortir me promener dans mon quartier. Il faisait un peu froid, mais le ciel était magnifique et les rues étaient tranquilles. En rentrant chez moi, j'ai préparé le souper, puis j'ai regardé un film avant d'aller me coucher.",
+      "chars": 292,
+      "words": 50
+    },
+    "D": {
+      "text": "Depuis quelques mois, j'essaie d'améliorer mon français en pratiquant un peu chaque jour. J'écoute des balados, je lis des articles et je parle avec des amis francophones lorsque j'en ai l'occasion. Parfois, j'ai du mal à comprendre les conversations rapides, surtout lorsque les gens utilisent des expressions familières ou parlent avec un accent québécois. Cependant, je remarque que je fais des progrès et que je peux maintenant exprimer des idées plus complexes. Mon objectif est de pouvoir participer naturellement à des conversations, raconter des histoires et comprendre les nuances de la langue sans devoir constamment traduire dans ma tête.",
+      "chars": 649,
+      "words": 99
+    }
+  }
+}

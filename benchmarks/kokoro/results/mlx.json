@@ -1,0 +1,416 @@
+{
+  "env": {
+    "backend": "native-mlx",
+    "machine": "arm64",
+    "device": "Device(gpu, 0)",
+    "mlx": "0.32.4",
+    "mlx_audio": "0.6.1",
+    "python": "3.12.13",
+    "model": "mlx-community/Kokoro-82M-bf16",
+    "weight_dtypes": [
+      "mlx.core.float32"
+    ],
+    "load_s": 0.29117829201277345,
+    "first_synth_s": 6.050360959023237,
+    "peak_rss_mb": 340.8125,
+    "peak_metal_mb": 2710.2587366104126
+  },
+  "results": [
+    {
+      "sample": "A",
+      "speed": 1.0,
+      "runs": [
+        {
+          "synth_s": 0.17390520800836384,
+          "first_chunk_s": 0.16779800003860146,
+          "audio_s": 2.55,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.1319783329963684,
+          "first_chunk_s": 0.1259877079864964,
+          "audio_s": 2.55,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.13066141598392278,
+          "first_chunk_s": 0.12461504095699638,
+          "audio_s": 2.55,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.1315032501006499,
+          "first_chunk_s": 0.12468100001569837,
+          "audio_s": 2.55,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.13375258294399828,
+          "first_chunk_s": 0.12703062500804663,
+          "audio_s": 2.55,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.13400366704445332,
+          "first_chunk_s": 0.12729258299805224,
+          "audio_s": 2.55,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.13266758294776082,
+          "first_chunk_s": 0.12629462499171495,
+          "audio_s": 2.55,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.1315202919067815,
+          "first_chunk_s": 0.12564316694624722,
+          "audio_s": 2.55,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.13150000001769513,
+          "first_chunk_s": 0.1258796249749139,
+          "audio_s": 2.55,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.12947387504391372,
+          "first_chunk_s": 0.12331725005060434,
+          "audio_s": 2.55,
+          "chunks": 1
+        }
+      ]
+    },
+    {
+      "sample": "B",
+      "speed": 1.0,
+      "runs": [
+        {
+          "synth_s": 0.3811600839253515,
+          "first_chunk_s": 0.36818879190832376,
+          "audio_s": 7.8,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.40474912500940263,
+          "first_chunk_s": 0.3924493339145556,
+          "audio_s": 7.8,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.3896994999377057,
+          "first_chunk_s": 0.37288754200562835,
+          "audio_s": 7.8,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.39592366700526327,
+          "first_chunk_s": 0.37670150003395975,
+          "audio_s": 7.8,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.39522195898462087,
+          "first_chunk_s": 0.3769365840125829,
+          "audio_s": 7.8,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.3849178330274299,
+          "first_chunk_s": 0.3714498330373317,
+          "audio_s": 7.8,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.3968455829890445,
+          "first_chunk_s": 0.3809662499697879,
+          "audio_s": 7.8,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.39197516709100455,
+          "first_chunk_s": 0.3782386250095442,
+          "audio_s": 7.8,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.400131875067018,
+          "first_chunk_s": 0.382631583022885,
+          "audio_s": 7.8,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.39301004097796977,
+          "first_chunk_s": 0.37475191592238843,
+          "audio_s": 7.8,
+          "chunks": 1
+        }
+      ]
+    },
+    {
+      "sample": "C",
+      "speed": 1.0,
+      "runs": [
+        {
+          "synth_s": 0.8070857910206541,
+          "first_chunk_s": 0.79250475007575,
+          "audio_s": 15.975,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.7745572909479961,
+          "first_chunk_s": 0.7599950829753652,
+          "audio_s": 15.975,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.772452290984802,
+          "first_chunk_s": 0.7546628329437226,
+          "audio_s": 15.975,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.789274416049011,
+          "first_chunk_s": 0.7592152910074219,
+          "audio_s": 15.975,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.7726750000147149,
+          "first_chunk_s": 0.7489072079770267,
+          "audio_s": 15.975,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.7708207500400022,
+          "first_chunk_s": 0.7510687500471249,
+          "audio_s": 15.975,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.7750518340617418,
+          "first_chunk_s": 0.7503026250051335,
+          "audio_s": 15.975,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.7775622080080211,
+          "first_chunk_s": 0.7564955420093611,
+          "audio_s": 15.975,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.8099846669938415,
+          "first_chunk_s": 0.7927643749862909,
+          "audio_s": 15.975,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.7866245410405099,
+          "first_chunk_s": 0.7653455409454182,
+          "audio_s": 15.975,
+          "chunks": 1
+        }
+      ]
+    },
+    {
+      "sample": "D",
+      "speed": 1.0,
+      "runs": [
+        {
+          "synth_s": 1.7748798339162022,
+          "first_chunk_s": 0.9183023750083521,
+          "audio_s": 34.4,
+          "chunks": 2
+        },
+        {
+          "synth_s": 1.7022943750489503,
+          "first_chunk_s": 0.9248083750717342,
+          "audio_s": 34.4,
+          "chunks": 2
+        },
+        {
+          "synth_s": 1.6880831249291077,
+          "first_chunk_s": 0.9022608749801293,
+          "audio_s": 34.4,
+          "chunks": 2
+        },
+        {
+          "synth_s": 1.6959674999816343,
+          "first_chunk_s": 0.9110333330463618,
+          "audio_s": 34.4,
+          "chunks": 2
+        },
+        {
+          "synth_s": 1.6993947920855135,
+          "first_chunk_s": 0.923265082994476,
+          "audio_s": 34.4,
+          "chunks": 2
+        },
+        {
+          "synth_s": 1.7040253749582916,
+          "first_chunk_s": 0.9187263329513371,
+          "audio_s": 34.4,
+          "chunks": 2
+        },
+        {
+          "synth_s": 1.730349582969211,
+          "first_chunk_s": 0.9451597919687629,
+          "audio_s": 34.4,
+          "chunks": 2
+        },
+        {
+          "synth_s": 1.6868719999911264,
+          "first_chunk_s": 0.9075713750207797,
+          "audio_s": 34.4,
+          "chunks": 2
+        },
+        {
+          "synth_s": 1.7110427080187947,
+          "first_chunk_s": 0.9117781659588218,
+          "audio_s": 34.4,
+          "chunks": 2
+        },
+        {
+          "synth_s": 1.7274585840059444,
+          "first_chunk_s": 0.9435235420241952,
+          "audio_s": 34.4,
+          "chunks": 2
+        }
+      ]
+    },
+    {
+      "sample": "A",
+      "speed": 0.75,
+      "runs": [
+        {
+          "synth_s": 0.1776194169651717,
+          "first_chunk_s": 0.16852483397815377,
+          "audio_s": 3.4,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.16847254196181893,
+          "first_chunk_s": 0.16125362494494766,
+          "audio_s": 3.4,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.16529716609511524,
+          "first_chunk_s": 0.15692866605240852,
+          "audio_s": 3.4,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.16755812498740852,
+          "first_chunk_s": 0.1590664170216769,
+          "audio_s": 3.4,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.17067954200319946,
+          "first_chunk_s": 0.16161116701550782,
+          "audio_s": 3.4,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.16871683404315263,
+          "first_chunk_s": 0.1609829169465229,
+          "audio_s": 3.4,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.16636079200543463,
+          "first_chunk_s": 0.1586965840542689,
+          "audio_s": 3.4,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.16996816697064787,
+          "first_chunk_s": 0.1624815840041265,
+          "audio_s": 3.4,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.1684522080468014,
+          "first_chunk_s": 0.16164929105434567,
+          "audio_s": 3.4,
+          "chunks": 1
+        },
+        {
+          "synth_s": 0.17289916705340147,
+          "first_chunk_s": 0.1647620419971645,
+          "audio_s": 3.4,
+          "chunks": 1
+        }
+      ]
+    },
+    {
+      "sample": "C",
+      "speed": 0.75,
+      "runs": [
+        {
+          "synth_s": 1.0713415839709342,
+          "first_chunk_s": 1.0489597920095548,
+          "audio_s": 22.275,
+          "chunks": 1
+        },
+        {
+          "synth_s": 1.0223784999689087,
+          "first_chunk_s": 1.0061246659606695,
+          "audio_s": 22.275,
+          "chunks": 1
+        },
+        {
+          "synth_s": 1.0598915839800611,
+          "first_chunk_s": 1.041566833970137,
+          "audio_s": 22.275,
+          "chunks": 1
+        },
+        {
+          "synth_s": 1.0947240829700604,
+          "first_chunk_s": 1.0746994579676539,
+          "audio_s": 22.275,
+          "chunks": 1
+        },
+        {
+          "synth_s": 1.0599175419192761,
+          "first_chunk_s": 1.034646874992177,
+          "audio_s": 22.275,
+          "chunks": 1
+        },
+        {
+          "synth_s": 1.0151532919844612,
+          "first_chunk_s": 0.9936661249957979,
+          "audio_s": 22.275,
+          "chunks": 1
+        },
+        {
+          "synth_s": 1.0158141249557957,
+          "first_chunk_s": 0.9958157079527155,
+          "audio_s": 22.275,
+          "chunks": 1
+        },
+        {
+          "synth_s": 1.0926575829507783,
+          "first_chunk_s": 1.0621653749840334,
+          "audio_s": 22.275,
+          "chunks": 1
+        },
+        {
+          "synth_s": 1.0696525839157403,
+          "first_chunk_s": 1.0577688749181107,
+          "audio_s": 22.275,
+          "chunks": 1
+        },
+        {
+          "synth_s": 1.0581130409846082,
+          "first_chunk_s": 1.0430091249290854,
+          "audio_s": 22.275,
+          "chunks": 1
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+default: all
+
+onnx:
+    docker compose run --rm onnx python onnx/bench_onnx.py
+
+mlx:
+    cd mlx && uv run bench_mlx.py
+
+report:
+    python3 report.py
+
+# backends run sequentially so they never compete for CPU/memory
+all: onnx mlx report

@@ -1,0 +1,128 @@
+@import "tailwindcss";
+
+/* Design tokens (dark theme). A light theme can later override these under
+   [data-theme="light"] without touching components. */
+:root {
+  --page: #292929;
+  --chrome: #212121;
+  --surface: #333333;
+  --line: #444444;
+  --body: #949494;
+  --heading: #ffffff;
+  --muted: #6f6f6f;
+  --detail: #b5b5b5;
+  --teal: #5e95ab;
+  --teal-hover: #4e8297;
+  --purple: #7e57c2;
+  --purple-hover: #6a45ad;
+  --success: #4f8a5d;
+  --failure: #b55252;
+  --blocked: #b8862f;
+  --neutral: #5a5a5a;
+  --kept: #8fc79c;
+  --error-text: #e07a7a;
+  --warning-text: #e0b252;
+  --log: #1b1b1b;
+  --card-border: rgb(255 255 255 / 0.05);
+  --radius-control: 6px;
+  --radius-card: 12px;
+  --shadow-card: 0 10px 25px rgb(0 0 0 / 0.4);
+  --shadow-drawer: -10px 0 25px rgb(0 0 0 / 0.5);
+  --font-heading: "Avenir LT Pro", Avenir, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-body: "Avenir LT Pro", Avenir, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-code: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --duration: 0.2s;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-page: var(--page);
+  --color-chrome: var(--chrome);
+  --color-surface: var(--surface);
+  --color-line: var(--line);
+  --color-body: var(--body);
+  --color-heading: var(--heading);
+  --color-muted: var(--muted);
+  --color-detail: var(--detail);
+  --color-teal: var(--teal);
+  --color-teal-hover: var(--teal-hover);
+  --color-purple: var(--purple);
+  --color-purple-hover: var(--purple-hover);
+  --color-success: var(--success);
+  --color-failure: var(--failure);
+  --color-blocked: var(--blocked);
+  --color-neutral: var(--neutral);
+  --color-kept: var(--kept);
+  --color-error-text: var(--error-text);
+  --color-warning-text: var(--warning-text);
+  --color-log: var(--log);
+  --color-card-border: var(--card-border);
+  --radius-control: var(--radius-control);
+  --radius-card: var(--radius-card);
+  --shadow-card: var(--shadow-card);
+  --shadow-drawer: var(--shadow-drawer);
+  --font-heading: var(--font-heading);
+  --font-sans: var(--font-body);
+  --font-mono: var(--font-code);
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+  body {
+    background: var(--page);
+    color: var(--body);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--heading);
+    font-family: var(--font-heading);
+    font-weight: 800;
+  }
+  :focus-visible {
+    outline: 2px solid var(--purple);
+    outline-offset: 2px;
+  }
+  code,
+  pre {
+    font-family: var(--font-code);
+  }
+}
+
+@keyframes drawer-in {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+@keyframes drawer-out {
+  from { transform: translateX(0); }
+  to { transform: translateX(100%); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

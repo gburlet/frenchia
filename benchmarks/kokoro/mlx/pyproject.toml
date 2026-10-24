@@ -1,0 +1,5 @@
+[project]
+name = "kokoro-mlx-bench"
+version = "0.0.0"
+requires-python = ">=3.12,<3.13"
+dependencies = ["mlx-audio==0.6.1", "misaki", "phonemizer-fork", "espeakng-loader", "soundfile", "numpy"]

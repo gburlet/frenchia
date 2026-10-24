@@ -1,0 +1,28 @@
+# Local state (logs, audio cache, backups, rendered launchd plists)
+/var/*
+!/var/.gitkeep
+.env
+.tools/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+backend/staticfiles/
+
+# Node
+node_modules/
+dist/
+*.tsbuildinfo
+coverage/
+
+# Benchmark outputs (audio is large; JSON + report are kept)
+benchmarks/kokoro/results/audio/
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/

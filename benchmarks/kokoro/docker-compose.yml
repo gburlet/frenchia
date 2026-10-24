@@ -1,0 +1,7 @@
+services:
+  onnx:
+    build: ./onnx
+    platform: linux/arm64
+    working_dir: /work
+    volumes:
+      - ./:/work

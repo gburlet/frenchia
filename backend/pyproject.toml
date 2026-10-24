@@ -1,0 +1,52 @@
+[project]
+name = "frenchia-backend"
+version = "0.1.0"
+description = "Frenchia backend: local-first French learning app"
+requires-python = ">=3.13,<3.14"
+dependencies = [
+    "django==6.1.2",
+    "djangorestframework==3.18.3",
+    "drf-spectacular==0.30.0",
+    "psycopg[binary]==3.3.6",
+    "django-environ==0.14.0",
+    "uvicorn[standard]==0.54.0",
+    "django-tasks-db==0.13.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest==9.1.1",
+    "pytest-django==4.14.0",
+    "ruff==0.17.2",
+    "mypy==2.4.0",
+    "django-stubs==6.1.2",
+    "djangorestframework-stubs==3.18.1",
+    "factory-boy==3.3.3",
+]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+python_files = ["test_*.py"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+extend-exclude = ["*/migrations/*"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "DJ", "W"]
+
+[tool.mypy]
+python_version = "3.13"
+plugins = ["mypy_django_plugin.main", "mypy_drf_plugin.main"]
+strict_optional = true
+warn_unused_ignores = true
+exclude = ["migrations/"]
+
+[tool.django-stubs]
+django_settings_module = "config.settings"
+
+[[tool.mypy.overrides]]
+module = ["environ"]
+ignore_missing_imports = true
