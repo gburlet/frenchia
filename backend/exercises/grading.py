@@ -15,7 +15,7 @@ from contentkit.reference import Reference
 from inference.errors import InferenceError
 from inference.llm import ChatModel, Message, complete_structured
 
-PROMPT_VERSION = "judge-3"
+PROMPT_VERSION = "judge-5"
 CATEGORIES = (
     "agreement",
     "article",
@@ -171,15 +171,17 @@ class JudgeOutput(BaseModel):
     corrected: str = Field(
         description="The learner answer minimally corrected (unchanged if correct)"
     )
-    summary: str = Field(description="One encouraging sentence, at most 25 words")
     register_note: str = Field(description="Register/Québec note, or empty")
 
 
+# Output is what costs time (~21 tokens/s on the M2 Pro), so the schema asks for as little as
+# possible and the summary is written in code. The instructions stay in the user turn after the
+# case: moving them into the system message was faster but less accurate (ADR 0002 addendum).
 SYSTEM = (
     "You are an expert French teacher for an English-speaking adult learning Québec French. "
     "Québec usage is the default: accept Québec vocabulary and natural informal spoken forms as "
-    "correct (déjeuner = breakfast, dîner = lunch, souper = supper; la fin de semaine). Be precise "
-    "and brief. Explanations are in English."
+    "correct (déjeuner = breakfast, dîner = lunch, souper = supper; la fin de semaine, en fin de "
+    "semaine). Be precise and brief. Explanations are in English."
 )
 CHECKLIST = (
     "Before concluding there are no errors, check: gender/number agreement (adjectives, past "
@@ -201,8 +203,7 @@ List every problem in the learner answer, at most 5. severity 'error' = anything
 mark wrong (grammar, agreement, article, preposition, tense, spelling or accent, wrong meaning); \
 'minor' = correct but slightly unnatural. Québec usage and informal spoken forms are correct: put \
 register remarks in register_note, not in errors. Do not invent errors. {checklist}
-Copy each error's span exactly from the learner answer. Keep every explanation under 20 words and \
-the summary under 25 words."""
+Copy each error's span exactly from the learner answer. Keep every explanation under 12 words."""
 
 
 def _lexicon_notes(ref: Reference | None, *texts: str) -> str:
@@ -295,7 +296,7 @@ def _from_judge(result: JudgeOutput, answer: str, model: str, latency_ms: int) -
         verdict,
         score,
         _feedback(
-            result.summary,
+            _summary(verdict, errors),
             corrected=corrected,
             errors=errors,
             register_note=result.register_note.strip() or None,
@@ -303,6 +304,19 @@ def _from_judge(result: JudgeOutput, answer: str, model: str, latency_ms: int) -
         model=model,
         latency_ms=latency_ms,
     )
+
+
+SUMMARIES = {
+    "correct": "Correct! Well done.",
+    "acceptable": "Correct, with a small suggestion to sound more natural.",
+}
+
+
+def _summary(verdict: str, errors: list[dict[str, str]]) -> str:
+    if verdict in SUMMARIES:
+        return SUMMARIES[verdict]
+    count = sum(e["severity"] == "error" for e in errors)
+    return f"Not quite: {count} thing{'s' if count != 1 else ''} to fix." if count else "Not quite."
 
 
 def _pending(accepted: list[str]) -> Grade:

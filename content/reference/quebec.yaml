@@ -35,7 +35,7 @@
   formality: familiar
 - term: fin de semaine
   match: ['\bfins? de semaine\b']
-  meaning: "weekend"
+  meaning: "weekend; « en fin de semaine » = on the weekend / this weekend"
   france: week-end
   formality: standard
 - term: char

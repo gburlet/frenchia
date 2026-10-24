@@ -89,7 +89,6 @@ def test_translate_attempt_graded_by_llm_records_mistakes(client_user: tuple[Cli
                 }
             ],
             "corrected": "Nous avons magasiné.",
-            "summary": "Almost.",
             "register_note": "",
         }
     )
@@ -122,9 +121,7 @@ def test_pending_then_regrade(client_user: tuple[Client, User]) -> None:
             content_type="application/json",
         ).json()
     assert body["status"] == "pending" and body["verdict"] is None
-    ok = JudgeOutput(
-        errors=[], corrected="Nous avons fait du shopping.", summary="Good!", register_note=""
-    )
+    ok = JudgeOutput(errors=[], corrected="Nous avons fait du shopping.", register_note="")
     with patch(
         "exercises.services.get_chat_model",
         return_value=FakeChatModel(lambda m: ok.model_dump_json()),
@@ -162,7 +159,6 @@ def test_dispute_and_accept_answer_updates_the_content_file(
                     )
                 ],
                 corrected="Nous avons magasiné.",
-                summary="x",
                 register_note="",
             ).model_dump_json()
         ),

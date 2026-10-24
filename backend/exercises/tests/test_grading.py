@@ -73,7 +73,6 @@ def test_translate_uses_llm_and_computes_verdict_from_errors() -> None:
                 )
             ],
             corrected="On a soupé à six heures.",
-            summary="Close!",
             register_note="",
         ).model_dump_json()
 
@@ -99,7 +98,6 @@ def test_hallucinated_spans_are_dropped_and_minor_only_is_acceptable() -> None:
             ),
         ],
         corrected="On a mangé.",
-        summary="Good.",
         register_note="Familiar « on ».",
     )
     grade = _from_judge(output, "On a mangé.", "m", 10)
@@ -127,9 +125,7 @@ def test_quebec_lexicon_grounds_the_prompt() -> None:
         )
     ]
     chat = FakeChatModel(
-        lambda m: JudgeOutput(
-            errors=[], corrected="x", summary="ok", register_note=""
-        ).model_dump_json()
+        lambda m: JudgeOutput(errors=[], corrected="x", register_note="").model_dump_json()
     )
     grade_translate(TRANSLATE, "On soupe à six heures", level="A2", chat=chat, ref=ref)
     assert "souper: supper" in chat.calls[0]["messages"][1].content

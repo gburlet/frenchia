@@ -74,3 +74,19 @@ workable only with the other Docker stacks stopped.
   the dispute flow.
 - **Upgrades are re-checked.** Any model or Ollama upgrade must re-run
   `uv run evals/bakeoff.py <model>` and be compared against these numbers.
+
+## Addendum (2026-10-24): production grader prompt
+
+Measured with `manage.py grader_eval` on the 39 judge cases. This is the real grading code: deterministic
+short-circuits, Québec lexicon grounding, and dropping of hallucinated spans.
+
+| Prompt | Verdicts | Categories | LLM p50 / p90 | Change |
+|---|---|---|---|---|
+| judge-3 | 38/39 | 25/25 | 8.5 / 10.4 s | v2 design with the lexicon, under 20-word explanations and a model-written summary |
+| judge-4 | 34/39 | 23/25 | 7.0 / 9.2 s | instructions moved into the system message (cache-friendly), no summary |
+| **judge-5** | **39/39** | **25/25** | **7.9 / 9.9 s** | judge-3 layout, no model summary (written in code), under 12-word explanations |
+
+Generation dominates latency: about 131 output tokens at about 21 tok/s, against about 0.2 s of cached prompt
+processing. Shorter output is the lever. Gemma follows instructions placed after the case in the
+user turn noticeably better than instructions in the system message. Adding conjugated forms
+(« on soupe ») to the Québec lexicon fixed the remaining Québec judging miss.
