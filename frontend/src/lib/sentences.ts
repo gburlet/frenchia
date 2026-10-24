@@ -76,7 +76,8 @@ export function splitSentences(text: string): string[] {
 
 /** "un"/"une"/"l'" prefix for a noun, based on gender and the first letter. */
 export function withArticle(word: string, gender: "m" | "f" | null | undefined, isNoun: boolean): string {
-  if (!isNoun || !gender) return word;
+  // Proper nouns (le Vieux-Québec) don't take un/une; the gender pill still shows the gender.
+  if (!isNoun || !gender || /^\p{Lu}/u.test(word)) return word;
   const first = word.normalize("NFD").replace(/[̀-ͯ]/g, "").charAt(0).toLowerCase();
   // Mute h can't be told from aspirated h without a dictionary, so h-words get un/une.
   if ("aeiou".includes(first)) return `l’${word}`;

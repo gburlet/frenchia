@@ -51,4 +51,7 @@ describe("withArticle", () => {
     expect(withArticle("école", "f", true)).toBe("l’école");
     expect(withArticle("manger", null, false)).toBe("manger");
   });
+  it("leaves proper nouns without an article", () => {
+    expect(withArticle("Vieux-Québec", "m", true)).toBe("Vieux-Québec");
+  });
 });

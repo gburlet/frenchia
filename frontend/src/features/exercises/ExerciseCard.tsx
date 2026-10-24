@@ -248,7 +248,6 @@ function FillBlank({
   const after = rest.join("___");
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-sm text-detail">Fill in the blank</p>
       <p lang="fr" className="flex flex-wrap items-center gap-x-2 gap-y-2 text-lg text-heading">
         <span>{before}</span>
         <input
