@@ -94,3 +94,8 @@
   meaning: "you're welcome (in reply to merci), as well as 'welcome'"
   france: de rien, je vous en prie
   formality: standard
+- term: centre d'achats
+  match: ["\\bcentres? d['’]achats?\\b"]
+  meaning: "shopping mall (very common in Québec; the OQLF recommends « centre commercial »)"
+  france: centre commercial
+  formality: standard
