@@ -27,6 +27,7 @@ from contentkit.models import (
     RegionalNoteSection,
     TableSection,
     TranslateExercise,
+    VocabItem,
     VocabularySection,
 )
 from contentkit.reference import Reference
@@ -38,6 +39,7 @@ from inference.llm import ChatModel, Message, complete_structured
 from . import prompts
 from .critic import critique
 from .schemas import (
+    DRAFT_SHAPES,
     ChoiceDraft,
     ExamplesStep,
     ExplanationStep,
@@ -48,6 +50,7 @@ from .schemas import (
     TableStep,
     TranslateDraft,
     VocabularyStep,
+    as_draft,
     batch,
     strip_article,
     tidy,
@@ -566,6 +569,8 @@ class LessonReviser:
 
     def _revise_item(self, model: type[BaseModel], data: dict[str, Any], notes: str) -> BaseModel:
         self.progress(f"Revising {data['id']}")
+        if data["type"] in DRAFT_SHAPES:
+            return self._revise_vocab_section(model, data, notes)
         current = json.dumps(data, ensure_ascii=False, indent=1)
         messages = [
             Message("system", prompts.SYSTEM),
@@ -579,6 +584,30 @@ class LessonReviser:
             k: data[k] for k in ("id", "type", "grammar_topics", "reading_id") if k in data
         }
         return revised.model_copy(update=keep)
+
+    def _revise_vocab_section(
+        self, model: type[BaseModel], data: dict[str, Any], notes: str
+    ) -> BaseModel:
+        """Reading/vocabulary sections are revised in the gender-required draft shape, then
+        converted back with the same deterministic clean-up as generation."""
+        draft_model, list_key = DRAFT_SHAPES[data["type"]]
+        items = [VocabItem.model_validate(i) for i in data.get(list_key, [])]
+        current = json.dumps(
+            {**data, list_key: [as_draft(i) for i in items]}, ensure_ascii=False, indent=1
+        )
+        messages = [
+            Message("system", prompts.SYSTEM),
+            Message("user", prompts.REVISE.format(notes=notes, current=current)),
+        ]
+        started = time.perf_counter()
+        revised, completion = complete_structured(
+            self.chat, messages, draft_model, max_tokens=MAX_TOKENS
+        )
+        self.stats.record(time.perf_counter() - started, completion.completion_tokens or 0)
+        out = revised.model_dump()
+        out[list_key] = [vocab_item(d) for d in getattr(revised, list_key)]
+        out.update(id=data["id"], type=data["type"])
+        return model.model_validate(out)
 
 
 def _clean_vocab(section: Any) -> Any:

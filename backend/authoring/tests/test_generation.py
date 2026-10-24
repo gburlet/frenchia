@@ -5,6 +5,7 @@ from authoring.generation import LessonBrief, LessonGenerator, LessonReviser
 from contentkit.models import FillBlankExercise, Lesson, LessonOutline
 from contentkit.reference import QuebecTerm, Reference
 from contentkit.yamlio import content_hash
+from inference.llm import Completion
 
 from .scripted import ScriptedChat
 
@@ -336,3 +337,28 @@ def test_generated_hash_is_computed_after_tidying() -> None:
     )
     assert lesson.sections[0].body == "parler → parlé"  # type: ignore[union-attr]
     assert lesson.provenance and lesson.provenance.generated_hash == content_hash(lesson)
+
+
+def test_reading_revisions_use_the_gender_required_shape() -> None:
+    lesson = (
+        LessonGenerator(ScriptedChat(), reference(), critic=False)
+        .generate(brief(), content_version=1, job_id=None)
+        .lesson
+    )
+    data = lesson.model_dump(mode="json", exclude_none=True)
+
+    class RevisesReading(ScriptedChat):
+        def complete(self, messages, *, json_schema=None, temperature=0.0, max_tokens=800):
+            if (json_schema or {}).get("title") == "ReadingRevision":
+                assert json_schema is not None
+                assert "gender" in json_schema["$defs"]["VocabDraft"]["required"]
+                current = json.loads(messages[-1].content.split("Current content (JSON):\n", 1)[1])
+                current["glossary"][0].update(fr="le souper", gender="none", pos="noun")
+                return Completion(content=json.dumps(current), model="x", latency_ms=1)
+            return super().complete(messages, json_schema=json_schema)
+
+    result = LessonReviser(RevisesReading(), reference(), critic=False).revise(
+        data, "Fix the glossary", ["reading"], content_version=1, job_id=None
+    )
+    reading = next(s for s in result.lesson.sections if s.type == "reading")
+    assert (reading.glossary[0].fr, reading.glossary[0].gender) == ("souper", "m")

@@ -150,3 +150,35 @@ def tidy(value: object) -> object:
     if isinstance(value, dict):
         return {k: tidy(v) for k, v in value.items()}
     return value
+
+
+class ReadingRevision(Step):
+    """LLM-facing shape for revising a reading section (gender required, as in VocabDraft)."""
+
+    type: Literal["reading"]
+    id: str
+    title: str
+    passage_fr: str
+    translation_en: str
+    glossary: list[VocabDraft] = Field(min_length=3, max_length=8)
+
+
+class VocabularyRevision(Step):
+    type: Literal["vocabulary"]
+    id: str
+    heading: str
+    items: list[VocabDraft] = Field(min_length=3, max_length=24)
+
+
+def as_draft(item: VocabItem) -> dict[str, object]:
+    data = item.model_dump(mode="json")
+    data["gender"] = data.get("gender") or "none"
+    data["example_fr"] = data.get("example_fr") or ""
+    data["example_en"] = data.get("example_en") or ""
+    return data
+
+
+DRAFT_SHAPES: dict[str, tuple[type[Step], str]] = {
+    "reading": (ReadingRevision, "glossary"),
+    "vocabulary": (VocabularyRevision, "items"),
+}
