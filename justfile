@@ -72,6 +72,14 @@ content-import *args:
 content-generate lesson *args:
     {{compose}} exec backend python manage.py content_generate {{lesson}} {{args}}
 
+# Write proof-reading prompts for generated lessons awaiting review (content/drafts/review/)
+content-review-export *args:
+    {{compose}} exec backend python manage.py content_review_export {{args}}
+
+# Attach reviewer findings (job-N.findings.json); add --revise to queue LLM revisions from them
+content-review-import reviewer="claude-haiku-5-5" *args:
+    {{compose}} exec backend python manage.py content_review_import --reviewer {{reviewer}} {{args}}
+
 # Publish (or roll back to) a lesson version, e.g. `just content-publish a2-imparfait --version 2`
 content-publish lesson *args:
     {{compose}} exec backend python manage.py content_publish {{lesson}} {{args}}

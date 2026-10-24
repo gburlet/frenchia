@@ -30,14 +30,21 @@ the importer and the LLM's structured output.
    - English text in French fields
    - Québec terms missing from the verified lexicon (warning)
    - repeated words after filling a blank
-3. **Review.** Open Admin → Generation jobs. Each job shows a rendered preview, the validation report and a diff
+3. **External proof-reading (ADR 0003).** `just content-review-export` writes one self-contained
+   prompt per job awaiting review to `content/drafts/review/job-N.prompt.txt`. A stronger model
+   reads it and writes `job-N.findings.json` next to it. In practice that's a Claude Code Haiku
+   subagent; anything that follows the JSON schema at the end of the prompt works. Then run
+   `just content-review-import claude-haiku-5-5` (add `--revise` to queue a local-LLM revision
+   from the findings straight away). Findings appear in Admin as suggestions and pre-fill the
+   revision form. They are never applied automatically.
+4. **Review.** Open Admin → Generation jobs. Each job shows a rendered preview, the validation report and a diff
    against the published version. Then choose one of:
    - **Approve & publish:** writes `content/lessons/<level>/<id>.yaml` with the next `content_version`, imports
      it and makes it live.
    - **Reject**, with notes.
    - **Request revision:** give notes and optional section/exercise ids. The local LLM revises those parts and
      a new job appears for review.
-4. **Commit** the changed YAML with git. Nothing is committed automatically.
+5. **Commit** the changed YAML with git. Nothing is committed automatically.
 
 You can also edit lesson YAML by hand. Bump `content_version`, then run
 `just content-import --publish`. A manual edit is detected because the content hash no longer matches

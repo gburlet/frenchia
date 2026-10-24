@@ -37,6 +37,11 @@ class GenerationJob(models.Model):
     llm_calls = models.PositiveIntegerField(default=0)
     llm_seconds = models.FloatField(default=0)
     completion_tokens = models.PositiveIntegerField(default=0)
+    external_review = models.JSONField(
+        default=list, blank=True, help_text="Findings from an external proof-reader (ADR 0003)"
+    )
+    external_reviewer = models.CharField(max_length=100, blank=True)
+    external_reviewed_at = models.DateTimeField(null=True, blank=True)
     reviewer_notes = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     started_at = models.DateTimeField(null=True, blank=True)

@@ -11,6 +11,7 @@ from django.utils.html import format_html
 from contentkit.yamlio import dump_yaml
 from curriculum.admin import render_preview
 
+from .external_review import revision_notes
 from .forms import ApproveForm, RejectForm, RevisionForm
 from .models import GenerationJob
 from .services import ReviewError, approve, reject, request_revision
@@ -112,12 +113,16 @@ class GenerationJobAdmin(admin.ModelAdmin):
                 )
             )
         reviewable = job.status == GenerationJob.Status.NEEDS_REVIEW
+        review_notes, review_targets = revision_notes(job) if job.external_review else ("", [])
         context = {
             **self.admin_site.each_context(request),
             "opts": self.model._meta,
             "title": f"Review job {job.pk}: {job.lesson_id}",
             "job": job,
             "issues": [*errors, *others],
+            "external_review": sorted(job.external_review, key=lambda f: f["severity"] != "error"),
+            "review_notes": review_notes,
+            "review_targets": ", ".join(review_targets),
             "error_count": len(errors),
             "preview": render_preview(job.output) if job.output else "",
             "diff": diff,

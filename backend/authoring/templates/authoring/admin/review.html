@@ -54,8 +54,9 @@
     <form method="post" action="{% url 'admin:authoring_generationjob_revise' job.pk %}">
       {% csrf_token %}
       <b>Request revision</b>
-      <label>Notes<br><textarea name="notes" rows="3" required></textarea></label>
-      <label>Section/exercise ids (comma-separated, optional)<br><input type="text" name="targets"></label>
+      {% if review_notes %}<p>Pre-filled from the external review; edit before sending.</p>{% endif %}
+      <label>Notes<br><textarea name="notes" rows="{% if review_notes %}8{% else %}3{% endif %}" required>{{ review_notes }}</textarea></label>
+      <label>Section/exercise ids (comma-separated, optional)<br><input type="text" name="targets" value="{{ review_targets }}"></label>
       <button type="submit">Request revision</button>
     </form>
   {% endif %}
@@ -70,6 +71,27 @@
     {% if not reviewable %}</div>{% endif %}
   {% endif %}
   {% if reviewable %}</div>{% endif %}
+
+  <h2>External review</h2>
+  {% if job.external_reviewed_at %}
+    <p>{{ job.external_reviewer }}, {{ job.external_reviewed_at }}: suggestions only, never applied automatically.</p>
+    {% if external_review %}
+      <table>
+        <tr><th>Severity</th><th>Item</th><th>Category</th><th>Problem</th><th>Suggested fix</th></tr>
+        {% for f in external_review %}
+          <tr>
+            <td class="sev-{% if f.severity == 'error' %}error{% else %}warning{% endif %}">{{ f.severity }}</td>
+            <td>{{ f.item_id }}{% if f.unknown_item %} (unknown id){% endif %}</td>
+            <td>{{ f.category }}</td><td>{{ f.problem }}</td><td>{{ f.suggested_fix }}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    {% else %}
+      <p>No problems found.</p>
+    {% endif %}
+  {% else %}
+    <p>Not reviewed yet. Run <code>just content-review-export</code> and have a reviewer write the findings (see docs/content-authoring.md).</p>
+  {% endif %}
 
   <h2>Validation</h2>
   {% if issues %}
