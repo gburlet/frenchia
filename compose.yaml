@@ -10,6 +10,8 @@ x-backend: &backend
     DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
     AUDIO_CACHE_DIR: /var/frenchia/audio
     CONTENT_DIR: /content
+    # uvicorn --reload misses some edits through the Docker Desktop bind mount; poll instead.
+    WATCHFILES_FORCE_POLLING: "true"
   volumes:
     - ./backend:/app
     # Content-addressed TTS cache, kept on the host (var/ is gitignored)

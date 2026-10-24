@@ -125,3 +125,28 @@ def strip_article(item: VocabItem) -> VocabItem:
         return item
     gender = item.gender or _ARTICLE_GENDER.get((match.group(1) or "").lower())
     return item.model_copy(update={"fr": item.fr[match.end() :], "gender": gender})
+
+
+_LATEX = {
+    r"$\rightarrow$": "→",
+    r"$\to$": "→",
+    r"$\leftarrow$": "←",
+    r"$\Rightarrow$": "⇒",
+    r"\rightarrow": "→",
+    r"\to ": "→ ",
+    r"$\times$": "×",
+    r"$\cdot$": "·",
+}
+
+
+def tidy(value: object) -> object:
+    """Recursively replace LaTeX arrows and similar markup that small models emit in prose."""
+    if isinstance(value, str):
+        for latex, plain in _LATEX.items():
+            value = value.replace(latex, plain)
+        return value
+    if isinstance(value, list):
+        return [tidy(v) for v in value]
+    if isinstance(value, dict):
+        return {k: tidy(v) for k, v in value.items()}
+    return value

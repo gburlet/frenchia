@@ -129,3 +129,8 @@ def test_quebec_lexicon_grounds_the_prompt() -> None:
     )
     grade_translate(TRANSLATE, "On soupe à six heures", level="A2", chat=chat, ref=ref)
     assert "souper: supper" in chat.calls[0]["messages"][1].content
+
+
+def test_placeholder_register_notes_are_dropped() -> None:
+    output = JudgeOutput(errors=[], corrected="On a mangé.", register_note="None")
+    assert _from_judge(output, "On a mangé.", "m", 10).feedback["register_note"] is None

@@ -311,3 +311,28 @@ def test_revisions_strip_glossary_articles() -> None:
     )
     revised = next(s for s in result.lesson.sections if s.type == "reading")
     assert revised.glossary[0].fr == "souper"
+
+
+def test_latex_arrows_are_tidied() -> None:
+    from authoring.schemas import tidy
+
+    assert tidy({"body": ["parler $\\rightarrow$ parlé"]}) == {"body": ["parler → parlé"]}
+
+
+def test_generated_hash_is_computed_after_tidying() -> None:
+    class LatexExplanation(ScriptedChat):
+        def complete(self, messages, *, json_schema=None, temperature=0.0, max_tokens=800):
+            completion = super().complete(messages, json_schema=json_schema)
+            if (json_schema or {}).get("title") == "ExplanationStep":
+                step = json.loads(completion.content)
+                step["body"] = "parler $\\rightarrow$ parlé"
+                return completion.__class__(content=json.dumps(step), model="x", latency_ms=1)
+            return completion
+
+    lesson = (
+        LessonGenerator(LatexExplanation(), reference(), critic=False)
+        .generate(brief(), content_version=1, job_id=None)
+        .lesson
+    )
+    assert lesson.sections[0].body == "parler → parlé"  # type: ignore[union-attr]
+    assert lesson.provenance and lesson.provenance.generated_hash == content_hash(lesson)

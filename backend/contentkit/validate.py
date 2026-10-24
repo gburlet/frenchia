@@ -134,6 +134,21 @@ def check_references(repo: Repository) -> None:
 
 # --- Deterministic quality checks ----------------------------------------------------------
 
+_LATEX = re.compile(r"\$\\[a-zA-Z]+\$|\\(?:rightarrow|leftarrow|to|times|cdot)\b")
+
+
+def _strings(value: object, path: str = "") -> list[tuple[str, str]]:
+    if isinstance(value, str):
+        return [(path or "lesson", value)]
+    if isinstance(value, list):
+        return [item for i, v in enumerate(value) for item in _strings(v, f"{path}.{i}")]
+    if isinstance(value, dict):
+        return [
+            item for k, v in value.items() for item in _strings(v, f"{path}.{k}" if path else k)
+        ]
+    return []
+
+
 _ARTICLE = re.compile(r"^(le|la|les|un|une|des)\s|^l'", re.IGNORECASE)
 _ENGLISH = re.compile(r"\b(the|and|is|are|of|to|you|with|this|that|it)\b", re.IGNORECASE)
 _WORD = re.compile(r"[\w'’-]+")
@@ -179,6 +194,10 @@ def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
         if isinstance(section, RegionalNoteSection):
             for variant in section.variants:
                 _check_quebec(add, section.id, variant.qc, ref)
+
+    for path, text in _strings(lesson.model_dump(mode="json", exclude={"provenance"})):
+        if _LATEX.search(text):
+            add("warning", path, f"LaTeX markup in text: {_LATEX.search(text).group(0)!r}")  # type: ignore[union-attr]
 
     for ex in lesson.exercises:
         if isinstance(ex, FillBlankExercise):

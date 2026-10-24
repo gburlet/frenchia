@@ -56,8 +56,8 @@
   formality: familiar
 - term: à matin
   match: ['\bà matin\b']
-  meaning: "this morning"
-  france: ce matin
+  meaning: "this morning (familiar Québec speech); « ce matin » is standard in Québec too"
+  france: ce matin (standard everywhere)
   formality: familiar
 - term: dépanneur
   match: ['\bdépanneurs?\b', '\bdép\b']

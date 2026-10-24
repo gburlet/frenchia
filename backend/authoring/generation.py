@@ -50,6 +50,7 @@ from .schemas import (
     VocabularyStep,
     batch,
     strip_article,
+    tidy,
     vocab_item,
 )
 
@@ -460,6 +461,8 @@ class LessonGenerator:
             sections=sections,
             exercises=exercises,
         )
+        # Tidy before hashing: the generated hash must match the content as written.
+        lesson = Lesson.model_validate(tidy(lesson.model_dump(mode="json", exclude_none=True)))
         provenance = Provenance(
             generator=f"llm/{self.chat.model}",
             prompts=dict(prompts.PROMPT_VERSIONS),
@@ -520,7 +523,7 @@ class LessonReviser:
             "sections": [s.model_dump(mode="json", exclude_none=True) for s in sections],
             "exercises": [e.model_dump(mode="json", exclude_none=True) for e in exercises],
         }
-        revised = Lesson.model_validate(data)
+        revised = Lesson.model_validate(tidy(data))
         provenance = Provenance(
             generator=f"llm/{self.chat.model}",
             prompts=dict(prompts.PROMPT_VERSIONS),

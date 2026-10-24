@@ -299,11 +299,17 @@ def _from_judge(result: JudgeOutput, answer: str, model: str, latency_ms: int) -
             _summary(verdict, errors),
             corrected=corrected,
             errors=errors,
-            register_note=result.register_note.strip() or None,
+            register_note=_note(result.register_note),
         ),
         model=model,
         latency_ms=latency_ms,
     )
+
+
+def _note(text: str) -> str | None:
+    """Models sometimes write a placeholder instead of leaving the note empty."""
+    text = text.strip()
+    return None if text.casefold().strip(".") in {"", "none", "n/a", "na", "-", "null"} else text
 
 
 SUMMARIES = {

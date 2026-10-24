@@ -133,3 +133,10 @@ def test_quality_checks_gender_language_and_quebec_claims() -> None:
     assert not any("'livre'" in m for m in found)  # both genders exist
     assert any("'bécosse' is not in the verified lexicon" in m for m in found)
     assert "error:en_fr answers must be French" in found
+
+
+def test_leftover_latex_is_flagged() -> None:
+    data = lesson_data()
+    data["sections"][0]["body"] = "parler $\\rightarrow$ parlé"
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert any("LaTeX markup" in m for m in found)
