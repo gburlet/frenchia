@@ -1,0 +1,407 @@
+# Grammar topics: the unit of mastery tracking, mistakes and targeted review.
+schema_version: 1
+topics:
+- id: alphabet
+  level: A1
+  title: The alphabet and spelling
+  related: []
+- id: accents
+  level: A1
+  title: Accent marks
+  related: []
+- id: letter-combinations
+  level: A1
+  title: Letter combinations and nasal vowels
+  related: []
+- id: silent-letters
+  level: A1
+  title: Silent letters and liaison
+  related: []
+- id: greetings
+  level: A1
+  title: Greetings and tu/vous
+  related: []
+- id: introductions
+  level: A1
+  title: Introducing yourself
+  related: []
+- id: articles-definite-indefinite
+  level: A1
+  title: Definite and indefinite articles
+  related: []
+- id: noun-gender
+  level: A1
+  title: Noun gender
+  related: []
+- id: subject-pronouns
+  level: A1
+  title: Subject pronouns
+  related: []
+- id: present-er
+  level: A1
+  title: 'Present tense: -er verbs'
+  related: []
+- id: present-ir
+  level: A1
+  title: 'Present tense: -ir verbs (2nd group)'
+  related: []
+- id: present-irregular
+  level: A1
+  title: 'Present tense: irregular verbs'
+  related: []
+- id: negation-basic
+  level: A1
+  title: Basic negation
+  related: []
+- id: yes-no-questions
+  level: A1
+  title: Yes/no questions
+  related: []
+- id: question-words
+  level: A1
+  title: Question words
+  related: []
+- id: il-y-a
+  level: A1
+  title: Il y a
+  related: []
+- id: prepositions-location
+  level: A1
+  title: Prepositions of location
+  related: []
+- id: adjective-agreement
+  level: A1
+  title: Adjective agreement and position
+  related: []
+- id: possessive-adjectives
+  level: A1
+  title: Possessive adjectives
+  related: []
+- id: numbers
+  level: A1
+  title: Numbers
+  related: []
+- id: telling-time
+  level: A1
+  title: Telling the time
+  related: []
+- id: dates
+  level: A1
+  title: Dates
+  related: []
+- id: futur-proche
+  level: A1
+  title: Futur proche
+  related: []
+- id: basic-connectors
+  level: A1
+  title: Basic connectors
+  related: []
+- id: passe-compose-avoir
+  level: A2
+  title: Passé composé with avoir
+  related: []
+- id: past-participles-irregular
+  level: A2
+  title: Irregular past participles
+  related: []
+- id: passe-compose-etre
+  level: A2
+  title: Passé composé with être and agreement
+  related: []
+- id: imparfait
+  level: A2
+  title: Imparfait
+  related: []
+- id: pc-vs-imparfait
+  level: A2
+  title: Passé composé vs imparfait
+  related: []
+- id: direct-object-pronouns
+  level: A2
+  title: Direct object pronouns
+  related: []
+- id: indirect-object-pronouns
+  level: A2
+  title: Indirect object pronouns
+  related: []
+- id: comparatives
+  level: A2
+  title: Comparatives
+  related: []
+- id: superlatives
+  level: A2
+  title: Superlatives
+  related: []
+- id: demonstrative-adjectives
+  level: A2
+  title: Demonstrative adjectives
+  related: []
+- id: demonstrative-pronouns
+  level: A2
+  title: Demonstrative pronouns
+  related: []
+- id: futur-simple
+  level: A2
+  title: Futur simple
+  related: []
+- id: adverbs-frequency
+  level: A2
+  title: Adverbs of frequency
+  related: []
+- id: imperatif
+  level: A2
+  title: Imperative
+  related: []
+- id: gerondif
+  level: A2
+  title: Gérondif
+  related: []
+- id: reflexive-verbs
+  level: A2
+  title: Reflexive (pronominal) verbs
+  related: []
+- id: relative-qui-que
+  level: A2
+  title: Relative pronouns qui and que
+  related: []
+- id: depuis-pendant-pour
+  level: A2
+  title: Depuis, pendant, pour
+  related: []
+- id: adverbs-manner
+  level: A2
+  title: Adverbs of manner
+  related: []
+- id: partitive-articles
+  level: A2
+  title: Partitive articles
+  related: []
+- id: possessive-pronouns
+  level: A2
+  title: Possessive pronouns
+  related: []
+- id: transport-prepositions
+  level: A2
+  title: Prepositions with means of transport
+  related: []
+- id: plus-que-parfait
+  level: B1
+  title: Plus-que-parfait
+  related: []
+- id: pc-vs-pqp
+  level: B1
+  title: Passé composé vs plus-que-parfait
+  related: []
+- id: conditionnel-present
+  level: B1
+  title: Conditionnel présent
+  related: []
+- id: futur-vs-conditionnel
+  level: B1
+  title: Futur simple vs conditionnel
+  related: []
+- id: subjonctif-present
+  level: B1
+  title: Subjonctif présent
+  related: []
+- id: indicatif-vs-subjonctif
+  level: B1
+  title: Indicatif vs subjonctif
+  related: []
+- id: coordinating-conjunctions
+  level: B1
+  title: Coordinating conjunctions
+  related: []
+- id: subordinating-conjunctions
+  level: B1
+  title: Subordinating conjunctions
+  related: []
+- id: temporal-conjunctions
+  level: B1
+  title: Temporal conjunctions
+  related: []
+- id: relative-dont-ou-lequel
+  level: B1
+  title: Relative pronouns dont, où, lequel
+  related: []
+- id: infinitive-constructions
+  level: B1
+  title: Infinitive constructions
+  related: []
+- id: passive-voice
+  level: B1
+  title: Passive voice
+  related: []
+- id: indefinite-pronouns
+  level: B1
+  title: Indefinite pronouns
+  related: []
+- id: compound-prepositions
+  level: B1
+  title: Compound prepositions
+  related: []
+- id: indirect-speech
+  level: B1
+  title: Indirect (reported) speech
+  related: []
+- id: prepositions-places
+  level: B1
+  title: Prepositions with places
+  related: []
+- id: impersonal-verbs
+  level: B1
+  title: Impersonal verbs
+  related: []
+- id: passe-recent
+  level: B1
+  title: Passé récent
+  related: []
+- id: pronoun-y
+  level: B1
+  title: The pronoun y
+  related: []
+- id: pronoun-en
+  level: B1
+  title: The pronoun en
+  related: []
+- id: si-clauses
+  level: B1
+  title: Si clauses
+  related: []
+- id: cause-consequence
+  level: B1
+  title: Cause and consequence
+  related: []
+- id: nominalization
+  level: B1
+  title: Nominalization
+  related: []
+- id: tout
+  level: B1
+  title: Uses of tout
+  related: []
+- id: negation-advanced
+  level: B1
+  title: Advanced negation
+  related: []
+- id: clause-types
+  level: B1
+  title: Clause types
+  related: []
+- id: emphatic-pronouns
+  level: B1
+  title: Emphatic (stressed) pronouns
+  related: []
+- id: conditionnel-passe
+  level: B2
+  title: Conditionnel passé
+  related: []
+- id: subjonctif-passe
+  level: B2
+  title: Subjonctif passé
+  related: []
+- id: futur-anterieur
+  level: B2
+  title: Futur antérieur
+  related: []
+- id: subjonctif-imparfait
+  level: B2
+  title: Subjonctif imparfait (recognition)
+  related: []
+- id: passe-simple
+  level: B2
+  title: Passé simple (recognition)
+  related: []
+- id: passe-anterieur
+  level: B2
+  title: Passé antérieur (recognition)
+  related: []
+- id: tenses-review
+  level: B2
+  title: All tenses review
+  related: []
+- id: ce-qui-ce-que-ce-dont
+  level: B2
+  title: Ce qui, ce que, ce dont
+  related: []
+- id: causative-faire
+  level: B2
+  title: Causative faire
+  related: []
+- id: causative-se-faire
+  level: B2
+  title: Causative se faire
+  related: []
+- id: causative-se-laisser
+  level: B2
+  title: Causative se laisser
+  related: []
+- id: discourse-markers
+  level: B2
+  title: Discourse markers
+  related: []
+- id: complex-inversion
+  level: B2
+  title: Complex inversion
+  related: []
+- id: prepositions-advanced
+  level: B2
+  title: Advanced prepositions
+  related: []
+- id: adjectives-advanced
+  level: B2
+  title: Advanced adjectives
+  related: []
+- id: irregular-plurals
+  level: B2
+  title: Irregular plurals
+  related: []
+- id: relative-auquel-duquel
+  level: B2
+  title: Relative pronouns auquel and duquel
+  related: []
+- id: relatives-review
+  level: B2
+  title: All relative pronouns review
+  related: []
+- id: articles-review
+  level: B2
+  title: All articles review
+  related: []
+- id: y-en-advanced
+  level: B2
+  title: Advanced y and en
+  related: []
+- id: ne-expletif
+  level: B2
+  title: Expletive ne
+  related: []
+- id: ceci-cela-ca
+  level: B2
+  title: Ceci, cela, ça
+  related: []
+- id: cest-vs-il-est
+  level: B2
+  title: C'est vs il est
+  related: []
+- id: prefixes
+  level: B2
+  title: Prefixes
+  related: []
+- id: suffixes
+  level: B2
+  title: Suffixes
+  related: []
+- id: verbs-sen
+  level: B2
+  title: Verbs with s'en
+  related: []
+- id: punctuation
+  level: B2
+  title: Punctuation
+  related: []
+- id: on-vs-lon
+  level: B2
+  title: On vs l'on
+  related: []

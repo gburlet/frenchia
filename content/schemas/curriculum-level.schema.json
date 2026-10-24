@@ -1,0 +1,194 @@
+{
+  "$defs": {
+    "LessonOutline": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 80,
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "pronunciation",
+            "communication",
+            "grammar",
+            "vocabulary",
+            "expressions",
+            "review"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "objectives": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 4,
+          "minItems": 1,
+          "title": "Objectives",
+          "type": "array"
+        },
+        "grammar_topics": {
+          "default": [],
+          "items": {
+            "maxLength": 80,
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Grammar Topics",
+          "type": "array"
+        },
+        "vocabulary_theme": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Vocabulary Theme"
+        },
+        "prerequisites": {
+          "default": [],
+          "items": {
+            "maxLength": 80,
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Prerequisites",
+          "type": "array"
+        },
+        "quebec_focus": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Quebec Focus"
+        },
+        "reference": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reference"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "kind",
+        "objectives"
+      ],
+      "title": "LessonOutline",
+      "type": "object"
+    },
+    "Unit": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 80,
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "objectives": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Objectives",
+          "type": "array"
+        },
+        "lessons": {
+          "items": {
+            "$ref": "#/$defs/LessonOutline"
+          },
+          "minItems": 1,
+          "title": "Lessons",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "objectives",
+        "lessons"
+      ],
+      "title": "Unit",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "level": {
+      "enum": [
+        "A1",
+        "A2",
+        "B1",
+        "B2",
+        "C1",
+        "C2"
+      ],
+      "title": "Level",
+      "type": "string"
+    },
+    "title": {
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    },
+    "summary": {
+      "minLength": 1,
+      "title": "Summary",
+      "type": "string"
+    },
+    "units": {
+      "items": {
+        "$ref": "#/$defs/Unit"
+      },
+      "minItems": 1,
+      "title": "Units",
+      "type": "array"
+    }
+  },
+  "required": [
+    "level",
+    "title",
+    "summary",
+    "units"
+  ],
+  "title": "CurriculumLevel",
+  "type": "object"
+}

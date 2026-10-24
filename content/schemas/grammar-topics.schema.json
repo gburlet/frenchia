@@ -1,0 +1,70 @@
+{
+  "$defs": {
+    "GrammarTopic": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 80,
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "level": {
+          "enum": [
+            "A1",
+            "A2",
+            "B1",
+            "B2",
+            "C1",
+            "C2"
+          ],
+          "title": "Level",
+          "type": "string"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "related": {
+          "default": [],
+          "items": {
+            "maxLength": 80,
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Related",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "level",
+        "title"
+      ],
+      "title": "GrammarTopic",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "topics": {
+      "items": {
+        "$ref": "#/$defs/GrammarTopic"
+      },
+      "title": "Topics",
+      "type": "array"
+    }
+  },
+  "required": [
+    "topics"
+  ],
+  "title": "GrammarTopicRegistry",
+  "type": "object"
+}

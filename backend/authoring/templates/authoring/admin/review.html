@@ -1,0 +1,116 @@
+{% extends "admin/base_site.html" %}
+{% block extrahead %}{{ block.super }}{% if auto_refresh %}<meta http-equiv="refresh" content="5">{% endif %}
+<style>
+  .rv h2 { margin-top: 1.5em; }
+  .rv .sev-error { color: #dc2626; font-weight: bold; }
+  .rv .sev-warning { color: #d97706; }
+  .rv pre.diff { overflow-x: auto; border: 1px solid var(--border-color, #ccc); padding: 8px; }
+  .rv .diff span { display: block; }
+  .rv .diff .add { background: rgba(46,160,67,.25); }
+  .rv .diff .del { background: rgba(220,38,38,.25); }
+  .rv .diff .hunk, .rv .diff .hdr { opacity: .7; }
+  .rv .actions { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start; }
+  .rv .actions form { border: 1px solid var(--border-color, #ccc); border-radius: 6px; padding: 12px; }
+  .rv label { display: block; margin: 6px 0; }
+  .rv textarea, .rv input[type=text] { width: 24rem; max-width: 100%; }
+</style>
+{% endblock %}
+{% block breadcrumbs %}
+<div class="breadcrumbs"><a href="{% url 'admin:index' %}">Home</a> &rsaquo; <a href="{% url 'admin:authoring_generationjob_changelist' %}">Generation jobs</a> &rsaquo; Job {{ job.pk }}</div>
+{% endblock %}
+{% block content %}
+<div class="rv">
+  <p>
+    Lesson <a href="{% url 'admin:curriculum_lesson_change' job.lesson_id %}">{{ job.lesson_id }}</a> &middot;
+    {{ job.get_kind_display }} &middot;
+    status <b style="color:{{ status_color }}">{{ job.get_status_display }}</b>
+    {% if parent_url %}&middot; <a href="{{ parent_url }}">parent job {{ job.parent_id }}</a>{% endif %}
+  </p>
+  {% if job.notes %}<p><b>Notes:</b> {{ job.notes|linebreaksbr }}</p>{% endif %}
+  {% if job.reviewer_notes %}<p><b>Reviewer notes:</b> {{ job.reviewer_notes|linebreaksbr }}</p>{% endif %}
+  {% if job.error %}<h2>Error</h2><pre>{{ job.error }}</pre>{% endif %}
+
+  {% if auto_refresh %}
+    <p><i>This page refreshes every 5 seconds while the job runs.</i></p>
+  {% endif %}
+  {% if job.progress %}
+    <h2>Progress</h2>
+    <ul>{% for p in job.progress %}<li><code>{{ p.at }}</code> {{ p.message }}</li>{% endfor %}</ul>
+  {% endif %}
+
+  {% if reviewable %}
+  <h2>Decision</h2>
+  <div class="actions">
+    <form method="post" action="{% url 'admin:authoring_generationjob_approve' job.pk %}">
+      {% csrf_token %}
+      <b>Approve &amp; publish</b>
+      {% if error_count %}
+        <p class="sev-error">{{ error_count }} validation error{{ error_count|pluralize }}: approval is disabled unless you tick the box below.</p>
+        <label><input type="checkbox" name="allow_errors" id="allow-errors"> Approve despite errors</label>
+      {% endif %}
+      <label><input type="checkbox" name="allow_overwrite_edits"> Overwrite manual edits</label>
+      <button type="submit" class="default" id="approve-btn"{% if error_count %} disabled{% endif %}>Approve &amp; publish</button>
+    </form>
+    <form method="post" action="{% url 'admin:authoring_generationjob_revise' job.pk %}">
+      {% csrf_token %}
+      <b>Request revision</b>
+      <label>Notes<br><textarea name="notes" rows="3" required></textarea></label>
+      <label>Section/exercise ids (comma-separated, optional)<br><input type="text" name="targets"></label>
+      <button type="submit">Request revision</button>
+    </form>
+  {% endif %}
+  {% if can_reject %}
+    {% if not reviewable %}<div class="actions">{% endif %}
+    <form method="post" action="{% url 'admin:authoring_generationjob_reject' job.pk %}">
+      {% csrf_token %}
+      <b>Reject</b>
+      <label>Notes<br><textarea name="notes" rows="3"></textarea></label>
+      <button type="submit">Reject</button>
+    </form>
+    {% if not reviewable %}</div>{% endif %}
+  {% endif %}
+  {% if reviewable %}</div>{% endif %}
+
+  <h2>Validation</h2>
+  {% if issues %}
+    <table>
+      <tr><th>Severity</th><th>Path</th><th>Message</th></tr>
+      {% for i in issues %}
+        <tr><td class="sev-{{ i.severity }}">{{ i.severity }}</td><td>{{ i.path }}</td><td>{{ i.message }}</td></tr>
+      {% endfor %}
+    </table>
+  {% elif job.output %}
+    <p>No validation issues.</p>
+  {% else %}
+    <p>Not validated yet.</p>
+  {% endif %}
+
+  {% if job.output %}
+    <h2>Changes</h2>
+    {% if is_new %}<p>New lesson (nothing published yet).</p>{% endif %}
+    {% if diff %}
+      <pre class="diff">{% for line, cls in diff_lines %}<span class="{{ cls }}">{{ line }}</span>{% endfor %}</pre>
+    {% elif not is_new %}
+      <p>No differences from the published version.</p>
+    {% endif %}
+
+    <h2>Preview</h2>
+    {{ preview }}
+  {% endif %}
+
+  <h2>Stats</h2>
+  <table>
+    <tr><th>Model</th><td>{{ job.model|default:"-" }}</td></tr>
+    <tr><th>LLM calls</th><td>{{ job.llm_calls }}</td></tr>
+    <tr><th>LLM seconds</th><td>{{ job.llm_seconds }}</td></tr>
+    <tr><th>Completion tokens</th><td>{{ job.completion_tokens }}</td></tr>
+    <tr><th>Prompt versions</th><td>{% for k, v in job.prompts.items %}{{ k }}: {{ v }}{% if not forloop.last %}, {% endif %}{% empty %}-{% endfor %}</td></tr>
+  </table>
+</div>
+<script>
+  (function () {
+    var box = document.getElementById("allow-errors"), btn = document.getElementById("approve-btn");
+    if (box && btn) box.addEventListener("change", function () { btn.disabled = !box.checked; });
+  })();
+</script>
+{% endblock %}

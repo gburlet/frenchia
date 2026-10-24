@@ -60,6 +60,30 @@ logs *services:
       *) exec {{compose}} logs -f --tail=200 {{services}} ;;
     esac
 
+# Validate content files (schemas, references, deterministic checks)
+content-validate:
+    {{compose}} exec backend python manage.py content_validate
+
+# Import content/ into the database (idempotent); add --publish to make new versions live
+content-import *args:
+    {{compose}} exec backend python manage.py content_import {{args}}
+
+# Generate a lesson draft with the local LLM, e.g. `just content-generate a2-imparfait`
+content-generate lesson *args:
+    {{compose}} exec backend python manage.py content_generate {{lesson}} {{args}}
+
+# Publish (or roll back to) a lesson version, e.g. `just content-publish a2-imparfait --version 2`
+content-publish lesson *args:
+    {{compose}} exec backend python manage.py content_publish {{lesson}} {{args}}
+
+# Export JSON Schemas for content files to content/schemas/
+content-schemas:
+    {{compose}} exec backend python -m contentkit schemas /content
+
+# Rebuild deterministic reference data (conjugations, noun genders) from Lexique/verbecc
+build-reference:
+    uv run tools/reference/build_reference.py
+
 # Call the live LLM and TTS through Django's provider layer
 smoke:
     {{compose}} exec backend python manage.py inference_smoke

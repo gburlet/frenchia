@@ -24,6 +24,8 @@ Open http://localhost:5173 and log in with the credentials that `just setup` pri
 | `just start` / `just stop` / `just restart [svc]` | Manage the stack. Other Docker projects are never touched. |
 | `just logs [svc]` / `just status` / `just doctor` | Logs, health, and environment diagnostics (ports, memory, competing containers). |
 | `just check` | Backend ruff, mypy and pytest (in Docker), plus frontend typecheck, lint and Vitest. |
+| `just content-generate <lesson>` | Generate a lesson draft with the local LLM, then review it in Admin → Generation jobs ([docs/content-authoring.md](docs/content-authoring.md)). |
+| `just content-validate` / `just content-import [--publish]` | Validate and import content files (idempotent, versioned). |
 | `just smoke` | Calls the live LLM (plain and structured) and TTS through Django's provider layer. |
 | `just setup-native` | Installs the pinned Ollama binary (sha256-verified), the TTS environment and the models. |
 | `just logs llm` / `just logs tts` | Logs for the native services (`var/log/`). |
@@ -54,6 +56,8 @@ Ollama runs with `OLLAMA_NO_CLOUD=1`, and Django refuses cloud model names.
 backend/      Django project (uv)
 frontend/     React + Vite + Tailwind + shadcn/ui
 services/     native inference: llm/ (pinned Ollama config), tts/ (Kokoro FastAPI service)
+content/      learning content as YAML: curriculum outlines, grammar topics, lessons, reference data
+tools/        reference-data builders (conjugations, noun genders)
 evals/        curated French/Québec eval set and the LLM bake-off harness
 scripts/      setup/doctor/status/backup helpers used by the justfile
 docs/         architecture, ADRs, style guide, curriculum sources

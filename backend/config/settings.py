@@ -33,6 +33,8 @@ INSTALLED_APPS = [
     "django_tasks_db",
     "accounts",
     "inference",
+    "curriculum",
+    "authoring",
 ]
 
 MIDDLEWARE = [
@@ -124,6 +126,9 @@ INFERENCE = {
     "TTS_VOICE": env("INFERENCE_TTS_VOICE", default="ff_siwis"),
     "TTS_TIMEOUT_S": env.float("INFERENCE_TTS_TIMEOUT_S", default=60.0),
 }
+# Version-controlled learning content (mounted at /content in Docker)
+CONTENT_DIR = Path(env("CONTENT_DIR", default=str(BASE_DIR.parent / "content")))
+
 AUDIO_CACHE_DIR = Path(env("AUDIO_CACHE_DIR", default=str(BASE_DIR / "var" / "audio")))
 
 TASKS = {

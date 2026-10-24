@@ -26,3 +26,8 @@ benchmarks/kokoro/results/audio/
 .DS_Store
 .idea/
 .vscode/
+verbecc.log
+
+# Generated lesson drafts are reviewed in Admin; only approved lessons are committed
+/content/drafts/*
+!/content/drafts/.gitkeep

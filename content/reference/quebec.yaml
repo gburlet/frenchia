@@ -1,0 +1,96 @@
+# Verified Québec usage. Used to ground LLM prompts (entries whose `match` regexes hit the
+# text are injected as authoritative notes) and to flag unverified Québec claims in generated
+# content. Reviewed by the learner on 2026-10-24. References: OQLF Banque de dépannage
+# linguistique, Usito. Add entries here instead of trusting the LLM's Québec claims.
+- term: souper
+  match: ['\bsoup(er|e|es|ons|ez|ent|é|ée|és|ait|aient|erai|erais)\b']
+  meaning: "evening meal; verb: to have supper (on soupe, nous soupons, j'ai soupé)"
+  france: dîner
+  formality: standard
+  notes: "As a verb, « on soupe » means we're having supper, not the noun soupe."
+- term: dîner
+  match: ['\bd[îi]n(er|e|es|ons|ez|ent|é|ée|és|ait|aient)\b']
+  meaning: "midday meal (lunch); verb: to have lunch"
+  france: déjeuner
+  formality: standard
+- term: déjeuner
+  match: ['\bdéjeun(er|e|es|ons|ez|ent|é|ait|aient)\b']
+  meaning: "morning meal (breakfast); verb: to have breakfast"
+  france: petit-déjeuner
+  formality: standard
+- term: magasiner
+  match: ['\bmagasin(er|e|es|ons|ez|ent|é|ée|ait|age)\b']
+  meaning: "to go shopping; le magasinage = shopping"
+  france: faire du shopping, faire les magasins
+  formality: standard
+- term: blonde
+  match: ['\b(ma|ta|sa|leur|une|la) blonde\b']
+  meaning: "girlfriend"
+  france: copine, petite amie
+  formality: familiar
+- term: chum
+  match: ['\bchums?\b']
+  meaning: "boyfriend; also a (male) friend"
+  france: copain, petit ami
+  formality: familiar
+- term: fin de semaine
+  match: ['\bfins? de semaine\b']
+  meaning: "weekend"
+  france: week-end
+  formality: standard
+- term: char
+  match: ['\bchars?\b']
+  meaning: "car"
+  france: voiture
+  formality: familiar
+  notes: "« auto » and « voiture » are neutral in Québec."
+- term: "-tu (question particle)"
+  match: ['\w-tu\b']
+  meaning: "marks a yes/no question in informal speech: « Tu viens-tu ? » = Are you coming?"
+  france: "Tu viens ? / Est-ce que tu viens ?"
+  formality: familiar
+- term: frette
+  match: ['\bfrette\b']
+  meaning: "very cold"
+  france: très froid
+  formality: familiar
+- term: à matin
+  match: ['\bà matin\b']
+  meaning: "this morning"
+  france: ce matin
+  formality: familiar
+- term: dépanneur
+  match: ['\bdépanneurs?\b', '\bdép\b']
+  meaning: "convenience store (« le dép » informally)"
+  france: épicerie de quartier, supérette
+  formality: standard
+- term: tuque
+  match: ['\btuques?\b']
+  meaning: "knit winter hat"
+  france: bonnet
+  formality: standard
+- term: plate
+  match: ['\b(c''est|c''était|ben|vraiment|trop) plate\b']
+  meaning: "boring, too bad (« c'est plate »)"
+  france: ennuyeux, dommage
+  formality: familiar
+- term: pantoute
+  match: ['\bpantoute\b']
+  meaning: "not at all (« pas pantoute »)"
+  france: pas du tout
+  formality: familiar
+- term: courriel
+  match: ['\bcourriels?\b']
+  meaning: "email (OQLF-recommended)"
+  france: e-mail, mail
+  formality: standard
+- term: être tanné
+  match: ['\btann[ée]e?s?\b']
+  meaning: "to be fed up (« Je suis tanné de l'hiver »)"
+  france: en avoir marre
+  formality: familiar
+- term: bienvenue
+  match: ['\bbienvenue\b']
+  meaning: "you're welcome (in reply to merci), as well as 'welcome'"
+  france: de rien, je vous en prie
+  formality: standard

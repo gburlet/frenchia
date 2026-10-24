@@ -1,0 +1,113 @@
+{% comment %}Renders a lesson payload dict (`lesson`). Plain text only; everything autoescaped.{% endcomment %}
+<style>
+  .lp { max-width: 56rem; line-height: 1.5; }
+  .lp h3, .lp h4 { margin: 1.2em 0 .4em; }
+  .lp table { border-collapse: collapse; margin: .5em 0; width: auto; }
+  .lp th, .lp td { border: 1px solid var(--border-color, #ccc); padding: 4px 8px; vertical-align: top; }
+  .lp .sec { border: 1px solid var(--border-color, #ccc); border-radius: 6px; padding: 0 12px 8px; margin: 12px 0; }
+  .lp .badge { display: inline-block; border-radius: 8px; padding: 0 7px; font-size: 11px; margin-right: 3px;
+    background: var(--darkened-bg, #eee); color: var(--body-fg, #333); border: 1px solid var(--border-color, #ccc); }
+  .lp .meta { opacity: .75; }
+  .lp .cols { display: flex; gap: 16px; flex-wrap: wrap; }
+  .lp .cols > div { flex: 1 1 20rem; }
+  .lp .ok { background: rgba(46, 160, 67, .25); font-weight: bold; }
+  .lp ul.opts { list-style: none; padding-left: 0; }
+  .lp ul.opts li { padding: 2px 6px; border-radius: 4px; }
+</style>
+<div class="lp">
+  <h2>{{ lesson.title }} <span class="meta">/ {{ lesson.title_en }}</span></h2>
+  <p>
+    <span class="badge">{{ lesson.level }}</span>
+    <span class="badge">{{ lesson.estimated_minutes }} min</span>
+    <span class="badge">v{{ lesson.content_version }}</span>
+    <span class="meta">{{ lesson.id }} &middot; unit {{ lesson.unit }}</span>
+  </p>
+  {% if lesson.objectives %}
+    <h4>Objectives</h4>
+    <ul>{% for o in lesson.objectives %}<li>{{ o }}</li>{% endfor %}</ul>
+  {% endif %}
+
+  {% for s in lesson.sections %}
+    <div class="sec">
+      {% if s.type == "explanation" %}
+        <h3>{{ s.heading }} <span class="badge">explanation</span> <span class="meta">{{ s.id }}</span></h3>
+        <div>{{ s.body|linebreaksbr }}</div>
+      {% elif s.type == "examples" %}
+        <h3>{{ s.heading }} <span class="badge">examples</span> <span class="meta">{{ s.id }}</span></h3>
+        <table>
+          <tr><th>FR</th><th>EN</th><th>Note</th></tr>
+          {% for e in s.examples %}
+            <tr><td>{{ e.fr }}{% if e.region and e.region != "common" %} <span class="badge">{{ e.region }}</span>{% endif %}</td><td>{{ e.en }}</td><td>{{ e.note|default:"" }}</td></tr>
+          {% endfor %}
+        </table>
+      {% elif s.type == "table" %}
+        <h3>{{ s.heading }} <span class="badge">table</span> <span class="meta">{{ s.id }}</span></h3>
+        <table>
+          <tr>{% for c in s.columns %}<th>{{ c }}</th>{% endfor %}</tr>
+          {% for row in s.rows %}<tr>{% for cell in row %}<td>{{ cell }}</td>{% endfor %}</tr>{% endfor %}
+        </table>
+        {% if s.caption %}<p class="meta">{{ s.caption }}</p>{% endif %}
+      {% elif s.type == "vocabulary" %}
+        <h3>{{ s.heading }} <span class="badge">vocabulary</span> <span class="meta">{{ s.id }}</span></h3>
+        <table>
+          <tr><th>FR</th><th>EN</th><th>Tags</th><th>Example</th></tr>
+          {% for v in s.items %}
+            <tr>
+              <td>{{ v.fr }}</td><td>{{ v.en }}</td>
+              <td>
+                <span class="badge">{{ v.pos }}</span>
+                {% if v.gender %}<span class="badge">{{ v.gender }}</span>{% endif %}
+                {% if v.region %}<span class="badge">{{ v.region }}</span>{% endif %}
+                {% if v.formality %}<span class="badge">{{ v.formality }}</span>{% endif %}
+              </td>
+              <td>{{ v.example_fr|default:"" }}{% if v.example_en %}<br><span class="meta">{{ v.example_en }}</span>{% endif %}</td>
+            </tr>
+          {% endfor %}
+        </table>
+      {% elif s.type == "reading" %}
+        <h3>{{ s.title }} <span class="badge">reading</span> <span class="meta">{{ s.id }}</span></h3>
+        <div class="cols">
+          <div>{{ s.passage_fr|linebreaksbr }}</div>
+          <div class="meta">{{ s.translation_en|linebreaksbr }}</div>
+        </div>
+        {% if s.glossary %}
+          <p>{% for g in s.glossary %}<span class="badge">{{ g.fr }}: {{ g.en }}</span>{% endfor %}</p>
+        {% endif %}
+      {% elif s.type == "regional_note" %}
+        <h3>{{ s.heading }} <span class="badge">regional note</span> <span class="meta">{{ s.id }}</span></h3>
+        <div>{{ s.body|linebreaksbr }}</div>
+        {% if s.variants %}
+          <table>
+            <tr><th>Quebec</th><th>France</th><th>EN</th><th>Formality</th></tr>
+            {% for v in s.variants %}<tr><td>{{ v.qc }}</td><td>{{ v.fr }}</td><td>{{ v.en }}</td><td>{{ v.formality|default:"" }}</td></tr>{% endfor %}
+          </table>
+        {% endif %}
+      {% else %}
+        <h3>{{ s.type }} <span class="meta">{{ s.id }}</span></h3>
+      {% endif %}
+    </div>
+  {% endfor %}
+
+  {% if lesson.exercises %}<h3>Exercises ({{ lesson.exercises|length }})</h3>{% endif %}
+  {% for x in lesson.exercises %}
+    <div class="sec">
+      <h4><span class="badge">{{ x.type }}</span> <span class="meta">{{ x.id }}</span></h4>
+      {% if x.type == "translate" %}
+        <p>{{ x.prompt }} <span class="meta">({{ x.direction }})</span></p>
+        {% if x.hint %}<p class="meta">Hint: {{ x.hint }}</p>{% endif %}
+        <p>Accepted: {% for a in x.accepted_answers %}<span class="badge ok">{{ a }}</span>{% endfor %}</p>
+      {% elif x.type == "fill_blank" %}
+        <p>{{ x.sentence }} {% if x.hint %}<span class="meta">{{ x.hint }}</span>{% endif %}</p>
+        <p class="meta">{{ x.translation_en }}</p>
+        <p>Accepted: {% for a in x.answers %}<span class="badge ok">{{ a }}</span>{% endfor %}</p>
+      {% else %}
+        {% if x.reading_id %}<p class="meta">About reading: {{ x.reading_id }}</p>{% endif %}
+        <p>{{ x.question }}</p>
+        <ul class="opts">
+          {% for o in x.options %}<li{% if forloop.counter0 == x.answer_index %} class="ok"{% endif %}>{{ o }}</li>{% endfor %}
+        </ul>
+        {% if x.explanation %}<p class="meta">{{ x.explanation }}</p>{% endif %}
+      {% endif %}
+    </div>
+  {% endfor %}
+</div>

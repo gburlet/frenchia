@@ -1,0 +1,929 @@
+{
+  "$defs": {
+    "ComprehensionExercise": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 80,
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "grammar_topics": {
+          "default": [],
+          "items": {
+            "maxLength": 80,
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Grammar Topics",
+          "type": "array"
+        },
+        "type": {
+          "const": "comprehension",
+          "title": "Type",
+          "type": "string"
+        },
+        "question": {
+          "minLength": 1,
+          "title": "Question",
+          "type": "string"
+        },
+        "options": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 5,
+          "minItems": 2,
+          "title": "Options",
+          "type": "array"
+        },
+        "answer_index": {
+          "minimum": 0,
+          "title": "Answer Index",
+          "type": "integer"
+        },
+        "explanation": {
+          "minLength": 1,
+          "title": "Explanation",
+          "type": "string"
+        },
+        "reading_id": {
+          "maxLength": 80,
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "title": "Reading Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "question",
+        "options",
+        "answer_index",
+        "explanation",
+        "reading_id"
+      ],
+      "title": "ComprehensionExercise",
+      "type": "object"
+    },
+    "Example": {
+      "additionalProperties": false,
+      "properties": {
+        "fr": {
+          "minLength": 1,
+          "title": "Fr",
+          "type": "string"
+        },
+        "en": {
+          "minLength": 1,
+          "title": "En",
+          "type": "string"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        },
+        "region": {
+          "default": "common",
+          "enum": [
+            "qc",
+            "fr",
+            "common"
+          ],
+          "title": "Region",
+          "type": "string"
+        }
+      },
+      "required": [
+        "fr",
+        "en"
+      ],
+      "title": "Example",
+      "type": "object"
+    },
+    "ExamplesSection": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "examples",
+          "title": "Type",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 80,
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "heading": {
+          "minLength": 1,
+          "title": "Heading",
+          "type": "string"
+        },
+        "examples": {
+          "items": {
+            "$ref": "#/$defs/Example"
+          },
+          "maxItems": 12,
+          "minItems": 2,
+          "title": "Examples",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "heading",
+        "examples"
+      ],
+      "title": "ExamplesSection",
+      "type": "object"
+    },
+    "ExplanationSection": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "explanation",
+          "title": "Type",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 80,
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "heading": {
+          "minLength": 1,
+          "title": "Heading",
+          "type": "string"
+        },
+        "body": {
+          "minLength": 1,
+          "title": "Body",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "heading",
+        "body"
+      ],
+      "title": "ExplanationSection",
+      "type": "object"
+    },
+    "FillBlankExercise": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 80,
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "grammar_topics": {
+          "default": [],
+          "items": {
+            "maxLength": 80,
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Grammar Topics",
+          "type": "array"
+        },
+        "type": {
+          "const": "fill_blank",
+          "title": "Type",
+          "type": "string"
+        },
+        "sentence": {
+          "minLength": 1,
+          "title": "Sentence",
+          "type": "string"
+        },
+        "answers": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 4,
+          "minItems": 1,
+          "title": "Answers",
+          "type": "array"
+        },
+        "hint": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Hint"
+        },
+        "translation_en": {
+          "minLength": 1,
+          "title": "Translation En",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "sentence",
+        "answers",
+        "translation_en"
+      ],
+      "title": "FillBlankExercise",
+      "type": "object"
+    },
+    "MultipleChoiceExercise": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 80,
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "grammar_topics": {
+          "default": [],
+          "items": {
+            "maxLength": 80,
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Grammar Topics",
+          "type": "array"
+        },
+        "type": {
+          "const": "multiple_choice",
+          "title": "Type",
+          "type": "string"
+        },
+        "question": {
+          "minLength": 1,
+          "title": "Question",
+          "type": "string"
+        },
+        "options": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 5,
+          "minItems": 2,
+          "title": "Options",
+          "type": "array"
+        },
+        "answer_index": {
+          "minimum": 0,
+          "title": "Answer Index",
+          "type": "integer"
+        },
+        "explanation": {
+          "minLength": 1,
+          "title": "Explanation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "question",
+        "options",
+        "answer_index",
+        "explanation"
+      ],
+      "title": "MultipleChoiceExercise",
+      "type": "object"
+    },
+    "Provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "generator": {
+          "title": "Generator",
+          "type": "string"
+        },
+        "prompts": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {},
+          "title": "Prompts",
+          "type": "object"
+        },
+        "generated_at": {
+          "format": "date-time",
+          "title": "Generated At",
+          "type": "string"
+        },
+        "generated_hash": {
+          "title": "Generated Hash",
+          "type": "string"
+        },
+        "job_id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Job Id"
+        }
+      },
+      "required": [
+        "generator",
+        "generated_at",
+        "generated_hash"
+      ],
+      "title": "Provenance",
+      "type": "object"
+    },
+    "ReadingSection": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "reading",
+          "title": "Type",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 80,
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "passage_fr": {
+          "minLength": 1,
+          "title": "Passage Fr",
+          "type": "string"
+        },
+        "translation_en": {
+          "minLength": 1,
+          "title": "Translation En",
+          "type": "string"
+        },
+        "glossary": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/VocabItem"
+          },
+          "title": "Glossary",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "title",
+        "passage_fr",
+        "translation_en"
+      ],
+      "title": "ReadingSection",
+      "type": "object"
+    },
+    "RegionalNoteSection": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "regional_note",
+          "title": "Type",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 80,
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "heading": {
+          "minLength": 1,
+          "title": "Heading",
+          "type": "string"
+        },
+        "body": {
+          "minLength": 1,
+          "title": "Body",
+          "type": "string"
+        },
+        "variants": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/RegionalVariant"
+          },
+          "title": "Variants",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "heading",
+        "body"
+      ],
+      "title": "RegionalNoteSection",
+      "type": "object"
+    },
+    "RegionalVariant": {
+      "additionalProperties": false,
+      "properties": {
+        "qc": {
+          "minLength": 1,
+          "title": "Qc",
+          "type": "string"
+        },
+        "fr": {
+          "minLength": 1,
+          "title": "Fr",
+          "type": "string"
+        },
+        "en": {
+          "minLength": 1,
+          "title": "En",
+          "type": "string"
+        },
+        "formality": {
+          "default": "standard",
+          "enum": [
+            "formal",
+            "standard",
+            "familiar"
+          ],
+          "title": "Formality",
+          "type": "string"
+        }
+      },
+      "required": [
+        "qc",
+        "fr",
+        "en"
+      ],
+      "title": "RegionalVariant",
+      "type": "object"
+    },
+    "TableSection": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "table",
+          "title": "Type",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 80,
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "heading": {
+          "minLength": 1,
+          "title": "Heading",
+          "type": "string"
+        },
+        "columns": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 6,
+          "minItems": 2,
+          "title": "Columns",
+          "type": "array"
+        },
+        "rows": {
+          "items": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "maxItems": 20,
+          "minItems": 1,
+          "title": "Rows",
+          "type": "array"
+        },
+        "caption": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Caption"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "heading",
+        "columns",
+        "rows"
+      ],
+      "title": "TableSection",
+      "type": "object"
+    },
+    "TranslateExercise": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 80,
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "grammar_topics": {
+          "default": [],
+          "items": {
+            "maxLength": 80,
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Grammar Topics",
+          "type": "array"
+        },
+        "type": {
+          "const": "translate",
+          "title": "Type",
+          "type": "string"
+        },
+        "direction": {
+          "enum": [
+            "en_fr",
+            "fr_en"
+          ],
+          "title": "Direction",
+          "type": "string"
+        },
+        "prompt": {
+          "minLength": 1,
+          "title": "Prompt",
+          "type": "string"
+        },
+        "accepted_answers": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 8,
+          "minItems": 1,
+          "title": "Accepted Answers",
+          "type": "array"
+        },
+        "hint": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Hint"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "direction",
+        "prompt",
+        "accepted_answers"
+      ],
+      "title": "TranslateExercise",
+      "type": "object"
+    },
+    "VocabItem": {
+      "additionalProperties": false,
+      "properties": {
+        "fr": {
+          "minLength": 1,
+          "title": "Fr",
+          "type": "string"
+        },
+        "en": {
+          "minLength": 1,
+          "title": "En",
+          "type": "string"
+        },
+        "pos": {
+          "enum": [
+            "noun",
+            "verb",
+            "adjective",
+            "adverb",
+            "expression",
+            "other"
+          ],
+          "title": "Pos",
+          "type": "string"
+        },
+        "gender": {
+          "anyOf": [
+            {
+              "enum": [
+                "m",
+                "f"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Gender"
+        },
+        "region": {
+          "default": "common",
+          "enum": [
+            "qc",
+            "fr",
+            "common"
+          ],
+          "title": "Region",
+          "type": "string"
+        },
+        "formality": {
+          "default": "standard",
+          "enum": [
+            "formal",
+            "standard",
+            "familiar"
+          ],
+          "title": "Formality",
+          "type": "string"
+        },
+        "example_fr": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Example Fr"
+        },
+        "example_en": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Example En"
+        }
+      },
+      "required": [
+        "fr",
+        "en",
+        "pos"
+      ],
+      "title": "VocabItem",
+      "type": "object"
+    },
+    "VocabularySection": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "vocabulary",
+          "title": "Type",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 80,
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "heading": {
+          "minLength": 1,
+          "title": "Heading",
+          "type": "string"
+        },
+        "items": {
+          "items": {
+            "$ref": "#/$defs/VocabItem"
+          },
+          "maxItems": 24,
+          "minItems": 3,
+          "title": "Items",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "heading",
+        "items"
+      ],
+      "title": "VocabularySection",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "id": {
+      "maxLength": 80,
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "title": "Id",
+      "type": "string"
+    },
+    "content_version": {
+      "minimum": 1,
+      "title": "Content Version",
+      "type": "integer"
+    },
+    "level": {
+      "enum": [
+        "A1",
+        "A2",
+        "B1",
+        "B2",
+        "C1",
+        "C2"
+      ],
+      "title": "Level",
+      "type": "string"
+    },
+    "unit": {
+      "maxLength": 80,
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "title": "Unit",
+      "type": "string"
+    },
+    "title": {
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    },
+    "title_en": {
+      "minLength": 1,
+      "title": "Title En",
+      "type": "string"
+    },
+    "objectives": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "maxItems": 4,
+      "minItems": 1,
+      "title": "Objectives",
+      "type": "array"
+    },
+    "grammar_topics": {
+      "default": [],
+      "items": {
+        "maxLength": 80,
+        "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+        "type": "string"
+      },
+      "title": "Grammar Topics",
+      "type": "array"
+    },
+    "region_focus": {
+      "default": "qc",
+      "enum": [
+        "qc",
+        "fr",
+        "common"
+      ],
+      "title": "Region Focus",
+      "type": "string"
+    },
+    "estimated_minutes": {
+      "maximum": 90,
+      "minimum": 5,
+      "title": "Estimated Minutes",
+      "type": "integer"
+    },
+    "sections": {
+      "items": {
+        "discriminator": {
+          "mapping": {
+            "examples": "#/$defs/ExamplesSection",
+            "explanation": "#/$defs/ExplanationSection",
+            "reading": "#/$defs/ReadingSection",
+            "regional_note": "#/$defs/RegionalNoteSection",
+            "table": "#/$defs/TableSection",
+            "vocabulary": "#/$defs/VocabularySection"
+          },
+          "propertyName": "type"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/$defs/ExplanationSection"
+          },
+          {
+            "$ref": "#/$defs/ExamplesSection"
+          },
+          {
+            "$ref": "#/$defs/TableSection"
+          },
+          {
+            "$ref": "#/$defs/VocabularySection"
+          },
+          {
+            "$ref": "#/$defs/ReadingSection"
+          },
+          {
+            "$ref": "#/$defs/RegionalNoteSection"
+          }
+        ]
+      },
+      "minItems": 1,
+      "title": "Sections",
+      "type": "array"
+    },
+    "exercises": {
+      "default": [],
+      "items": {
+        "discriminator": {
+          "mapping": {
+            "comprehension": "#/$defs/ComprehensionExercise",
+            "fill_blank": "#/$defs/FillBlankExercise",
+            "multiple_choice": "#/$defs/MultipleChoiceExercise",
+            "translate": "#/$defs/TranslateExercise"
+          },
+          "propertyName": "type"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/$defs/TranslateExercise"
+          },
+          {
+            "$ref": "#/$defs/FillBlankExercise"
+          },
+          {
+            "$ref": "#/$defs/MultipleChoiceExercise"
+          },
+          {
+            "$ref": "#/$defs/ComprehensionExercise"
+          }
+        ]
+      },
+      "title": "Exercises",
+      "type": "array"
+    },
+    "provenance": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Provenance"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "id",
+    "content_version",
+    "level",
+    "unit",
+    "title",
+    "title_en",
+    "objectives",
+    "estimated_minutes",
+    "sections"
+  ],
+  "title": "Lesson",
+  "type": "object"
+}
