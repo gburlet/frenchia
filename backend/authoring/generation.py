@@ -49,6 +49,7 @@ from .schemas import (
     TranslateDraft,
     VocabularyStep,
     batch,
+    vocab_item,
 )
 
 
@@ -235,6 +236,10 @@ class LessonGenerator:
                 "reading": (ReadingSection, "reading"),
             }
             model, section_id = builders[step]
+            if step == "vocabulary":
+                data["items"] = [vocab_item(item) for item in obj.items]
+            elif step == "reading":
+                data["glossary"] = [vocab_item(item) for item in obj.glossary]
             return model(type=step, id=section_id, **data)
 
         def check(obj: Any) -> list[str]:

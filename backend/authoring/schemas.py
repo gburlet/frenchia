@@ -2,13 +2,49 @@
 assigns those) so outputs stay small and focused; the generator converts them into
 contentkit models."""
 
+import re
+from typing import Literal
+
 from pydantic import BaseModel, ConfigDict, Field
 
-from contentkit.models import Example, RegionalVariant, VocabItem
+from contentkit.models import Example, Gender, RegionalVariant, VocabItem
 
 
 class Step(BaseModel):
     model_config = ConfigDict(extra="forbid")
+
+
+class VocabDraft(Step):
+    """LLM-facing vocabulary item. Unlike VocabItem, gender is *required* ("none" for non-nouns)
+    so grammar-constrained decoding can't omit it for nouns."""
+
+    fr: str = Field(description="The bare word or expression, without article")
+    en: str
+    pos: Literal["noun", "verb", "adjective", "adverb", "expression", "other"]
+    gender: Literal["m", "f", "none"]
+    region: Literal["qc", "fr", "common"]
+    formality: Literal["formal", "standard", "familiar"]
+    example_fr: str
+    example_en: str
+
+
+_ARTICLE = re.compile(r"^(?:(les|le|la|un|une|des)\s+|(l)['’]\s*)", re.IGNORECASE)
+_ARTICLE_GENDER: dict[str, Gender] = {"le": "m", "un": "m", "la": "f", "une": "f"}
+
+
+def vocab_item(draft: VocabDraft) -> VocabItem:
+    """Deterministic clean-up: strip a leading article (inferring gender from it if needed)."""
+    data = draft.model_dump(exclude={"gender"})
+    gender: Gender | None = None if draft.gender == "none" else draft.gender
+    if match := _ARTICLE.match(data["fr"]):
+        article = (match.group(1) or "").lower()
+        data["fr"] = data["fr"][match.end() :]
+        gender = gender or _ARTICLE_GENDER.get(article)
+    if data["pos"] == "noun" and gender is None:
+        data["pos"] = "expression"  # no reliable gender: don't present it as a noun
+    for key in ("example_fr", "example_en"):
+        data[key] = data[key].strip() or None
+    return VocabItem(gender=gender, **data)
 
 
 class ExplanationStep(Step):
@@ -32,7 +68,7 @@ class ExamplesStep(Step):
 
 class VocabularyStep(Step):
     heading: str
-    items: list[VocabItem] = Field(min_length=10, max_length=16)
+    items: list[VocabDraft] = Field(min_length=10, max_length=16)
 
 
 class RegionalNoteStep(Step):
@@ -45,7 +81,7 @@ class ReadingStep(Step):
     title: str
     passage_fr: str
     translation_en: str
-    glossary: list[VocabItem] = Field(min_length=3, max_length=8)
+    glossary: list[VocabDraft] = Field(min_length=3, max_length=8)
 
 
 class FillBlankDraft(Step):

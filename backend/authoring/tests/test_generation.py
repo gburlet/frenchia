@@ -264,3 +264,34 @@ def test_optional_table_still_invalid_after_repair_is_dropped() -> None:
     )
     assert "table" not in [s.type for s in result.lesson.sections]
     assert any("dropped invalid table" in i.message for i in result.issues)
+
+
+def test_vocab_drafts_are_cleaned_deterministically() -> None:
+    from authoring.schemas import VocabDraft, vocab_item
+
+    def draft(fr: str, pos: str = "noun", gender: str = "none") -> VocabDraft:
+        return VocabDraft.model_validate(
+            {
+                "fr": fr,
+                "en": "x",
+                "pos": pos,
+                "gender": gender,
+                "region": "qc",
+                "formality": "standard",
+                "example_fr": "",
+                "example_en": "",
+            }
+        )
+
+    assert (
+        vocab_item(draft("La fin de semaine")).fr,
+        vocab_item(draft("La fin de semaine")).gender,
+    ) == ("fin de semaine", "f")
+    assert vocab_item(draft("l'épicerie", gender="f")).fr == "épicerie"
+    unknown = vocab_item(draft("les bas"))
+    assert (unknown.fr, unknown.pos, unknown.gender) == (
+        "bas",
+        "expression",
+        None,
+    )  # no reliable gender
+    assert vocab_item(draft("magasiner", pos="verb")).gender is None

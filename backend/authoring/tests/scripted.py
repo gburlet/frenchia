@@ -8,6 +8,22 @@ from inference.llm import Completion, Message
 
 READING = "Samedi passé, j'ai magasiné au centre-ville. Ensuite, nous avons soupé chez ma sœur."
 
+
+def vocab(
+    fr: str, en: str, pos: str, *, gender: str = "none", region: str = "common"
+) -> dict[str, str]:
+    return {
+        "fr": fr,
+        "en": en,
+        "pos": pos,
+        "gender": gender,
+        "region": region,
+        "formality": "standard",
+        "example_fr": "",
+        "example_en": "",
+    }
+
+
 STEP_OUTPUTS: dict[str, Any] = {
     "ExplanationStep": {
         "title_en": "The passé composé of -er verbs",
@@ -39,8 +55,11 @@ STEP_OUTPUTS: dict[str, Any] = {
                 "fr": f"mot{i}",
                 "en": f"word{i}",
                 "pos": "other",
+                "gender": "none",
                 "region": "common",
                 "formality": "standard",
+                "example_fr": "",
+                "example_en": "",
             }
             for i in range(10)
         ],
@@ -55,9 +74,11 @@ STEP_OUTPUTS: dict[str, Any] = {
         "passage_fr": READING,
         "translation_en": "Last Saturday I went shopping downtown.",
         "glossary": [
-            {"fr": "ensuite", "en": "then", "pos": "adverb"},
-            {"fr": "chez", "en": "at the home of", "pos": "other"},
-            {"fr": "passé", "en": "last", "pos": "adjective"},
+            vocab(
+                "La fin de semaine", "weekend", "noun", region="qc"
+            ),  # article -> stripped, gender f
+            vocab("chez", "at the home of", "other"),
+            vocab("passé", "last", "adjective"),
         ],
     },
 }

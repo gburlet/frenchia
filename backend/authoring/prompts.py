@@ -3,7 +3,7 @@ changes: jobs record the versions they used (GenerationJob.prompts, lesson prove
 
 PROMPT_VERSIONS = {
     "author.system": "2",
-    "author.steps": "2",
+    "author.steps": "3",
     "author.revise": "1",
     "author.critic": "1",
 }
