@@ -35,6 +35,8 @@ INSTALLED_APPS = [
     "inference",
     "curriculum",
     "authoring",
+    "exercises",
+    "progress",
 ]
 
 MIDDLEWARE = [

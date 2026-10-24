@@ -19,6 +19,7 @@ describe("LoginPage", () => {
   it("submits and redirects to the original location", async () => {
     let loggedIn = false;
     const fetchMock = mockFetch({
+      "GET /api/curriculum": { body: { levels: [] } },
       "GET /api/auth/me": () =>
         loggedIn ? { body: staffUser } : { status: 403, body: { detail: "Forbidden" } },
       "GET /api/auth/csrf": () => {

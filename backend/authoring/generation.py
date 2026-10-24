@@ -105,6 +105,7 @@ SECTION_STEPS: dict[str, type[BaseModel]] = {
     "reading": ReadingStep,
 }
 MAX_TOKENS = 1800
+OPTIONAL_SECTIONS = {"table"}
 
 SECTION_TYPES: dict[str, type[BaseModel]] = {
     "explanation": ExplanationSection,
@@ -241,7 +242,17 @@ class LessonGenerator:
             return [] if section is None else self._problems(brief, [*sections, section], [])
 
         obj = self._ask(context, sections, instruction, schema, check)
-        return convert(obj), extra
+        try:
+            return convert(obj), extra
+        except ValidationError as exc:
+            if step not in OPTIONAL_SECTIONS:
+                raise
+            # An optional section that is still invalid after repair is dropped, not fatal.
+            message = exc.errors()[0]["msg"]
+            self.dropped.append(
+                Issue("warning", f"{brief.outline.id}:{step}", f"dropped invalid {step}: {message}")
+            )
+            return None, extra
 
     def _exercises(
         self, step: str, count: int, brief: LessonBrief, context: str, sections: list[Any]

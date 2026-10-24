@@ -4,10 +4,11 @@ import { LoginPage } from "@/features/auth/LoginPage";
 import { RequireAuth } from "@/features/auth/RequireAuth";
 import { Dashboard } from "@/routes/Dashboard";
 import { NotFound } from "@/routes/NotFound";
+import { CurriculumPage } from "@/features/curriculum/CurriculumPage";
+import { LessonPage } from "@/features/lessons/LessonPage";
+import { TranslatePage } from "@/features/practice/TranslatePage";
 import {
-  CurriculumPage,
   ProgressPage,
-  TranslatePage,
   VerbsPage,
   VocabPage,
 } from "@/routes/placeholders";
@@ -22,6 +23,7 @@ export const routes: RouteObject[] = [
         children: [
           { index: true, element: <Dashboard /> },
           { path: "curriculum", element: <CurriculumPage /> },
+          { path: "lessons/:lessonId", element: <LessonPage /> },
           { path: "practice/translate", element: <TranslatePage /> },
           { path: "practice/verbs", element: <VerbsPage /> },
           { path: "practice/vocab", element: <VocabPage /> },

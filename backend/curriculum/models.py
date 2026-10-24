@@ -42,6 +42,18 @@ class ImmutableFieldsMixin(models.Model):
         super().save(*args, **kwargs)
 
 
+class CurriculumLevel(models.Model):
+    code = models.CharField(primary_key=True, max_length=2, choices=Level.choices)
+    title = models.CharField(max_length=100)
+    summary = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ["code"]
+
+    def __str__(self) -> str:
+        return f"{self.code} · {self.title}"
+
+
 class GrammarTopic(models.Model):
     slug = models.SlugField(primary_key=True, max_length=80)
     level = models.CharField(max_length=2, choices=Level.choices)

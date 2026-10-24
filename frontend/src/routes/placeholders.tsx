@@ -10,12 +10,6 @@ function ComingSoon({ title, description }: { title: string; description: string
   );
 }
 
-export const CurriculumPage = () => (
-  <ComingSoon title="Curriculum" description="Your learning path, unit by unit." />
-);
-export const TranslatePage = () => (
-  <ComingSoon title="Translate" description="Practise translating between English and Québec French." />
-);
 export const VerbsPage = () => (
   <ComingSoon title="Verbs" description="Drill conjugations until they feel natural." />
 );

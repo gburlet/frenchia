@@ -22,6 +22,7 @@ from contentkit.yamlio import content_hash
 
 from .models import (
     ContentImport,
+    CurriculumLevel,
     Exercise,
     ExerciseRevision,
     GrammarTopic,
@@ -107,6 +108,9 @@ def _sync_structure(repo: Repository) -> None:
             )
     order = 0
     for level in sorted(repo.levels.values(), key=lambda lvl: lvl.level):
+        CurriculumLevel.objects.update_or_create(
+            code=level.level, defaults={"title": level.title, "summary": level.summary}
+        )
         for unit_index, unit in enumerate(level.units):
             Unit.objects.update_or_create(
                 slug=unit.id,

@@ -247,3 +247,20 @@ def test_reviser_fills_missing_exercise_topics_from_the_lesson() -> None:
         data, "Tidy", ["table"], content_version=1, job_id=None
     )
     assert result.lesson.exercises[1].grammar_topics == ["passe-compose-avoir"]
+
+
+def test_optional_table_still_invalid_after_repair_is_dropped() -> None:
+    class RaggedTable(ScriptedChat):
+        def complete(self, messages, *, json_schema=None, temperature=0.0, max_tokens=800):
+            completion = super().complete(messages, json_schema=json_schema)
+            if (json_schema or {}).get("title") == "TableStep":
+                table = json.loads(completion.content)
+                table["rows"] = [["j'", "ai", "extra"]]
+                return completion.__class__(content=json.dumps(table), model="x", latency_ms=1)
+            return completion
+
+    result = LessonGenerator(RaggedTable(), reference(), critic=False).generate(
+        brief(), content_version=1, job_id=None
+    )
+    assert "table" not in [s.type for s in result.lesson.sections]
+    assert any("dropped invalid table" in i.message for i in result.issues)
