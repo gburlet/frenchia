@@ -1,7 +1,7 @@
 #!/usr/bin/env -S uv run --script
 # /// script
 # requires-python = ">=3.12"
-# dependencies = ["httpx==0.28.1", "pyyaml==6.0.3", "jsonschema==4.26.0"]
+# dependencies = ["httpx==0.28.1", "pyyaml==6.0.3", "jsonschema==4.26.0", "anthropic==2.3.0"]
 # ///
 """LLM bake-off for Frenchia: French/Québec quality, JSON reliability, latency, memory.
 
@@ -9,6 +9,12 @@ Uses the same path as the app: Ollama's OpenAI-compatible /v1/chat/completions w
 response_format=json_schema (grammar-constrained) and reasoning_effort="none".
 
     uv run evals/bakeoff.py gemma4:12b-it-qat qwen3.5:9b
+
+`--provider anthropic` instead runs Claude models through the Anthropic API (structured
+outputs via output_config.format; adaptive thinking at the model's default effort) and
+records token usage and cost. Needs ANTHROPIC_API_KEY (or another SDK credential source).
+
+    uv run evals/bakeoff.py --provider anthropic claude-haiku-5-5
 """
 
 from __future__ import annotations
@@ -222,6 +228,56 @@ def norm(s: str) -> str:
     s = unicodedata.normalize("NFC", s).lower().replace("’", "'").strip()
     s = re.sub(r"\s+", " ", s)
     return re.sub(r"^(que |qu')", "", s)
+
+
+# USD per million tokens (input, output); prompts under 100K tokens.
+PRICES = {"claude-haiku-5-5": (0.10, 0.50), "claude-sonnet-5-5": (2.0, 10.0), "claude-opus-5-5": (4.0, 20.0)}
+
+
+class AnthropicClient:
+    """Same interface as Client, backed by the Anthropic API."""
+
+    def __init__(self, model: str) -> None:
+        import anthropic
+
+        self.model = model
+        self.api = anthropic.Anthropic()
+        self.input_tokens = 0
+        self.output_tokens = 0
+
+    @property
+    def cost_usd(self) -> float:
+        price_in, price_out = PRICES.get(self.model, (0.0, 0.0))
+        return (self.input_tokens * price_in + self.output_tokens * price_out) / 1e6
+
+    def chat(self, user: str, schema: dict | None = None, max_tokens: int = 700) -> tuple[str, float, int | None]:
+        params: dict[str, Any] = {
+            "model": self.model,
+            # Room for adaptive thinking on top of the visible answer.
+            "max_tokens": max_tokens + 8000,
+            "system": SYSTEM,
+            "messages": [{"role": "user", "content": user}],
+        }
+        if schema:
+            params["output_config"] = {"format": {"type": "json_schema", "schema": schema}}
+        t = time.perf_counter()
+        response = self.api.messages.create(**params)
+        dt = time.perf_counter() - t
+        self.input_tokens += response.usage.input_tokens
+        self.output_tokens += response.usage.output_tokens
+        if response.stop_reason == "refusal":
+            return "", dt, response.usage.output_tokens
+        text = next((b.text for b in response.content if b.type == "text"), "")
+        return text, dt, response.usage.output_tokens
+
+    def structured(self, user: str, schema: dict, max_tokens: int = 700) -> tuple[dict | None, float, int | None, str]:
+        text, dt, toks = self.chat(user, schema, max_tokens)
+        try:
+            obj = json.loads(text)
+            jsonschema.validate(obj, schema)
+            return obj, dt, toks, text
+        except (json.JSONDecodeError, jsonschema.ValidationError):
+            return None, dt, toks, text
 
 
 class Client:
@@ -440,6 +496,7 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("models", nargs="+")
     ap.add_argument("--base", default="http://127.0.0.1:11435")
+    ap.add_argument("--provider", choices=["ollama", "anthropic"], default="ollama")
     ap.add_argument("--out", type=Path, default=HERE / "results" / datetime.now().strftime("%Y%m%d-%H%M"))
     ap.add_argument("--tasks", default="judge,grammar,quebec,conjugation,genders,open_gen,explain")
     ap.add_argument("--judge-version", type=int, choices=[1, 2], default=2)
@@ -459,9 +516,14 @@ def main() -> None:
     for model in args.models:
         print(f"\n=== {model}", flush=True)
         mem_before = system_memory()
-        stats = model_stats(args.base, model)
-        print(f"  load {stats['load_s']}s, decode {stats['decode_tok_s']} tok/s, resident {stats['resident_gb']} GB", flush=True)
-        c = Client(args.base, model)
+        c: Any
+        if args.provider == "anthropic":
+            stats: dict[str, Any] = {}
+            c = AnthropicClient(model)
+        else:
+            stats = model_stats(args.base, model)
+            print(f"  load {stats['load_s']}s, decode {stats['decode_tok_s']} tok/s, resident {stats['resident_gb']} GB", flush=True)
+            c = Client(args.base, model)
         results: list[Result] = []
         for name, fn in [
             ("judge", lambda: run_judge_v2(c, judge, lexicon) if args.judge_version == 2 else run_judge(c, judge)),
@@ -481,7 +543,11 @@ def main() -> None:
         mem_after = system_memory()
         mem = {"swap_before_mb": mem_before["swap_used_mb"], "swap_after_mb": mem_after["swap_used_mb"],
                "free_pct_after": mem_after["free_pct"]}
-        unload(args.base, model)
+        if args.provider == "anthropic":
+            stats.update(input_tokens=c.input_tokens, output_tokens=c.output_tokens, cost_usd=round(c.cost_usd, 4))
+            print(f"  tokens in {c.input_tokens}, out {c.output_tokens}, cost ${c.cost_usd:.4f}", flush=True)
+        else:
+            unload(args.base, model)
         safe = re.sub(r"[^A-Za-z0-9._-]", "_", model)
         with (args.out / f"{safe}.jsonl").open("w") as f:
             for r in results:
@@ -492,7 +558,7 @@ def main() -> None:
     cols = ["model", "judge_score", "judge_category_hit", "judge_quebec_accept", "grammar_score", "quebec_score",
             "conjugation_score", "genders_score", "open_gen_score", "explain_score", "json_valid_rate",
             "judge_latency_p50", "judge_latency_p90", "decode_tok_s", "prefill_tok_s", "load_s", "resident_gb",
-            "swap_before_mb", "swap_after_mb", "free_pct_after"]
+            "swap_before_mb", "swap_after_mb", "free_pct_after", "input_tokens", "output_tokens", "cost_usd"]
     lines = ["| " + " | ".join(cols) + " |", "|" + "---|" * len(cols)]
     lines += ["| " + " | ".join(str(s.get(k, "")) for k in cols) + " |" for s in summaries]
     (args.out / "scorecard.md").write_text("# Bake-off scorecard\n\n" + "\n".join(lines) + "\n")

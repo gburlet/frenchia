@@ -1,0 +1,22 @@
+
+=== lessons/a2-passe-compose-er.gemma-original.json  (0s, None output tokens)
+  ✓ parler-a           « Elle a parlé son ami »: parler needs à
+  ✓ ex09-two-correct   option = correct answer + ? (also a valid sentence)
+  ✓ ex10-punct         option = correct answer + ?
+  ✓ samedi-note        false claim that « samedi » vs « le samedi » is a Québec difference
+  ✓ souper-note        souper note attached to an unrelated sentence
+  ✓ diner-lunch        in Québec dîner = lunch, translated as dinner
+  ✓ week-end           « le week-end dernier » in a Québec-first reading titled « Ma fin de semaine »
+  ✓ glossary-articles  glossary entries include articles
+  ✗ fake-pitfall       invented pitfall « J'é parlé »
+  unmatched findings (2): classify by hand
+    - [suggestion/quebec_usage] reading: The glossary glosses « souper » as « The supper / dinner ». In Québec « dinner » can mean lunch (dîner), which conflicts with the lesson's own point that souper is the evening meal. → Gloss it as « supper (evening meal) ».
+    - [suggestion/consistency] table: The row for « Il/Elle/On » lists « On » in the pronoun column, but the full form shows only « Il a mangé ». Learners will not see the on form (« on a mangé »). → Split the row into « Il/Elle » (« Il a mangé ») and « On » (« On a mangé »), or change the pronoun cell to « Il/Elle ».
+
+=== lessons/a2-passe-compose-er.gemma-revised.json  (0s, None output tokens)
+  unmatched findings (3): classify by hand
+    - [suggestion/consistency] ex-04: The hint is written in French, while every other hint in the lesson is in English. It also reads as a long clue rather than a short hint, which is inconsistent for an English-speaking learner. → Shorten it to English, for example « (parler - use avoir; parler takes à before a person) ».
+    - [suggestion/consistency] ex-04: grammar_topics is empty ("[]"), while every other fill-in-the-blank in the lesson, and the same exercise in lesson 0, is tagged passe-compose-avoir. → Set grammar_topics to ["passe-compose-avoir"].
+    - [suggestion/consistency] table: The row for « Il/Elle/On » lists « On » in the pronoun column, but the full form shows only « Il a mangé ». Learners will not see the on form (« on a mangé »). → Split the row into « Il/Elle » (« Il a mangé ») and « On » (« On a mangé »), or change the pronoun cell to « Il/Elle ».
+
+Recall: 8/9

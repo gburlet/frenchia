@@ -1,0 +1,5 @@
+{"issues": [
+{"item_id": "ex-04", "severity": "suggestion", "category": "consistency", "problem": "The hint is written in French, while every other hint in the lesson is in English. It also reads as a long clue rather than a short hint, which is inconsistent for an English-speaking learner.", "suggested_fix": "Shorten it to English, for example « (parler - use avoir; parler takes à before a person) »."},
+{"item_id": "ex-04", "severity": "suggestion", "category": "consistency", "problem": "grammar_topics is empty (\"[]\"), while every other fill-in-the-blank in the lesson, and the same exercise in lesson 0, is tagged passe-compose-avoir.", "suggested_fix": "Set grammar_topics to [\"passe-compose-avoir\"]."},
+{"item_id": "table", "severity": "suggestion", "category": "consistency", "problem": "The row for « Il/Elle/On » lists « On » in the pronoun column, but the full form shows only « Il a mangé ». Learners will not see the on form (« on a mangé »).", "suggested_fix": "Split the row into « Il/Elle » (« Il a mangé ») and « On » (« On a mangé »), or change the pronoun cell to « Il/Elle »."}
+]}

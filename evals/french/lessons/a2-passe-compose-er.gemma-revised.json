@@ -1,0 +1,377 @@
+{
+ "id": "a2-passe-compose-er",
+ "unit": "a2-u01-past",
+ "level": "A2",
+ "title": "Le passé composé des verbes en -er",
+ "sections": [
+  {
+   "id": "explanation",
+   "body": "In French, the *passé composé* is the most common way to talk about completed actions in the past. To form it, you need two parts: an auxiliary verb (usually *avoir*) and the past participle of the main verb. \n\nFor all regular **-er** verbs (like *parler, manger, travailler*), you drop the **-er** ending and add **-é** to create the past participle. \n\nHere is the conjugation for the verb **parler** (to speak):\n- J'ai parlé\n- Tu as parlé\n- Il/Elle a parlé\n- Nous avons parlé\n- Vous avez parlé\n- Ils/Elles ont parlé\n\n**Examples:**\n- **J'ai mangé une poutine.** (I ate a poutine.)\n- **Nous avons travaillé toute la journée.** (We worked all day.)\n- **Ils ont regardé un film.** (They watched a movie.)\n\n**Common Pitfalls for English Speakers:**\n1. **Forgetting the accent:** Because the past participle ends in **-é**, it is easy to forget the accent mark and write \"J'ai parle.\" Remember that the accent is necessary to distinguish the past participle from the present tense or the infinitive.\n2. **Over-complicating agreement:** Unlike some other past tenses, the past participle of verbs using *avoir* does not usually change to match the subject. For example, even if the subject is feminine, it remains **Elle a mangé** (not *mangée*). \n\nIn Québec, you will hear the *passé composé* used constantly in daily life, whether you are talking about your *fin de semaine* (weekend) or what you did at the *dépanneur* (convenience store)!",
+   "type": "explanation",
+   "heading": "Le passé composé avec les verbes en -er"
+  },
+  {
+   "id": "table",
+   "rows": [
+    [
+     "Je",
+     "ai",
+     "parlé",
+     "J'ai parlé"
+    ],
+    [
+     "Tu",
+     "as",
+     "travaillé",
+     "Tu as travaillé"
+    ],
+    [
+     "Il/Elle/On",
+     "a",
+     "mangé",
+     "Il a mangé"
+    ],
+    [
+     "Nous",
+     "avons",
+     "regardé",
+     "Nous avons regardé"
+    ],
+    [
+     "Vous",
+     "avez",
+     "écouté",
+     "Vous avez écouté"
+    ],
+    [
+     "Ils/Elles",
+     "ont",
+     "joué",
+     "Ils ont joué"
+    ]
+   ],
+   "type": "table",
+   "caption": "Conjugation of regular -er verbs in the passé composé with 'avoir'.",
+   "columns": [
+    "Pronoun",
+    "Avoir (Auxiliary)",
+    "Past Participle",
+    "Full Form"
+   ],
+   "heading": "Le passé composé avec avoir"
+  },
+  {
+   "id": "examples",
+   "type": "examples",
+   "heading": "Exemples du passé composé avec les verbes en -er",
+   "examples": [
+    {
+     "en": "I ate a poutine at the restaurant last night.",
+     "fr": "J'ai mangé une poutine au restaurant hier soir.",
+     "region": "qc"
+    },
+    {
+     "en": "You worked all day Saturday.",
+     "fr": "Tu as travaillé toute la journée samedi.",
+     "region": "common"
+    },
+    {
+     "en": "She watched a Québec film on TV.",
+     "fr": "Elle a regardé un film québécois à la télé.",
+     "region": "qc"
+    },
+    {
+     "en": "We bought vegetables at the market.",
+     "fr": "Nous avons acheté des légumes au marché.",
+     "region": "qc"
+    },
+    {
+     "en": "You lived in Montreal for two years.",
+     "fr": "Vous avez habité à Montréal pendant deux ans.",
+     "region": "qc"
+    },
+    {
+     "en": "They looked for a new car.",
+     "fr": "Ils ont cherché une nouvelle voiture.",
+     "region": "qc"
+    },
+    {
+     "en": "I prepared supper for my friends.",
+     "fr": "J'ai préparé le souper pour mes amis.",
+     "region": "qc"
+    },
+    {
+     "en": "Did you listen to music this morning?",
+     "fr": "Est-ce que tu as écouté de la musique ce matin ?",
+     "region": "common"
+    }
+   ]
+  },
+  {
+   "id": "regional-note",
+   "body": "In terms of grammar, the formation of the *passé composé* for regular -er verbs is identical in both Québec and France. You will use the same auxiliary verbs (*avoir*) and the same past participle endings (*-é*). However, the vocabulary you choose to place into these sentences will often differ. For example, while a person in France might say they 'prepared dinner' using the verb *préparer le dîner*, a Québécois person would almost always say *préparer le souper*. Both are grammatically correct, but using *souper* is the standard way to refer to the evening meal in Québec.",
+   "type": "regional_note",
+   "heading": "Québec vs. France: The Passé Composé",
+   "variants": [
+    {
+     "en": "dinner",
+     "fr": "le dîner",
+     "qc": "le souper",
+     "formality": "standard"
+    },
+    {
+     "en": "the weekend",
+     "fr": "le week-end",
+     "qc": "la fin de semaine",
+     "formality": "standard"
+    },
+    {
+     "en": "to go shopping",
+     "fr": "faire du shopping",
+     "qc": "magasiner",
+     "formality": "standard"
+    },
+    {
+     "en": "a convenience store",
+     "fr": "une épicerie de proximité",
+     "qc": "un dépanneur",
+     "formality": "standard"
+    }
+   ]
+  },
+  {
+   "id": "reading",
+   "type": "reading",
+   "title": "Ma fin de semaine à Québec",
+   "glossary": [
+    {
+     "en": "weekend",
+     "fr": "fin de semaine",
+     "pos": "noun",
+     "gender": "f",
+     "region": "common",
+     "formality": "standard"
+    },
+    {
+     "en": "Old Québec",
+     "fr": "Vieux-Québec",
+     "pos": "noun",
+     "gender": "m",
+     "region": "common",
+     "formality": "standard"
+    },
+    {
+     "en": "meat pie",
+     "fr": "tourtière",
+     "pos": "noun",
+     "gender": "f",
+     "region": "common",
+     "formality": "standard"
+    },
+    {
+     "en": "supper",
+     "fr": "souper",
+     "pos": "noun",
+     "gender": "m",
+     "region": "common",
+     "formality": "standard"
+    },
+    {
+     "en": "to enjoy / to make the most of",
+     "fr": "profiter de",
+     "pos": "verb",
+     "region": "common",
+     "formality": "standard"
+    }
+   ],
+   "passage_fr": "La fin de semaine dernière, j'ai passé une journée magnifique dans la ville de Québec. Samedi matin, j'ai visité le Vieux-Québec avec mon ami Marc. Nous avons marché dans les rues historiques et nous avons pris beaucoup de photos. À midi, nous avons mangé dans un petit bistro traditionnel. J'ai goûté une tourtière délicieuse !\n\nL'après-midi, nous avons regardé les monuments et nous avons écouté un musicien de rue. Ensuite, nous avons acheté des souvenirs pour ma famille. Le soir, je suis rentré à la maison et j'ai préparé un bon souper. J'ai travaillé un peu sur mon projet, mais j'ai fini tôt. J'ai beaucoup aimé cette journée parce que j'ai relaxé et j'ai profité du beau temps.",
+   "translation_en": "Last weekend, I spent a wonderful day in the city of Québec. Saturday morning, I visited Old Québec with my friend Marc. We walked in the historic streets and took many photos. At noon, we ate in a small traditional bistro. I tasted a delicious tourtière. \n\nIn the afternoon, we looked at the monuments and listened to a street musician. Then, we bought souvenirs for my family. In the evening, I returned home and prepared a good supper. I worked a little on my project, but I finished early. I really liked this day because I relaxed and enjoyed the beautiful weather."
+  }
+ ],
+ "title_en": "The Past Tense of -er Verbs",
+ "exercises": [
+  {
+   "id": "ex-01",
+   "hint": "(manger)",
+   "type": "fill_blank",
+   "answers": [
+    "ai mangé"
+   ],
+   "sentence": "Hier, j'___ une pizza pour le dîner.",
+   "grammar_topics": [
+    "passe-compose-avoir"
+   ],
+   "translation_en": "Yesterday, I ate a pizza for lunch."
+  },
+  {
+   "id": "ex-02",
+   "hint": "(magasiner)",
+   "type": "fill_blank",
+   "answers": [
+    "avez magasiné"
+   ],
+   "sentence": "Est-ce que vous ___ au centre d'achat ce matin ?",
+   "grammar_topics": [
+    "passe-compose-avoir"
+   ],
+   "translation_en": "Did you go shopping at the mall this morning?"
+  },
+  {
+   "id": "ex-03",
+   "hint": "(regarder)",
+   "type": "fill_blank",
+   "answers": [
+    "avons regardé"
+   ],
+   "sentence": "Nous ___ beaucoup de photos pendant nos vacances.",
+   "grammar_topics": [
+    "passe-compose-avoir"
+   ],
+   "translation_en": "We looked at many photos during our vacation."
+  },
+  {
+   "id": "ex-04",
+   "hint": "(parler - passé composé avec avoir, féminin/masculin identique pour le participe passé ici, mais attention à la préposition 'à' qui est déjà incluse dans la phrase.)",
+   "type": "fill_blank",
+   "answers": [
+    "a parlé"
+   ],
+   "sentence": "Elle ___ à son ami au dépanneur.",
+   "grammar_topics": [],
+   "translation_en": "She spoke to her friend at the convenience store."
+  },
+  {
+   "id": "ex-05",
+   "hint": "Use the verb 'regarder' (to watch) and the auxiliary 'avoir'. 'Hier soir' is the most common way to say 'last night'.",
+   "type": "translate",
+   "prompt": "I watched a movie on my tablet last night.",
+   "direction": "en_fr",
+   "grammar_topics": [
+    "passe-compose-avoir"
+   ],
+   "accepted_answers": [
+    "J'ai regardé un film sur ma tablette hier soir.",
+    "J'ai regardé un film sur ma tablette la nuit dernière."
+   ]
+  },
+  {
+   "id": "ex-06",
+   "hint": "In Québec, 'on' is very commonly used instead of 'nous' in spoken French. Both are correct, but 'on' is more natural in conversation.",
+   "type": "translate",
+   "prompt": "We worked a lot during the week.",
+   "direction": "en_fr",
+   "grammar_topics": [
+    "passe-compose-avoir"
+   ],
+   "accepted_answers": [
+    "On a beaucoup travaillé pendant la semaine.",
+    "Nous avons beaucoup travaillé pendant la semaine."
+   ]
+  },
+  {
+   "id": "ex-07",
+   "hint": "Remember that in Québec, we use 'souper' for dinner, whereas in France, they usually say 'dîner'.",
+   "type": "translate",
+   "prompt": "Did you cook dinner for your family?",
+   "direction": "en_fr",
+   "grammar_topics": [
+    "passe-compose-avoir"
+   ],
+   "accepted_answers": [
+    "Est-ce que tu as préparé le souper pour ta famille ?",
+    "Tu as préparé le souper pour ta famille ?"
+   ]
+  },
+  {
+   "id": "ex-08",
+   "hint": "Remember that 'hier soir' is the standard way to say 'last night' or 'yesterday evening' in Québec.",
+   "type": "translate",
+   "prompt": "J'ai regardé le hockey avec mes amis hier soir.",
+   "direction": "fr_en",
+   "grammar_topics": [
+    "passe-compose-avoir"
+   ],
+   "accepted_answers": [
+    "I watched hockey with my friends last night.",
+    "I watched the hockey game with my friends last night.",
+    "I watched hockey with my friends yesterday evening."
+   ]
+  },
+  {
+   "id": "ex-09",
+   "type": "multiple_choice",
+   "options": [
+    "J'ai manger une pomme.",
+    "J'ai mangé une pomme.",
+    "Je suis mangé une pomme.",
+    "Je mange une pomme."
+   ],
+   "question": "Choose the correct sentence to describe a completed action in the past.",
+   "explanation": "The correct answer is 'J'ai mangé'. To form the passé composé, you need the auxiliary verb 'ai' (avoir) followed by the past participle. For -er verbs, the past participle ends in **-é**. Option 1 is incorrect because 'manger' is the infinitive form. Option 3 is incorrect because 'manger' uses the auxiliary 'avoir', not 'être'. Option 4 is in the present tense.",
+   "answer_index": 1,
+   "grammar_topics": [
+    "passe-compose-avoir"
+   ]
+  },
+  {
+   "id": "ex-10",
+   "type": "multiple_choice",
+   "options": [
+    "avons regardé",
+    "avons regarder",
+    "avons regardes",
+    "sommes regardé"
+   ],
+   "question": "Complete the sentence: 'Nous __________ beaucoup de photos pendant la visite.'",
+   "explanation": "The correct answer is 'avons regardé'. In the passé composé, we use the auxiliary verb 'avoir' (nous avons) followed by the past participle 'regardé'. A common mistake is to leave the verb in the infinitive form (regarder), to incorrectly add an 's' to the participle (regardes), or to use the wrong auxiliary verb (sommes) instead of 'avoir'.",
+   "answer_index": 0,
+   "grammar_topics": [
+    "passe-compose-avoir"
+   ]
+  },
+  {
+   "id": "ex-11",
+   "type": "comprehension",
+   "options": [
+    "Avec sa famille",
+    "Avec son ami Marc",
+    "Avec un musicien",
+    "Seul"
+   ],
+   "question": "Avec qui l'auteur a-t-il visité le Vieux-Québec ?",
+   "reading_id": "reading",
+   "explanation": "The text says: 'j'ai visité le Vieux-Québec avec mon ami Marc.'",
+   "answer_index": 1,
+   "grammar_topics": [
+    "passe-compose-avoir"
+   ]
+  },
+  {
+   "id": "ex-12",
+   "type": "comprehension",
+   "options": [
+    "Une poutine",
+    "Un sandwich",
+    "Une tourtière",
+    "Une pizza"
+   ],
+   "question": "Qu'est-ce que l'auteur a mangé à midi ?",
+   "reading_id": "reading",
+   "explanation": "The text says: 'J'ai goûté une tourtière délicieuse !'",
+   "answer_index": 2,
+   "grammar_topics": [
+    "passe-compose-avoir"
+   ]
+  }
+ ],
+ "objectives": [
+  "Form the passé composé with avoir for -er verbs"
+ ],
+ "region_focus": "qc",
+ "grammar_topics": [
+  "passe-compose-avoir"
+ ],
+ "schema_version": 1,
+ "content_version": 1,
+ "estimated_minutes": 33
+}

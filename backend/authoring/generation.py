@@ -548,5 +548,8 @@ class LessonReviser:
         started = time.perf_counter()
         revised, completion = complete_structured(self.chat, messages, model, max_tokens=MAX_TOKENS)
         self.stats.record(time.perf_counter() - started, completion.completion_tokens or 0)
-        # Identity is not the LLM's to change.
-        return revised.model_copy(update={"id": data["id"], "type": data["type"]})
+        # Identity and curriculum metadata are not the LLM's to change.
+        keep: dict[str, Any] = {
+            k: data[k] for k in ("id", "type", "grammar_topics", "reading_id") if k in data
+        }
+        return revised.model_copy(update=keep)

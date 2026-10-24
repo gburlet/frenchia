@@ -1,0 +1,12 @@
+{
+ "judge_score": 0.974,
+ "judge_category_hit": 1.0,
+ "judge_quebec_accept": 1.0,
+ "grammar_score": 1.0,
+ "quebec_score": 1.0,
+ "conjugation_score": 1.0,
+ "genders_score": 1.0,
+ "explain_score": 0.944,
+ "json_valid_rate": 1.0
+}
+  MISS judge/pron-04: {"verdict": "incorrect", "categories": ["spelling_accents"], "category_hit": null, "expected": {"verdict": "correct"}, "errors": [{"category": "spelling_accents", "severity": "error", "span": "moi!", "explanation": "Fren

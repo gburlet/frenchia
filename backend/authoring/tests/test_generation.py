@@ -210,3 +210,26 @@ def test_reviser_repairs_items_that_no_longer_validate() -> None:
     assert revised.options[1] == "J'ai manger."  # type: ignore[union-attr]
     prompt = next(ms[-1].content for t, ms in chat.calls if t == "MultipleChoiceExercise")
     assert 'currently invalid: Value error, duplicate options: "J\'ai mangé."' in prompt
+
+
+def test_reviser_keeps_exercise_metadata() -> None:
+    lesson = (
+        LessonGenerator(ScriptedChat(), reference(), critic=False)
+        .generate(brief(), content_version=1, job_id=None)
+        .lesson
+    )
+    data = lesson.model_dump(mode="json", exclude_none=True)
+
+    class DropsTopics(ScriptedChat):
+        def complete(self, messages, *, json_schema=None, temperature=0.0, max_tokens=800):
+            completion = super().complete(messages, json_schema=json_schema)
+            if (json_schema or {}).get("title") == "FillBlankExercise":
+                item = json.loads(completion.content)
+                item["grammar_topics"] = []
+                return completion.__class__(content=json.dumps(item), model="x", latency_ms=1)
+            return completion
+
+    result = LessonReviser(DropsTopics(), reference(), critic=False).revise(
+        data, "Simplify", ["ex-01"], content_version=1, job_id=None
+    )
+    assert result.lesson.exercises[0].grammar_topics == ["passe-compose-avoir"]

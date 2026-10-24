@@ -1,0 +1,16 @@
+# Ground truth for reviewing generated lessons. Each expected issue matches a reviewer finding
+# on the same item whose problem/fix text contains any keyword (case-insensitive). Findings that
+# match nothing are printed for a human to classify as a real extra catch or a false alarm.
+- lesson: lessons/a2-passe-compose-er.gemma-original.json
+  expected:
+    - {id: parler-a, item: ex-04, keywords: ["parler à", "parlé à", " à son", "preposition"], what: "« Elle a parlé son ami »: parler needs à"}
+    - {id: ex09-two-correct, item: ex-09, keywords: ["?", "question", "punctuation", "two correct", "also correct", "duplicate"], what: "option = correct answer + ? (also a valid sentence)"}
+    - {id: ex10-punct, item: ex-10, keywords: ["?", "punctuation", "duplicate", "identical"], what: "option = correct answer + ?"}
+    - {id: samedi-note, item: examples, keywords: ["samedi"], what: "false claim that « samedi » vs « le samedi » is a Québec difference"}
+    - {id: souper-note, item: examples, keywords: ["souper"], what: "souper note attached to an unrelated sentence"}
+    - {id: diner-lunch, item: ex-01, keywords: ["dîner", "diner", "lunch"], what: "in Québec dîner = lunch, translated as dinner"}
+    - {id: week-end, item: reading, keywords: ["week-end", "weekend", "fin de semaine"], what: "« le week-end dernier » in a Québec-first reading titled « Ma fin de semaine »"}
+    - {id: glossary-articles, item: reading, keywords: ["article"], what: "glossary entries include articles"}
+    - {id: fake-pitfall, item: explanation, keywords: ["j'é", "é parlé", "pitfall"], what: "invented pitfall « J'é parlé »"}
+- lesson: lessons/a2-passe-compose-er.gemma-revised.json
+  expected: []   # the revised draft: findings here are extra catches or false alarms
