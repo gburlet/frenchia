@@ -1,0 +1,20 @@
+# Open explanations scored by a concept rubric: each group is a list of alternatives (regex,
+# case-insensitive); the score is the fraction of groups matched. Text is kept for human review.
+- id: ex-01
+  question: "Why do we say « à Montréal » but « au Canada »?"
+  rubric: [["city", "cities", "ville"], ["masculin", "masculine"], ["à \\+ le", "à le", "contraction", "contract"]]
+- id: ex-02
+  question: "Pourquoi écrit-on « Elle est allée » avec un -e à la fin ?"
+  rubric: [["être"], ["accord", "agree", "agreement", "s'accorde"], ["sujet", "subject", "féminin", "feminine"]]
+- id: ex-03
+  question: "When should I use the imparfait instead of the passé composé?"
+  rubric: [["habit", "habitual", "repeated", "habitude", "used to"], ["background", "description", "describ", "ongoing", "en cours", "context"], ["completed", "specific", "single", "finished", "ponctuel", "one-time", "terminé"]]
+- id: ex-04
+  question: "Why is it « Je n'ai pas de pain » and not « Je n'ai pas du pain »?"
+  rubric: [["negat", "négation"], ["partitive", "partitif"], ["\\bde\\b"]]
+- id: ex-05
+  question: "In Québec, what does « dîner » mean, and how is that different from France?"
+  rubric: [["lunch", "midi", "noon"], ["souper", "supper"], ["France"]]
+- id: ex-06
+  question: "Why does the pronoun come before the verb in « Je la vois »?"
+  rubric: [["object", "objet", "COD", "direct"], ["before", "avant", "precede", "in front"], ["verb", "verbe"]]

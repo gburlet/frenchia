@@ -1,0 +1,37 @@
+# Structured-generation cases with deterministic ground truth.
+# conjugation: the model returns the full form with subject pronoun ("j'étais", "que je puisse",
+# "je me lève"); the scorer normalizes case/apostrophes and strips a leading "que"/"qu'".
+conjugation:
+  - {id: conj-01, verb: être, tense: imparfait, forms: {je: "j'étais", tu: "tu étais", il: "il était", nous: "nous étions", vous: "vous étiez", ils: "ils étaient"}}
+  - {id: conj-02, verb: aller, tense: futur simple, forms: {je: "j'irai", tu: "tu iras", il: "il ira", nous: "nous irons", vous: "vous irez", ils: "ils iront"}}
+  - {id: conj-03, verb: faire, tense: conditionnel présent, forms: {je: "je ferais", tu: "tu ferais", il: "il ferait", nous: "nous ferions", vous: "vous feriez", ils: "ils feraient"}}
+  - {id: conj-04, verb: venir, tense: passé composé (masculine subjects), forms: {je: "je suis venu", tu: "tu es venu", il: "il est venu", nous: "nous sommes venus", vous: ["vous êtes venus", "vous êtes venu"], ils: "ils sont venus"}}
+  - {id: conj-05, verb: pouvoir, tense: subjonctif présent, forms: {je: "je puisse", tu: "tu puisses", il: "il puisse", nous: "nous puissions", vous: "vous puissiez", ils: "ils puissent"}}
+  - {id: conj-06, verb: prendre, tense: présent, forms: {je: "je prends", tu: "tu prends", il: "il prend", nous: "nous prenons", vous: "vous prenez", ils: "ils prennent"}}
+  - {id: conj-07, verb: se lever, tense: présent, forms: {je: "je me lève", tu: "tu te lèves", il: "il se lève", nous: "nous nous levons", vous: "vous vous levez", ils: "ils se lèvent"}}
+  - {id: conj-08, verb: avoir, tense: subjonctif présent, forms: {je: "j'aie", tu: "tu aies", il: "il ait", nous: "nous ayons", vous: "vous ayez", ils: "ils aient"}}
+  - {id: conj-09, verb: finir, tense: imparfait, forms: {je: "je finissais", tu: "tu finissais", il: "il finissait", nous: "nous finissions", vous: "vous finissiez", ils: "ils finissaient"}}
+  - {id: conj-10, verb: vouloir, tense: conditionnel présent, forms: {je: "je voudrais", tu: "tu voudrais", il: "il voudrait", nous: "nous voudrions", vous: "vous voudriez", ils: "ils voudraient"}}
+
+# Noun gender: model returns gender (m/f) and indefinite article for each noun.
+genders:
+  id: gender-01
+  nouns: {problème: m, plage: f, musée: m, voiture: f, lycée: m, fin: f, silence: m, clé: f, dentifrice: m, peau: f, groupe: m, souris: f, dent: f, lait: m, mer: f, légume: m}
+
+# Open generation: structural checks are automatic; the content is dumped for human review.
+open:
+  - id: gen-fill-01
+    kind: fill_blank
+    instruction: >-
+      Create 4 fill-in-the-blank items for an A2 learner practising the passé composé with
+      the auxiliary être. Use everyday Québec contexts (e.g. dépanneur, fin de semaine, souper).
+      Each sentence contains exactly one blank written as ___ ; the answer is the full verb
+      phrase (auxiliary + past participle, correctly agreed).
+    count: 4
+  - id: gen-trans-01
+    kind: translation
+    instruction: >-
+      Create 3 English-to-French translation exercises for an A2 learner about weekend
+      activities. Prefer Québec usage. For each, give the English prompt and at least two
+      different correct French translations.
+    count: 3

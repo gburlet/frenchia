@@ -43,6 +43,21 @@ for p in "${FRONTEND_HOST_PORT:-5173}" "${BACKEND_HOST_PORT:-8000}" "${POSTGRES_
   fi
 done
 
+# Native inference ports: fine if held by our own launchd jobs, a conflict otherwise.
+for spec in "llm:11435" "tts:${TTS_PORT:-8791}"; do
+  name=${spec%%:*}; port=${spec##*:}
+  holder_pid=$(lsof -nP -iTCP:"$port" -sTCP:LISTEN -t 2>/dev/null | head -1)
+  our_pid=$(launchctl print "gui/$(id -u)/ca.amii.frenchia.$name" 2>/dev/null | awk '/^\tpid = /{print $3}')
+  if [[ -n "$holder_pid" && "$holder_pid" != "$our_pid" ]]; then
+    fail "Port $port ($name) is in use by $(ps -o comm= -p "$holder_pid")"
+  else
+    ok "Port $port ($name) available"
+  fi
+done
+version=$(grep '^OLLAMA_VERSION=' services/llm/ollama.version | cut -d= -f2)
+[[ -x ".tools/ollama/$version/ollama" ]] && ok "Ollama $version installed" || fail "Ollama $version missing; run 'just setup-native'"
+[[ -x services/tts/.venv/bin/python ]] && ok "TTS environment present" || fail "TTS environment missing; run 'just setup-native'"
+
 free_pct=$(memory_pressure 2>/dev/null | awk -F': ' '/free percentage/{gsub("%","",$2); print $2}')
 swap_used=$(sysctl -n vm.swapusage | awk '{print $6}')
 if [[ -n "$free_pct" && "$free_pct" -lt 25 ]]; then

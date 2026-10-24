@@ -1,0 +1,15 @@
+# Québec French usage (multiple choice, one correct option).
+- {id: qc-mc-01, question: "Au Québec, le « dîner » est généralement le repas de…", options: {a: "matin", b: "midi", c: "soir", d: "minuit"}, answer: b}
+- {id: qc-mc-02, question: "Au Québec, « magasiner » veut dire…", options: {a: "to store something", b: "to go shopping", c: "to manage a shop", d: "to deliver"}, answer: b}
+- {id: qc-mc-03, question: "« Ma blonde » au Québec signifie…", options: {a: "my blond friend", b: "my girlfriend", c: "my hairdresser", d: "my sister"}, answer: b}
+- {id: qc-mc-04, question: "Au Québec, un « dépanneur » est généralement…", options: {a: "a convenience store", b: "a gas station", c: "a pharmacy", d: "a bakery"}, answer: a}
+- {id: qc-mc-05, question: "Que veut dire « C'est plate » en français québécois ?", options: {a: "It's flat", b: "It's boring", c: "It's cheap", d: "It's easy"}, answer: b}
+- {id: qc-mc-06, question: "« Une tuque » est…", options: {a: "a winter hat", b: "a scarf", c: "a mitten", d: "a boot"}, answer: a}
+- {id: qc-mc-07, question: "Dans « Tu veux-tu un café ? », le « -tu » placé après le verbe…", options: {a: "is a second subject meaning 'you'", b: "marks a yes/no question", c: "is a spelling mistake", d: "marks the past tense"}, answer: b}
+- {id: qc-mc-08, question: "En français québécois, « la fin de semaine » correspond à…", options: {a: "Friday afternoon", b: "the weekend", c: "a long weekend", d: "the end of the month"}, answer: b}
+- {id: qc-mc-09, question: "Au Québec, on dit souvent « bienvenue » pour répondre à…", options: {a: "bonjour", b: "merci", c: "au revoir", d: "excusez-moi"}, answer: b}
+- {id: qc-mc-10, question: "« Il fait frette » signifie…", options: {a: "it's very cold", b: "it's windy", c: "it's foggy", d: "it's very hot"}, answer: a}
+- {id: qc-mc-11, question: "Le mot recommandé au Québec pour « e-mail » est…", options: {a: "mél", b: "courriel", c: "e-lettre", d: "messagel"}, answer: b}
+- {id: qc-mc-12, question: "Au Québec, « un char » désigne familièrement…", options: {a: "a tank", b: "a car", c: "a shopping cart", d: "a bus"}, answer: b}
+- {id: qc-mc-13, question: "« Être tanné » signifie…", options: {a: "to be suntanned", b: "to be fed up", c: "to be sore after exercise", d: "to be in a hurry"}, answer: b}
+- {id: qc-mc-14, question: "« Pantoute » veut dire…", options: {a: "not at all", b: "everything", c: "everywhere", d: "sometimes"}, answer: a}

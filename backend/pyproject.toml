@@ -11,6 +11,8 @@ dependencies = [
     "django-environ==0.14.0",
     "uvicorn[standard]==0.54.0",
     "django-tasks-db==0.13.0",
+    "httpx==0.28.1",
+    "pydantic==2.14.1",
 ]
 
 [dependency-groups]

@@ -1,0 +1,58 @@
+[project]
+name = "frenchia-tts"
+version = "0.1.0"
+description = "Native Kokoro (MLX) TTS HTTP service for Frenchia"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "mlx-audio==0.6.1",
+  "mlx==0.32.4",
+  "misaki==0.9.4",
+  "phonemizer-fork==3.3.2",
+  "espeakng-loader==0.2.4",
+  "soundfile==0.14.0",
+  "numpy==2.5.4",
+  "fastapi==0.162.0",
+  "uvicorn==0.54.0",
+]
+
+[project.scripts]
+frenchia-tts = "frenchia_tts.__main__:main"
+
+[dependency-groups]
+dev = [
+    "httpx==0.28.1",
+    "mypy==2.4.0",
+    "pytest==9.1.1",
+    "ruff==0.17.2",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/frenchia_tts"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-m 'not live'"
+markers = ["live: loads the real Kokoro model (run with `pytest -m live`)"]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests", "scripts"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+ignore = ["RUF001", "RUF012", "SIM905"]  # French typography / test fakes
+
+[tool.mypy]
+strict = true
+python_version = "3.12"
+files = ["src", "tests", "scripts"]
+
+[[tool.mypy.overrides]]
+module = ["mlx_audio.*", "mlx.*", "misaki.*", "soundfile.*"]
+ignore_missing_imports = true

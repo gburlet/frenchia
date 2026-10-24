@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "django_tasks_db",
     "accounts",
+    "inference",
 ]
 
 MIDDLEWARE = [
@@ -99,6 +100,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
     "DEFAULT_RENDERER_CLASSES": _renderers,
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "EXCEPTION_HANDLER": "config.exceptions.exception_handler",
 }
 
 SPECTACULAR_SETTINGS = {
@@ -109,6 +111,20 @@ SPECTACULAR_SETTINGS = {
     "SERVE_PERMISSIONS": ["rest_framework.permissions.AllowAny"],
     "SERVE_AUTHENTICATION": [],
 }
+
+# Native inference services (see inference/providers.py). MODE=fake swaps in deterministic
+# stand-ins for tests and for working without the LLM/TTS running.
+INFERENCE = {
+    "MODE": env("INFERENCE_MODE", default="live"),
+    "LLM_BASE_URL": env("INFERENCE_LLM_BASE_URL", default="http://host.docker.internal:11435/v1"),
+    "LLM_MODEL": env("INFERENCE_LLM_MODEL", default="gemma4:12b-it-qat"),
+    "LLM_TIMEOUT_S": env.float("INFERENCE_LLM_TIMEOUT_S", default=120.0),
+    "TTS_BASE_URL": env("INFERENCE_TTS_BASE_URL", default="http://host.docker.internal:8791"),
+    "TTS_MODEL": env("INFERENCE_TTS_MODEL", default="mlx-community/Kokoro-82M-bf16"),
+    "TTS_VOICE": env("INFERENCE_TTS_VOICE", default="ff_siwis"),
+    "TTS_TIMEOUT_S": env.float("INFERENCE_TTS_TIMEOUT_S", default=60.0),
+}
+AUDIO_CACHE_DIR = Path(env("AUDIO_CACHE_DIR", default=str(BASE_DIR / "var" / "audio")))
 
 TASKS = {
     "default": {
@@ -134,4 +150,6 @@ LOGGING = {
         },
     },
     "root": {"handlers": ["console"], "level": env("DJANGO_LOG_LEVEL")},
+    # One line per inference call is logged by the providers; httpx's own lines are noise.
+    "loggers": {"httpx": {"level": "WARNING"}, "httpcore": {"level": "WARNING"}},
 }

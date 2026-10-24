@@ -8,8 +8,11 @@ x-backend: &backend
   env_file: .env
   environment:
     DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    AUDIO_CACHE_DIR: /var/frenchia/audio
   volumes:
     - ./backend:/app
+    # Content-addressed TTS cache, kept on the host (var/ is gitignored)
+    - ./var/audio:/var/frenchia/audio
   depends_on:
     db:
       condition: service_healthy

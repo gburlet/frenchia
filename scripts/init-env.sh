@@ -5,7 +5,18 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 if [[ -f .env ]]; then
-  echo "• .env already exists; leaving it unchanged"
+  # Append settings added to .env.example since .env was created; never touch existing ones.
+  added=0
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    [[ "$line" =~ ^([A-Z_][A-Z0-9_]*)= ]] || continue
+    key="${BASH_REMATCH[1]}"
+    grep -q "^${key}=" .env && continue
+    [[ "$line" == *=__GENERATE__ ]] && line="${line%__GENERATE__}$(openssl rand -base64 48 | tr -dc 'A-Za-z0-9' | head -c 40)"
+    printf '%s\n' "$line" >>.env
+    echo "• Added ${key} to .env"
+    added=1
+  done <.env.example
+  [[ $added == 1 ]] || echo "• .env is up to date"
   exit 0
 fi
 

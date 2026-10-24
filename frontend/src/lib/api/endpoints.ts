@@ -1,5 +1,5 @@
 import { api, ApiError } from "./client";
-import type { HealthResponse, LoginRequest, User } from "./types";
+import type { AudioClip, HealthResponse, LoginRequest, User } from "./types";
 
 /** Returns the current user, or null when logged out (401/403). */
 export async function fetchMe(signal?: AbortSignal): Promise<User | null> {
@@ -35,3 +35,7 @@ export async function fetchHealth(signal?: AbortSignal): Promise<HealthResponse>
     throw error;
   }
 }
+
+/** Synthesize French speech (served from the server-side cache when already generated). */
+export const createAudio = (body: { text: string; speed?: number }) =>
+  api.post<AudioClip>("/api/audio", body);

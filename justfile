@@ -18,7 +18,12 @@ setup:
     {{compose}} run --rm backend python manage.py ensure_learner
     cd backend && uv sync --frozen
     cd frontend && npm ci --no-audit --no-fund
+    ./scripts/setup-native.sh
     @echo "✓ Setup complete. Run 'just start'."
+
+# Install/refresh native inference services (pinned Ollama, TTS venv, models)
+setup-native:
+    ./scripts/setup-native.sh
 
 # Start everything and wait until healthy
 start:
@@ -26,19 +31,38 @@ start:
     {{compose}} up -d --build --wait db
     {{compose}} run --rm backend python manage.py migrate --noinput
     {{compose}} up -d --build --wait --wait-timeout 300
+    @python3 -I scripts/native.py up
+    @./scripts/warm-llm.sh
     @./scripts/status.sh
 
-# Stop Frenchia services (data is kept)
+# Stop Frenchia services (data is kept). Only this project's containers and launchd jobs.
 stop:
     {{compose}} stop
+    @python3 -I scripts/native.py down
 
-# Restart all services, or the named ones (e.g. `just restart backend`)
+# Restart all services, or the named ones (e.g. `just restart backend tts`)
 restart *services:
-    {{compose}} restart {{services}}
+    #!/usr/bin/env bash
+    set -euo pipefail
+    docker_svcs=(); native_svcs=()
+    for s in {{services}}; do
+      case "$s" in llm|tts) native_svcs+=("$s");; *) docker_svcs+=("$s");; esac
+    done
+    if [[ -z "{{services}}" || ${#docker_svcs[@]} -gt 0 ]]; then {{compose}} restart ${docker_svcs[@]+"${docker_svcs[@]}"}; fi
+    if [[ -z "{{services}}" || ${#native_svcs[@]} -gt 0 ]]; then python3 -I scripts/native.py restart ${native_svcs[@]+"${native_svcs[@]}"}; fi
 
-# Follow logs for all services, or the named ones
+# Follow logs: Docker services by name, or `llm` / `tts` for the native services
 logs *services:
-    {{compose}} logs -f --tail=200 {{services}}
+    #!/usr/bin/env bash
+    set -euo pipefail
+    case "{{services}}" in
+      llm|tts) exec tail -n 200 -F "var/log/{{services}}.log" ;;
+      *) exec {{compose}} logs -f --tail=200 {{services}} ;;
+    esac
+
+# Call the live LLM and TTS through Django's provider layer
+smoke:
+    {{compose}} exec backend python manage.py inference_smoke
 
 # Service state and health
 status:

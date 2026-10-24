@@ -1,0 +1,20 @@
+[
+  {
+    "model": "gemma4:12b-it-qat",
+    "load_s": 5.9,
+    "decode_tok_s": 22.0,
+    "prefill_tok_s": 109.0,
+    "resident_gb": 1.01,
+    "resident_vram_gb": 1.01,
+    "context_length": 8192,
+    "swap_before_mb": 22854.31,
+    "swap_after_mb": 22877.62,
+    "free_pct_after": 13,
+    "judge_score": 0.974,
+    "judge_category_hit": 0.96,
+    "judge_quebec_accept": 0.75,
+    "json_valid_rate": 1.0,
+    "judge_latency_p50": 13.5,
+    "judge_latency_p90": 16.32
+  }
+]

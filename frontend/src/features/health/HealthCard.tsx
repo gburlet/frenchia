@@ -5,6 +5,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { fetchHealth } from "@/lib/api/endpoints";
 import { queryKeys } from "@/lib/api/queryKeys";
 
+const SERVICE_LABELS: Record<string, string> = {
+  database: "Database",
+  llm: "Language model",
+  tts: "Speech (TTS)",
+};
+
 function variantFor(status: string) {
   if (status === "ok") return "success" as const;
   if (status === "error") return "failure" as const;
@@ -43,7 +49,7 @@ export function HealthCard() {
               </li>
               {Object.entries(health.data.services).map(([name, status]) => (
                 <li key={name} className="flex items-center justify-between gap-4">
-                  <span className="capitalize text-detail">{name}</span>
+                  <span className="text-detail">{SERVICE_LABELS[name] ?? name}</span>
                   <Badge variant={variantFor(status)}>{status}</Badge>
                 </li>
               ))}

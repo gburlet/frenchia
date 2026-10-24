@@ -20,8 +20,8 @@ describe("HealthCard", () => {
       },
     });
     renderCard();
-    expect(await screen.findByText("database")).toBeInTheDocument();
-    expect(screen.getByText("llm")).toBeInTheDocument();
+    expect(await screen.findByText("Database")).toBeInTheDocument();
+    expect(screen.getByText("Language model")).toBeInTheDocument();
     expect(screen.getByText("error")).toHaveClass("bg-failure");
     expect(screen.getAllByText("ok").every((el) => el.classList.contains("bg-success"))).toBe(true);
   });

@@ -1,4 +1,5 @@
 import { useMe } from "@/features/auth/hooks";
+import { VoiceCheckCard } from "@/features/audio/VoiceCheckCard";
 import { HealthCard } from "@/features/health/HealthCard";
 
 export function Dashboard() {
@@ -8,6 +9,7 @@ export function Dashboard() {
       <h1 className="text-3xl">Bonjour, {me.data?.username}</h1>
       <div className="grid gap-6 md:grid-cols-2">
         <HealthCard />
+        <VoiceCheckCard />
       </div>
     </div>
   );

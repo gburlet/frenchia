@@ -1,0 +1,4 @@
+# Pinned Ollama release for the project-owned LLM service.
+# Upgrade deliberately: bump both lines, run `just setup-llm`, then `just eval`.
+OLLAMA_VERSION=0.40.11
+OLLAMA_SHA256=aea7d3f2e32371b7644a6e2ec8d4f26820a0e3965918cce8a46cef3e947f6291

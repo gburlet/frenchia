@@ -1,0 +1,16 @@
+# Multiple-choice grammar items with exactly one correct option.
+- {id: g-01, question: "Hier soir, nous ___ au cinéma.", options: {a: "sommes allés", b: "avons allé", c: "allions allés", d: "sommes allé"}, answer: a}
+- {id: g-02, question: "Quand j'étais petit, je ___ souvent chez mes grands-parents.", options: {a: "suis allé", b: "allais", c: "irai", d: "vais aller"}, answer: b}
+- {id: g-03, question: "I talked to her yesterday: Je ___ ai parlé hier.", options: {a: "la", b: "lui", c: "leur", d: "y"}, answer: b}
+- {id: g-04, question: "Il faut que tu ___ tes devoirs.", options: {a: "fais", b: "fasses", c: "feras", d: "faisais"}, answer: b}
+- {id: g-05, question: "Si j'étais riche, j'___ une maison au bord du lac.", options: {a: "achète", b: "achèterai", c: "achèterais", d: "aurais acheté"}, answer: c}
+- {id: g-06, question: "Tu as vu mes clés ? — Oui, je ___ ai vues sur la table.", options: {a: "les", b: "leur", c: "l'", d: "en"}, answer: a}
+- {id: g-07, question: "Elle habite ___ Québec depuis 2020. (the city of Québec)", options: {a: "au", b: "à", c: "en", d: "dans le"}, answer: b}
+- {id: g-08, question: "Nous allons ___ États-Unis cet été.", options: {a: "en", b: "à", c: "aux", d: "au"}, answer: c}
+- {id: g-09, question: "Je n'ai pas ___ pain.", options: {a: "du", b: "de", c: "le", d: "des"}, answer: b}
+- {id: g-10, question: "C'est la fille ___ je t'ai parlé.", options: {a: "que", b: "qui", c: "dont", d: "où"}, answer: c}
+- {id: g-11, question: "Les lettres qu'il a ___ sont arrivées.", options: {a: "écrit", b: "écrites", c: "écrits", d: "écrite"}, answer: b}
+- {id: g-12, question: "J'habite ici ___ cinq ans.", options: {a: "pendant", b: "depuis", c: "pour", d: "dans"}, answer: b}
+- {id: g-13, question: "She just finished her work: Elle ___ de finir son travail.", options: {a: "vient", b: "va", c: "a", d: "est"}, answer: a}
+- {id: g-14, question: "Demain, il ___ beau.", options: {a: "fera", b: "faisait", c: "a fait", d: "ferait"}, answer: a}
+- {id: g-15, question: "Mes parents se sont ___ en 1990.", options: {a: "rencontré", b: "rencontrés", c: "rencontrées", d: "rencontrer"}, answer: b}

@@ -1,0 +1,21 @@
+# Seed Québec lexicon used to ground judging prompts (matched by regex against the source,
+# references and learner answer). It becomes the reviewed content/reference/quebec.yaml in
+# Phase 3. References: OQLF Banque de dépannage linguistique and Usito.
+- {term: souper, match: ['\bsoup(er|e|es|ons|ez|ent|é|ait|aient)\b'], meaning: "evening meal; verb: to have supper", france: "dîner", register: standard}
+- {term: dîner, match: ['\bd[îi]n(er|e|es|ons|ez|ent|é|ait)\b'], meaning: "midday meal (lunch); verb: to have lunch", france: "déjeuner", register: standard}
+- {term: déjeuner, match: ['\bdéjeun(er|e|es|ons|ez|ent|é|ait)\b'], meaning: "morning meal (breakfast); verb: to have breakfast", france: "petit-déjeuner", register: standard}
+- {term: magasiner, match: ['\bmagasin(er|e|es|ons|ez|ent|é|age)\b'], meaning: "to go shopping", france: "faire du shopping / les magasins", register: standard}
+- {term: blonde, match: ['\bblonde\b'], meaning: "girlfriend", france: "copine", register: familiar}
+- {term: chum, match: ['\bchum\b'], meaning: "boyfriend; also a (male) friend", france: "copain, petit ami", register: familiar}
+- {term: fin de semaine, match: ['fin de semaine'], meaning: "weekend", france: "week-end", register: standard}
+- {term: char, match: ['\bchars?\b'], meaning: "car", france: "voiture", register: familiar, notes: "« auto » is also common and neutral"}
+- {term: "-tu (interrogative particle)", match: ['-tu\b'], meaning: "marks a yes/no question in informal speech: « Tu viens-tu ? » = Are you coming?", france: "Tu viens ? / Est-ce que tu viens ?", register: familiar}
+- {term: frette, match: ['\bfrette\b'], meaning: "very cold", france: "très froid", register: familiar}
+- {term: à matin, match: ['à matin'], meaning: "this morning", france: "ce matin", register: familiar}
+- {term: dépanneur, match: ['\bdépanneur'], meaning: "convenience store", france: "épicerie de quartier, supérette", register: standard}
+- {term: tuque, match: ['\btuques?\b'], meaning: "knit winter hat", france: "bonnet", register: standard}
+- {term: plate, match: ['\bplates?\b'], meaning: "boring (« c'est plate »)", france: "ennuyeux", register: familiar}
+- {term: pantoute, match: ['\bpantoute\b'], meaning: "not at all", france: "pas du tout", register: familiar}
+- {term: courriel, match: ['\bcourriels?\b'], meaning: "email", france: "e-mail, mail", register: standard}
+- {term: être tanné, match: ['\btann[ée]e?s?\b'], meaning: "to be fed up", france: "en avoir marre", register: familiar}
+- {term: bienvenue, match: ['\bbienvenue\b'], meaning: "you're welcome (reply to merci)", france: "de rien, je vous en prie", register: standard}

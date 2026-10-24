@@ -19,3 +19,9 @@ export interface HealthResponse {
   services: Record<string, ServiceStatus>;
   version: string;
 }
+
+export interface AudioClip {
+  key: string;
+  url: string;
+  cached: boolean;
+}
