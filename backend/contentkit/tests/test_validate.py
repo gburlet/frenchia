@@ -140,3 +140,14 @@ def test_leftover_latex_is_flagged() -> None:
     data["sections"][0]["body"] = "parler $\\rightarrow$ parlé"
     found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
     assert any("LaTeX markup" in m for m in found)
+
+
+def test_comprehension_explanations_must_quote_the_passage() -> None:
+    data = lesson_data()
+    data["exercises"][2]["explanation"] = (
+        "The text says: « Ils ont mangé une tourtière au chalet »."
+    )
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert any("quotes text that is not in the reading" in m for m in found)
+    data["exercises"][2]["explanation"] = "The text says: « j'ai magasiné avec ma blonde »."
+    assert check_lesson_quality(Lesson.model_validate(data), reference()) == []

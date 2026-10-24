@@ -11,6 +11,7 @@ from pydantic import BaseModel, ValidationError
 
 from .models import (
     BLANK,
+    ComprehensionExercise,
     CurriculumLevel,
     ExamplesSection,
     FillBlankExercise,
@@ -134,6 +135,8 @@ def check_references(repo: Repository) -> None:
 
 # --- Deterministic quality checks ----------------------------------------------------------
 
+# « … », "…" or '…' quotations (≥ 3 words are checked against the passage)
+_QUOTE = re.compile(r"«\s*([^»]+?)\s*»|\"([^\"]+)\"|(?<![\w])'([^']{12,}?)'(?![\w])")
 _LATEX = re.compile(r"\$\\[a-zA-Z]+\$|\\(?:rightarrow|leftarrow|to|times|cdot)\b")
 
 
@@ -199,7 +202,22 @@ def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
         if _LATEX.search(text):
             add("warning", path, f"LaTeX markup in text: {_LATEX.search(text).group(0)!r}")  # type: ignore[union-attr]
 
+    passages = {
+        s.id: normalize(s.passage_fr) for s in lesson.sections if isinstance(s, ReadingSection)
+    }
     for ex in lesson.exercises:
+        if isinstance(ex, ComprehensionExercise) and ex.reading_id in passages:
+            for quote in _QUOTE.findall(ex.explanation):
+                text = next(q for q in quote if q)
+                if (
+                    len(text.split()) >= 3
+                    and normalize(text).strip(" .!?…") not in passages[ex.reading_id]
+                ):
+                    add(
+                        "error",
+                        ex.id,
+                        f"explanation quotes text that is not in the reading: {text!r}",
+                    )
         if isinstance(ex, FillBlankExercise):
             _check_fill_blank(add, ex, ref)
         if isinstance(ex, TranslateExercise):
