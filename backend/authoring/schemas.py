@@ -116,3 +116,12 @@ def batch(item: type[Step], count: int) -> type[Step]:
             "items": Field(min_length=count, max_length=count),
         },
     )
+
+
+def strip_article(item: VocabItem) -> VocabItem:
+    """The same article clean-up for items that didn't come through VocabDraft (revisions)."""
+    match = _ARTICLE.match(item.fr)
+    if not match:
+        return item
+    gender = item.gender or _ARTICLE_GENDER.get((match.group(1) or "").lower())
+    return item.model_copy(update={"fr": item.fr[match.end() :], "gender": gender})

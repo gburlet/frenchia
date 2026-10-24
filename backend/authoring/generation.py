@@ -49,6 +49,7 @@ from .schemas import (
     TranslateDraft,
     VocabularyStep,
     batch,
+    strip_article,
     vocab_item,
 )
 
@@ -500,7 +501,8 @@ class LessonReviser:
         wanted = set(targets) or set(ids)
         self.dropped: list[Issue] = []
         sections = [
-            self._item(d, SECTION_TYPES, notes, d["id"] in wanted) for d in base["sections"]
+            _clean_vocab(self._item(d, SECTION_TYPES, notes, d["id"] in wanted))
+            for d in base["sections"]
         ]
         exercises = [
             item
@@ -574,3 +576,11 @@ class LessonReviser:
             k: data[k] for k in ("id", "type", "grammar_topics", "reading_id") if k in data
         }
         return revised.model_copy(update=keep)
+
+
+def _clean_vocab(section: Any) -> Any:
+    if isinstance(section, VocabularySection):
+        return section.model_copy(update={"items": [strip_article(i) for i in section.items]})
+    if isinstance(section, ReadingSection):
+        return section.model_copy(update={"glossary": [strip_article(i) for i in section.glossary]})
+    return section

@@ -295,3 +295,19 @@ def test_vocab_drafts_are_cleaned_deterministically() -> None:
         None,
     )  # no reliable gender
     assert vocab_item(draft("magasiner", pos="verb")).gender is None
+
+
+def test_revisions_strip_glossary_articles() -> None:
+    lesson = (
+        LessonGenerator(ScriptedChat(), reference(), critic=False)
+        .generate(brief(), content_version=1, job_id=None)
+        .lesson
+    )
+    data = lesson.model_dump(mode="json", exclude_none=True)
+    reading = next(s for s in data["sections"] if s["type"] == "reading")
+    reading["glossary"][0] = {"fr": "le souper", "en": "supper", "pos": "noun", "gender": "m"}
+    result = LessonReviser(ScriptedChat(), reference(), critic=False).revise(
+        data, "Tidy", ["table"], content_version=1, job_id=None
+    )
+    revised = next(s for s in result.lesson.sections if s.type == "reading")
+    assert revised.glossary[0].fr == "souper"
