@@ -38,8 +38,10 @@ the importer and the LLM's structured output.
    from the findings straight away). Findings appear in Admin as suggestions and pre-fill the
    revision form. They are never applied automatically.
    For batches, `just content-review-import claude-haiku-5-5 --revise --approve-clean` publishes
-   every draft with no reviewer errors and no validation errors (suggestions are ignored) and
-   queues a revision for the rest. After `--max-rounds` generations (default 4) a draft with
+   every draft with no reviewer errors, no validation errors, no Québec claims missing from the
+   verified lexicon and no AI-critic flags (reviewer suggestions are ignored), and queues a
+   revision for the rest. The last two are only warnings in Admin, but they are exactly what
+   Haiku misses: it passed « avoir le feu au cul » as a Québec expression. After `--max-rounds` generations (default 4) a draft with
    errors is left for you in Admin.
 4. **Review.** Open Admin → Generation jobs. Each job shows a rendered preview, the validation report and a diff
    against the published version. Then choose one of:
