@@ -150,6 +150,8 @@ def accept_disputed_answer(attempt: ExerciseAttempt) -> Path:
     field = {"translate": "accepted_answers", "fill_blank": "answers"}.get(kind)
     if field is None:
         raise AttemptError("only translation and fill-in-the-blank answers can be accepted")
+    if attempt.exercise_revision.origin != ExerciseRevision.Origin.CURRICULUM:
+        raise AttemptError("AI-generated review exercises are not in a lesson file")
     writer = ContentWriter(Path(settings.CONTENT_DIR))
     lesson = attempt.exercise_revision.lesson_revision.lesson
     path = writer.root / "lessons" / lesson.level.lower() / f"{lesson.slug}.yaml"

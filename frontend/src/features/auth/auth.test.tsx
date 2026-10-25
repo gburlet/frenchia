@@ -1,6 +1,7 @@
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
+import { dashboardFixture } from "@/test/fixtures";
 import { mockFetch, staffUser } from "@/test/mockFetch";
 import { renderApp } from "@/test/renderApp";
 
@@ -67,6 +68,7 @@ describe("AppShell", () => {
     mockFetch({
       "GET /api/auth/me": { body: { ...staffUser, is_staff: false } },
       "GET /api/health": { body: health },
+      "GET /api/dashboard": { body: dashboardFixture() },
     });
     renderApp("/");
     expect(await screen.findByText("Bonjour, marie")).toBeInTheDocument();

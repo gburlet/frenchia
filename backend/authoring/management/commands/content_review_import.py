@@ -6,7 +6,15 @@ from django.core.management.base import BaseCommand, CommandError, CommandParser
 
 from authoring.external_review import import_findings, revision_notes
 from authoring.models import GenerationJob
-from authoring.services import request_revision
+from authoring.services import ReviewError, approve, request_revision
+
+
+def _round(job: GenerationJob) -> int:
+    """How many generations led to this job (1 for a fresh draft)."""
+    depth = 1
+    while job.parent_id is not None:
+        job, depth = job.parent, depth + 1  # type: ignore[assignment]
+    return depth
 
 
 class Command(BaseCommand):
@@ -16,6 +24,17 @@ class Command(BaseCommand):
         parser.add_argument("--reviewer", required=True, help="e.g. claude-haiku-5-5")
         parser.add_argument(
             "--revise", action="store_true", help="queue an LLM revision for jobs with findings"
+        )
+        parser.add_argument(
+            "--approve-clean",
+            action="store_true",
+            help="publish drafts with no reviewer or validation errors (suggestions are ignored)",
+        )
+        parser.add_argument(
+            "--max-rounds",
+            type=int,
+            default=4,
+            help="with --revise, leave a draft for manual review after this many generations",
         )
 
     def handle(self, *args: Any, **options: Any) -> None:
@@ -30,10 +49,19 @@ class Command(BaseCommand):
                 f"job {job_id} ({job.lesson_id}): "
                 f"{counts['error']} errors, {counts['suggestion']} suggestions"
             )
-            if options["revise"] and job.external_review:
-                notes, targets = revision_notes(job)
-                child = request_revision(job, notes, targets)
-                line += f" -> revision job {child.pk} queued"
+            clean = not counts["error"] and not job.error_count
+            if options["approve_clean"] and clean:
+                try:
+                    line += f" -> approved {approve(job).name}"
+                except ReviewError as exc:
+                    line += f" -> not approved: {exc}"
+            elif options["revise"] and job.external_review:
+                if _round(job) >= options["max_rounds"]:
+                    line += f" -> left for manual review after {options['max_rounds']} rounds"
+                else:
+                    notes, targets = revision_notes(job)
+                    child = request_revision(job, notes, targets)
+                    line += f" -> revision job {child.pk} queued"
             self.stdout.write(line)
         for error in errors:
             self.stderr.write(error)

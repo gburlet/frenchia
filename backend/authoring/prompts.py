@@ -6,6 +6,7 @@ PROMPT_VERSIONS = {
     "author.steps": "3",
     "author.revise": "1",
     "author.critic": "1",
+    "author.practice": "1",
     "bank.verb": "4",
     "bank.vocab": "2",
     "bank.revise": "2",
@@ -123,6 +124,14 @@ missing or wrong preposition, article, tense, spelling or accent, unnatural word
 'minor' = acceptable but could be more natural. Québec usage and informal spoken forms are \
 correct. Before concluding there are no errors, check verb constructions (parler à, penser à, \
 téléphoner à), agreement, articles, prepositions and elision. Do not invent errors."""
+
+PRACTICE = """\
+You are now writing extra practice for one learner who has finished this lesson. Their recent \
+mistakes on its topic:
+{mistakes}
+Write new items that practise the same points as these mistakes (not the same sentences), in \
+everyday Québec situations. Keep them short and at CEFR {level}.
+"""
 
 
 # --- Verb and vocabulary banks (Phase 6) ---------------------------------------------------

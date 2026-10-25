@@ -63,6 +63,16 @@ services:
       backend:
         condition: service_healthy
 
+  # Personalized review extras get their own worker so they never wait behind a lesson batch.
+  practice-worker:
+    <<: *backend
+    command: ["sh", "-c", "python manage.py recover_reviews && exec python manage.py db_worker --queue-name practice --no-reload"]
+    depends_on:
+      db:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+
   frontend:
     build:
       context: ./frontend

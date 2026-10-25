@@ -82,6 +82,7 @@ def _published_translations() -> Any:
     """Translate exercise revisions of currently published lesson versions."""
     return ExerciseRevision.objects.filter(
         payload__type="translate",
+        origin=ExerciseRevision.Origin.CURRICULUM,
         lesson_revision__lesson__published_revision=F("lesson_revision"),
     ).select_related("lesson_revision__lesson__unit")
 

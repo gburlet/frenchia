@@ -139,7 +139,7 @@ AUDIO_CACHE_DIR = Path(env("AUDIO_CACHE_DIR", default=str(BASE_DIR / "var" / "au
 TASKS = {
     "default": {
         "BACKEND": "django_tasks_db.DatabaseBackend",
-        "QUEUES": ["default"],
+        "QUEUES": ["default", "practice"],
     }
 }
 

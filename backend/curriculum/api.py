@@ -14,7 +14,7 @@ from accounts.models import User
 from exercises.public import public_exercise
 from progress.models import LessonProgress
 
-from .models import CurriculumLevel, GrammarTopic, Lesson, Unit
+from .models import CurriculumLevel, ExerciseRevision, GrammarTopic, Lesson, Unit
 
 
 def progress_dict(progress: LessonProgress | None) -> dict[str, Any]:
@@ -78,7 +78,9 @@ class LessonView(APIView):
         topics = GrammarTopic.objects.filter(slug__in=payload.get("grammar_topics", []))
         exercises = {
             e.exercise.stable_id.split("/", 1)[1]: e
-            for e in revision.exercise_revisions.select_related("exercise")
+            for e in revision.exercise_revisions.filter(
+                origin=ExerciseRevision.Origin.CURRICULUM
+            ).select_related("exercise")
         }
         published = Lesson.objects.filter(published_revision__isnull=False).order_by("order")
         previous = published.filter(order__lt=lesson.order).last()

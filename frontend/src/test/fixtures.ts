@@ -1,3 +1,4 @@
+import type { Dashboard } from "@/lib/api/progress";
 import type { AttemptResult, Curriculum, Lesson } from "@/lib/api/types";
 
 export const curriculumFixture: Curriculum = {
@@ -119,6 +120,41 @@ export function attemptResult(overrides: Partial<AttemptResult> = {}): AttemptRe
     feedback: { summary: "Bravo!", errors: [], corrected: null, register_note: null, accent_only: false },
     explanation: null,
     model: null,
+    ...overrides,
+  };
+}
+
+export function dashboardFixture(overrides: Partial<Dashboard> = {}): Dashboard {
+  const history = Array.from({ length: 14 }, (_, i) => ({
+    date: `2026-10-${String(12 + i).padStart(2, "0")}`,
+    items: i === 13 ? 12 : i % 3,
+    minutes: i === 13 ? 9 : 1,
+    by_kind: i === 13 ? { exercises: 8, vocab: 4 } : {},
+  }));
+  return {
+    today: "2026-10-25",
+    streak: { current: 3, longest: 7, studied_today: true },
+    minutes: { today: 9, week: 41 },
+    accuracy_week: { graded: 20, accuracy: 0.75 },
+    history,
+    lessons: { published: 6, completed: 2 },
+    vocab: {
+      cards: 40, words: 20, due_now: 5, due_today: 8, new_waiting: 10,
+      new_remaining_today: 10, reviews_today: 3, mature: 2,
+    },
+    topics: [
+      { id: "passe-compose-etre", title: "Passé composé with être", level: "A2", attempts: 6, accuracy: 0.42, last_practiced: null },
+      { id: "imparfait", title: "Imparfait", level: "A2", attempts: 4, accuracy: 0.9, last_practiced: null },
+    ],
+    weak_topics: [
+      {
+        id: "passe-compose-etre", title: "Passé composé with être", level: "A2", accuracy: 0.42,
+        attempts: 6, recent_mistakes: 2, reason: "42% recent accuracy over 6 tries; 2 mistakes in the last 3 weeks",
+      },
+    ],
+    verb_tenses: [{ tense: "passe_compose", label: "Passé composé", attempts: 10, accuracy: 0.6 }],
+    mistakes: [{ category: "auxiliary", count: 3 }],
+    review: null,
     ...overrides,
   };
 }

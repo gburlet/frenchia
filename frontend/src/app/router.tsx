@@ -7,7 +7,8 @@ import { NotFound } from "@/routes/NotFound";
 import { CurriculumPage } from "@/features/curriculum/CurriculumPage";
 import { LessonPage } from "@/features/lessons/LessonPage";
 import { TranslatePage } from "@/features/practice/TranslatePage";
-import { ProgressPage } from "@/routes/placeholders";
+import { ProgressPage } from "@/features/progress/ProgressPage";
+import { ReviewPage } from "@/features/progress/ReviewPage";
 import { VerbsPage } from "@/features/verbs/VerbsPage";
 import { VerbDetailPage } from "@/features/verbs/VerbDetailPage";
 import { VerbDrillPage } from "@/features/verbs/VerbDrillPage";
@@ -33,6 +34,7 @@ export const routes: RouteObject[] = [
           { path: "practice/vocab", element: <VocabPage /> },
           { path: "practice/vocab/review", element: <VocabReviewPage /> },
           { path: "practice/vocab/sets/:slug", element: <VocabSetPage /> },
+          { path: "practice/review", element: <ReviewPage /> },
           { path: "progress", element: <ProgressPage /> },
         ],
       },

@@ -1,7 +1,7 @@
 import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import { curriculumFixture } from "@/test/fixtures";
+import { curriculumFixture, dashboardFixture } from "@/test/fixtures";
 import { mockFetch, staffUser } from "@/test/mockFetch";
 import { renderApp } from "@/test/renderApp";
 
@@ -71,5 +71,6 @@ function mockFetchForDashboard() {
     "GET /api/auth/me": { body: staffUser },
     "GET /api/curriculum": { body: curriculumFixture },
     "GET /api/health": { body: { status: "ok", services: {}, version: "1" } },
+    "GET /api/dashboard": { body: dashboardFixture() },
   });
 }

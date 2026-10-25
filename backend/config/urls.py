@@ -16,6 +16,7 @@ urlpatterns = [
     path("api/", include("tutor.urls")),
     path("api/", include("verbs.urls")),
     path("api/", include("vocabulary.urls")),
+    path("api/", include("progress.urls")),
     path("api/curriculum", CurriculumView.as_view(), name="curriculum"),
     path("api/lessons/<slug:slug>", LessonView.as_view(), name="lesson"),
     path("api/lessons/<slug:slug>/progress", LessonProgressView.as_view(), name="lesson-progress"),

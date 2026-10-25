@@ -76,7 +76,7 @@ content-generate lesson *args:
 content-review-export *args:
     {{compose}} exec backend python manage.py content_review_export {{args}}
 
-# Attach reviewer findings (job-N.findings.json); add --revise to queue LLM revisions from them
+# Attach reviewer findings (job-N.findings.json); --revise queues LLM revisions, --approve-clean publishes error-free drafts
 content-review-import reviewer="claude-haiku-5-5" *args:
     {{compose}} exec backend python manage.py content_review_import --reviewer {{reviewer}} {{args}}
 

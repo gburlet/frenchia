@@ -37,6 +37,10 @@ the importer and the LLM's structured output.
    `just content-review-import claude-haiku-5-5` (add `--revise` to queue a local-LLM revision
    from the findings straight away). Findings appear in Admin as suggestions and pre-fill the
    revision form. They are never applied automatically.
+   For batches, `just content-review-import claude-haiku-5-5 --revise --approve-clean` publishes
+   every draft with no reviewer errors and no validation errors (suggestions are ignored) and
+   queues a revision for the rest. After `--max-rounds` generations (default 4) a draft with
+   errors is left for you in Admin.
 4. **Review.** Open Admin → Generation jobs. Each job shows a rendered preview, the validation report and a diff
    against the published version. Then choose one of:
    - **Approve & publish:** writes `content/lessons/<level>/<id>.yaml` with the next `content_version`, imports

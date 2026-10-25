@@ -79,6 +79,41 @@ def test_import_attaches_findings_and_can_queue_a_revision(
     assert job.status == GenerationJob.Status.REJECTED  # superseded by the revision
 
 
+def test_approve_clean_publishes_a_draft_with_only_suggestions(
+    job: GenerationJob, settings: Any
+) -> None:
+    folder = Path(settings.CONTENT_DIR) / REVIEW_DIR
+    call_command("content_review_export")
+    suggestions = {"issues": [i for i in FINDINGS["issues"] if i["severity"] == "suggestion"]}
+    (folder / f"job-{job.pk}.findings.json").write_text(json.dumps(suggestions))
+    call_command(
+        "content_review_import", reviewer="claude-haiku-5-5", revise=True, approve_clean=True
+    )
+    job.refresh_from_db()
+    assert job.status == GenerationJob.Status.APPROVED
+    assert not GenerationJob.objects.filter(parent=job).exists()
+    assert Lesson.objects.get(slug="a2-passe-compose-er").published_revision is not None
+
+
+def test_revisions_stop_after_max_rounds(
+    job: GenerationJob, settings: Any, django_capture_on_commit_callbacks: Any
+) -> None:
+    folder = Path(settings.CONTENT_DIR) / REVIEW_DIR
+    call_command("content_review_export")
+    (folder / f"job-{job.pk}.findings.json").write_text(json.dumps(FINDINGS))
+    with django_capture_on_commit_callbacks(execute=False):
+        call_command(
+            "content_review_import",
+            reviewer="claude-haiku-5-5",
+            revise=True,
+            approve_clean=True,
+            max_rounds=1,
+        )
+    job.refresh_from_db()
+    assert job.status == GenerationJob.Status.NEEDS_REVIEW  # errors: neither approved nor revised
+    assert not GenerationJob.objects.filter(parent=job).exists()
+
+
 def test_invalid_findings_are_reported_not_imported(job: GenerationJob, settings: Any) -> None:
     folder = Path(settings.CONTENT_DIR) / REVIEW_DIR
     folder.mkdir(parents=True, exist_ok=True)
