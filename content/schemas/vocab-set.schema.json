@@ -1,0 +1,246 @@
+{
+  "$defs": {
+    "Provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "generator": {
+          "title": "Generator",
+          "type": "string"
+        },
+        "prompts": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {},
+          "title": "Prompts",
+          "type": "object"
+        },
+        "generated_at": {
+          "format": "date-time",
+          "title": "Generated At",
+          "type": "string"
+        },
+        "generated_hash": {
+          "title": "Generated Hash",
+          "type": "string"
+        },
+        "reviewed_by": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reviewed By"
+        },
+        "job_id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Job Id"
+        }
+      },
+      "required": [
+        "generator",
+        "generated_at",
+        "generated_hash"
+      ],
+      "title": "Provenance",
+      "type": "object"
+    },
+    "VocabEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 80,
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "fr": {
+          "minLength": 1,
+          "title": "Fr",
+          "type": "string"
+        },
+        "en": {
+          "minLength": 1,
+          "title": "En",
+          "type": "string"
+        },
+        "pos": {
+          "enum": [
+            "noun",
+            "verb",
+            "adjective",
+            "adverb",
+            "expression",
+            "other"
+          ],
+          "title": "Pos",
+          "type": "string"
+        },
+        "gender": {
+          "anyOf": [
+            {
+              "enum": [
+                "m",
+                "f"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Gender"
+        },
+        "plural": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Plural"
+        },
+        "region": {
+          "default": "common",
+          "enum": [
+            "qc",
+            "fr",
+            "common"
+          ],
+          "title": "Region",
+          "type": "string"
+        },
+        "formality": {
+          "default": "standard",
+          "enum": [
+            "formal",
+            "standard",
+            "familiar"
+          ],
+          "title": "Formality",
+          "type": "string"
+        },
+        "example_fr": {
+          "minLength": 1,
+          "title": "Example Fr",
+          "type": "string"
+        },
+        "example_en": {
+          "minLength": 1,
+          "title": "Example En",
+          "type": "string"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        }
+      },
+      "required": [
+        "id",
+        "fr",
+        "en",
+        "pos",
+        "example_fr",
+        "example_en"
+      ],
+      "title": "VocabEntry",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "id": {
+      "maxLength": 80,
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "title": "Id",
+      "type": "string"
+    },
+    "content_version": {
+      "minimum": 1,
+      "title": "Content Version",
+      "type": "integer"
+    },
+    "level": {
+      "enum": [
+        "A1",
+        "A2",
+        "B1",
+        "B2",
+        "C1",
+        "C2"
+      ],
+      "title": "Level",
+      "type": "string"
+    },
+    "title": {
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    },
+    "title_en": {
+      "minLength": 1,
+      "title": "Title En",
+      "type": "string"
+    },
+    "entries": {
+      "items": {
+        "$ref": "#/$defs/VocabEntry"
+      },
+      "maxItems": 40,
+      "minItems": 5,
+      "title": "Entries",
+      "type": "array"
+    },
+    "provenance": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Provenance"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "id",
+    "content_version",
+    "level",
+    "title",
+    "title_en",
+    "entries"
+  ],
+  "title": "VocabSet",
+  "type": "object"
+}

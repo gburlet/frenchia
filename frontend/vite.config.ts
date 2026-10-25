@@ -22,5 +22,7 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: ["./src/test/setup.ts"],
     css: false,
+    // Generous: the suite shares the machine with the local LLM during content generation.
+    testTimeout: 20000,
   },
 });

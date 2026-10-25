@@ -40,7 +40,7 @@
   formality: standard
 - term: char
   match: ['\bchars?\b']
-  meaning: "car"
+  meaning: "car; masculine: « un char », « mon char »"
   france: voiture
   formality: familiar
   notes: "« auto » and « voiture » are neutral in Québec."
@@ -98,4 +98,231 @@
   match: ["\\bcentres? d['’]achats?\\b"]
   meaning: "shopping mall (very common in Québec; the OQLF recommends « centre commercial »)"
   france: centre commercial
+  formality: standard
+
+# --- Added 2026-10-24 (Phase 6: Verb & Vocabulary Stations), pending learner review --------
+- term: jaser
+  match: ['\bjas(er|e|es|ons|ez|ent|é|ait|aient|ais|erai|erait|ette)\b']
+  meaning: "to chat, talk casually; « une jasette » = a chat"
+  france: bavarder, discuter
+  formality: familiar
+- term: placoter
+  match: ['\bplacot(er|e|es|ons|ez|ent|é|ait|aient|ais|age)\b']
+  meaning: "to chatter, gossip about little things"
+  france: papoter, bavarder
+  formality: familiar
+- term: niaiser
+  match: ['\bniais(er|e|es|ons|ez|ent|é|ée|ait|aient|ais|eux|euse)\b']
+  meaning: "to fool around, waste time; « niaiser quelqu'un » = to tease or pull someone's leg"
+  france: faire l'idiot, perdre son temps, taquiner
+  formality: familiar
+- term: pogner
+  match: ['\bpogn(er|e|es|ons|ez|ent|é|ée|és|ait|aient|ais)\b']
+  meaning: "to catch, grab, get (pogner le bus, pogner un rhume); « ça pogne » = it's popular"
+  france: attraper, prendre
+  formality: familiar
+- term: pelleter des nuages
+  match: ['\bpel(l)?[eè]t(t)?(er|e|es|ons|ez|ent|é|ait|aient|ais) des nuages\b']
+  meaning: "to daydream, to build castles in the air (« pelleter » alone, to shovel, is standard French)"
+  france: rêvasser, bâtir des châteaux en Espagne
+  formality: familiar
+- term: déneiger
+  match: ['\bdéneig(er|e|es|eons|ez|ent|é|ée|eait|eaient|ement|euse)\b']
+  meaning: "to clear snow from (a driveway, a street); « le déneigement » = snow removal"
+  france: déneiger (less frequent)
+  formality: standard
+- term: chialer
+  match: ['\bchial(er|e|es|ons|ez|ent|é|ait|aient|ais|eux|euse)\b']
+  meaning: "to complain, grumble (in France « chialer » means to cry)"
+  france: râler, se plaindre
+  formality: familiar
+- term: achaler
+  match: ['\bachal(er|e|es|ons|ez|ent|é|ait|aient|ais|ant|ante|ants|antes)\b']
+  meaning: "to bother, annoy; « achalant » = annoying"
+  france: embêter, déranger
+  formality: familiar
+- term: capoter
+  match: ['\bcapot(er|e|es|ons|ez|ent|é|ée|ait|aient|ais)\b']
+  meaning: "to freak out, go crazy (with excitement or worry); « ça capote » = it's amazing"
+  france: paniquer, halluciner, être fou de
+  formality: familiar
+- term: texter
+  match: ['\btext(er|e|es|ons|ez|ent|é|ait|aient|ais|o|os)\b']
+  meaning: "to text (send a text message); « un texto » = a text"
+  france: envoyer un SMS, envoyer un texto
+  formality: familiar
+- term: stationner
+  match: ['\bstationn(er|e|es|ons|ez|ent|é|ée|ait|aient|ais|ement|ements)\b']
+  meaning: "to park (a car); « le stationnement » = parking, a parking lot"
+  france: se garer, le parking
+  formality: standard
+- term: chauffer
+  match: ['\bchauff(er|e|es|ons|ez|ent|é|ait|aient|ais|eur)\b (son |mon |ton |le |un |leur )?char\b', '\bchauffe(r)? (jusqu|à|vers)']
+  meaning: "to drive (« chauffer son char »); « conduire » is standard"
+  france: conduire
+  formality: familiar
+- term: cellulaire
+  match: ['\bcellulaires?\b', '\b(mon|ton|son|un|le|leur) cell\b']
+  meaning: "cell phone (« un cellulaire », « un cell »)"
+  france: un portable
+  formality: standard
+- term: mitaine
+  match: ['\bmitaines?\b']
+  meaning: "mitten"
+  france: une moufle
+  formality: standard
+- term: chandail
+  match: ['\bchandails?\b']
+  meaning: "sweater; also a sports jersey or T-shirt (« chandail de hockey »)"
+  france: un pull, un maillot
+  formality: standard
+- term: espadrilles
+  match: ['\bespadrilles?\b']
+  meaning: "sneakers, running shoes"
+  france: des baskets (in France, espadrilles are rope-soled canvas shoes)
+  formality: standard
+- term: bas
+  match: ['\b(des|mes|tes|ses|nos|vos|leurs|les|paires? de) bas\b']
+  meaning: "socks (« une paire de bas »)"
+  france: des chaussettes
+  formality: standard
+- term: souliers
+  match: ['\bsouliers?\b']
+  meaning: "shoes (the everyday word in Québec)"
+  france: des chaussures
+  formality: standard
+- term: gougounes
+  match: ['\bgougounes?\b']
+  meaning: "flip-flops"
+  france: des tongs
+  formality: familiar
+- term: breuvage
+  match: ['\bbreuvages?\b']
+  meaning: "drink, beverage (on menus: « breuvages »)"
+  france: une boisson
+  formality: standard
+- term: liqueur
+  match: ['\b(une|la|des|les|de la|ma|ta|sa) liqueurs?\b']
+  meaning: "soft drink, soda pop (« une liqueur »), not only an alcoholic liqueur"
+  france: un soda, une boisson gazeuse
+  formality: familiar
+- term: patate
+  match: ['\bpatates?\b']
+  meaning: "potato (everyday word; « patates frites », « patate douce »)"
+  france: une pomme de terre
+  formality: familiar
+- term: blé d'Inde
+  match: ['\bblé d[''’]Inde\b']
+  meaning: "corn (« une épluchette de blé d'Inde » = a corn roast)"
+  france: le maïs
+  formality: standard
+- term: party
+  match: ['\b(un|le|mon|ton|son|du|au|des|gros) partys?\b']
+  meaning: "party, celebration (masculine in Québec: « un party »)"
+  france: une fête, une soirée
+  formality: familiar
+- term: fête
+  match: ['\bbonne fête\b', '\b(ma|ta|sa|leur|notre|votre) fête\b']
+  meaning: "birthday (« bonne fête! » = happy birthday; « c'est ma fête »)"
+  france: un anniversaire (« joyeux anniversaire »)
+  formality: standard
+- term: faire l'épicerie
+  match: ['\b(faire|fais|fait|faisons|faites|font|fera|ferai) l[''’]épicerie\b']
+  meaning: "to do the grocery shopping; « l'épicerie » = the grocery store or the groceries"
+  france: faire les courses
+  formality: standard
+- term: banc de neige
+  match: ['\bbancs? de neige\b']
+  meaning: "snowbank"
+  france: un tas de neige, une congère
+  formality: standard
+- term: poudrerie
+  match: ['\bpoudreries?\b']
+  meaning: "blowing snow, snow drifting in the wind"
+  france: (no common equivalent) neige soulevée par le vent
+  formality: standard
+- term: sloche
+  match: ['\bsloches?\b']
+  meaning: "slush (melting, dirty snow on the street)"
+  france: la neige fondue, la gadoue
+  formality: familiar
+- term: piasse
+  match: ['\bpiast?res?\b', '\bpiasses?\b']
+  meaning: "dollar (« ça coûte vingt piasses »)"
+  france: (dollar) — no equivalent; « balle » in familiar France for euros
+  formality: familiar
+- term: cenne
+  match: ['\bcennes?\b']
+  meaning: "cent; « pas une cenne » = not a penny"
+  france: un centime
+  formality: familiar
+- term: cabane à sucre
+  match: ['\bcabanes? à sucre\b']
+  meaning: "sugar shack: a maple farm serving traditional meals during the spring sugaring season"
+  france: (no equivalent) une érablière
+  formality: standard
+- term: tire d'érable
+  match: ['\btire (d[''’]érable|sur la neige)\b']
+  meaning: "maple taffy, poured on snow and rolled on a stick"
+  france: (no equivalent)
+  formality: standard
+- term: garde-robe
+  match: ['\bgarde-robes?\b']
+  meaning: "closet (built-in), wardrobe"
+  france: un placard, une penderie
+  formality: standard
+- term: laveuse
+  match: ['\blaveuses?\b', '\bsécheuses?\b']
+  meaning: "washing machine; « la sécheuse » = the dryer"
+  france: un lave-linge, un sèche-linge
+  formality: standard
+- term: débarbouillette
+  match: ['\bdébarbouillettes?\b']
+  meaning: "washcloth"
+  france: un gant de toilette
+  formality: standard
+- term: présentement
+  match: ['\bprésentement\b']
+  meaning: "currently, right now (very common in Québec)"
+  france: actuellement, en ce moment
+  formality: standard
+- term: tantôt
+  match: ['\btantôt\b']
+  meaning: "earlier or later today (« à tantôt! » = see you later)"
+  france: tout à l'heure
+  formality: standard
+- term: dispendieux
+  match: ['\bdispendieu(x|se|ses)\b']
+  meaning: "expensive"
+  france: cher
+  formality: standard
+- term: quétaine
+  match: ['\bquétaines?\b']
+  meaning: "tacky, corny, old-fashioned"
+  france: ringard, kitsch
+  formality: familiar
+- term: pas pire
+  match: ['\bpas pire\b']
+  meaning: "pretty good, not bad at all (« Comment ça va? — Pas pire! »)"
+  france: pas mal
+  formality: familiar
+- term: avoir de la misère
+  match: ['\b(de la )?misère à\b']
+  meaning: "to have trouble doing something (« j'ai de la misère à dormir »)"
+  france: avoir du mal à
+  formality: familiar
+- term: ça me tente
+  match: ['\b(ça|ca) (me|te|lui|nous|vous|leur) (tente|tentait|tenterait)\b', '\bavoir le goût de\b', '\b(ai|as|a|avons|avez|ont) le goût d']
+  meaning: "I feel like it (« ça me tente », « j'ai le goût d'aller au cinéma »)"
+  france: j'ai envie (de)
+  formality: standard
+- term: c'est correct
+  match: ['\bc[''’]est correct\b', '\bc[''’]était correct\b']
+  meaning: "it's okay, it's fine, no problem"
+  france: c'est bon, ça va, d'accord
+  formality: standard
+- term: poutine
+  match: ['\bpoutines?\b']
+  meaning: "fries topped with cheese curds and gravy"
+  france: (no equivalent)
   formality: standard

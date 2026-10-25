@@ -5,12 +5,24 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
-from .models import CurriculumLevel, GrammarTopicRegistry, Lesson
+from .models import (
+    CurriculumLevel,
+    GrammarTopicRegistry,
+    Lesson,
+    VerbBank,
+    VerbSetRegistry,
+    VocabSet,
+    VocabThemeRegistry,
+)
 
 SCHEMAS: dict[str, type[BaseModel]] = {
     "curriculum-level.schema.json": CurriculumLevel,
     "grammar-topics.schema.json": GrammarTopicRegistry,
     "lesson.schema.json": Lesson,
+    "verb-sets.schema.json": VerbSetRegistry,
+    "verb-bank.schema.json": VerbBank,
+    "vocab-themes.schema.json": VocabThemeRegistry,
+    "vocab-set.schema.json": VocabSet,
 }
 
 

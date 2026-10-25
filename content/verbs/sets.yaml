@@ -1,0 +1,102 @@
+# yaml-language-server: $schema=../schemas/verb-sets.schema.json
+# Verb Station drill sets: curated lists of reference verbs (content/reference/conjugations.json).
+# Structure only (which verbs, which tenses); glosses and context sentences live in bank/.
+schema_version: 1
+hidden: [baiser, chier, ficher, crever, virer]
+sets:
+  - id: essentiels
+    title: Les essentiels
+    title_en: The essentials
+    level: A1
+    description: The 20 most frequent verbs; most of them are irregular.
+    verbs: [être, avoir, aller, faire, dire, pouvoir, vouloir, savoir, voir, venir, prendre,
+            devoir, mettre, parler, aimer, partir, penser, donner, trouver, croire]
+    tenses: [indicatif.present, indicatif.futur_proche, indicatif.passe_compose]
+  - id: er-reguliers
+    title: Verbes réguliers en -er
+    title_en: Regular -er verbs
+    level: A1
+    description: The biggest family; learn one and you know them all.
+    verbs: [parler, aimer, travailler, habiter, regarder, écouter, chercher, demander, jouer,
+            danser, chanter, marcher, rester, arriver, entrer, rentrer, oublier, trouver,
+            penser, donner, étudier, préparer, rencontrer, utiliser]
+    tenses: [indicatif.present, indicatif.passe_compose, indicatif.imparfait]
+  - id: er-orthographiques
+    title: -er avec changements d'orthographe
+    title_en: -er verbs with spelling changes
+    level: A2
+    description: "manger → nous mangeons, appeler → j'appelle, acheter → j'achète, payer → je paie."
+    verbs: [manger, commencer, voyager, changer, appeler, jeter, acheter, lever, mener, amener,
+            préférer, espérer, répéter, payer, essayer, envoyer, nettoyer]
+    tenses: [indicatif.present, indicatif.imparfait, indicatif.futur_simple]
+  - id: ir-reguliers
+    title: Verbes réguliers en -ir
+    title_en: Regular -ir verbs (finir)
+    level: A2
+    description: "The finir pattern: nous finissons, ils finissent."
+    verbs: [finir, choisir, réussir, grandir, remplir, réfléchir, agir]
+    tenses: [indicatif.present, indicatif.passe_compose, indicatif.imparfait]
+  - id: re-verbes
+    title: Verbes en -re
+    title_en: -re verbs (attendre)
+    level: A2
+    description: "The attendre pattern: j'attends, il attend, attendu."
+    verbs: [attendre, vendre, répondre, entendre, perdre, rendre, descendre, défendre]
+    tenses: [indicatif.present, indicatif.passe_compose, indicatif.futur_simple]
+  - id: irreguliers-frequents
+    title: Irréguliers fréquents
+    title_en: Common irregular verbs
+    level: A2
+    description: Everyday irregular verbs beyond the top 20.
+    verbs: [connaître, boire, écrire, lire, vivre, ouvrir, recevoir, tenir, sortir, dormir,
+            courir, conduire, comprendre, apprendre, suivre, rire, offrir, servir, sentir, mourir]
+    tenses: [indicatif.present, indicatif.passe_compose, indicatif.futur_simple]
+  - id: auxiliaire-etre
+    title: Les verbes avec être
+    title_en: Verbs that take être
+    level: A2
+    description: "Movement and change of state: je suis allé(e), elle est née."
+    verbs: [aller, venir, arriver, partir, entrer, sortir, monter, descendre, naître, mourir,
+            rester, tomber, retourner, revenir, devenir, rentrer, passer]
+    tenses: [indicatif.passe_compose, indicatif.plus_que_parfait]
+  - id: pronominaux
+    title: Les verbes pronominaux
+    title_en: Reflexive verbs
+    level: A2
+    description: "Daily routine: je me lève, on s'habille, nous nous sommes dépêchés."
+    verbs: [se lever, se coucher, se réveiller, s'habiller, se laver, se dépêcher, s'amuser,
+            s'appeler, se promener, se reposer, s'asseoir, s'occuper, se souvenir, s'ennuyer,
+            se sentir, se marier]
+    tenses: [indicatif.present, indicatif.passe_compose, indicatif.futur_proche]
+  - id: quebec
+    title: Verbes du Québec
+    title_en: Québec everyday verbs
+    level: A2
+    description: "Verbs you'll hear every day in Québec: magasiner, jaser, pogner, chialer…"
+    verbs: [magasiner, jaser, placoter, niaiser, pogner, souper, dîner, déjeuner, pelleter,
+            déneiger, chialer, achaler, capoter, texter, stationner, chauffer, traîner]
+    tenses: [indicatif.present, indicatif.passe_compose, indicatif.futur_proche]
+  - id: modaux
+    title: Les verbes modaux
+    title_en: Modal verbs
+    level: B1
+    description: "pouvoir, vouloir, devoir and savoir beyond the present: je pourrais, tu devrais."
+    verbs: [pouvoir, vouloir, devoir, savoir, valoir]
+    tenses: [conditionnel.present, indicatif.imparfait, indicatif.futur_simple,
+             subjonctif.present]
+  - id: subjonctif-irreguliers
+    title: Subjonctifs irréguliers
+    title_en: Irregular subjunctives
+    level: B1
+    description: "que je sois, que j'aie, que j'aille, que je fasse, que je puisse…"
+    verbs: [être, avoir, aller, faire, pouvoir, savoir, vouloir, venir, prendre, devoir,
+            boire, recevoir]
+    tenses: [subjonctif.present]
+  - id: temps-composes-b2
+    title: Temps composés avancés
+    title_en: Advanced compound tenses
+    level: B2
+    description: "j'aurais dû, il sera parti, que nous ayons fini."
+    verbs: [devoir, pouvoir, vouloir, aller, partir, faire, finir, prendre, venir, savoir]
+    tenses: [conditionnel.passe, indicatif.futur_anterieur, subjonctif.passe,
+             indicatif.plus_que_parfait]

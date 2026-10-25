@@ -4,16 +4,14 @@ Everything here is budgeted so the prompt stays small (prefill time is part of t
 import re
 from dataclasses import dataclass
 from datetime import timedelta
-from pathlib import Path
 from typing import Any
 
-from django.conf import settings
 from django.db.models import Count
 from django.utils import timezone
 
 from accounts.models import LearnerProfile, User
 from contentkit.models import BLANK
-from contentkit.reference import Reference
+from curriculum import content
 from curriculum.models import ExerciseRevision, GrammarTopic, Lesson
 from exercises.models import ExerciseAttempt, MistakeOccurrence
 from progress.models import TopicMastery
@@ -148,7 +146,7 @@ def build_context(user: User, ref: dict[str, Any], question: str = "") -> TutorC
     elif revision is not None:
         parts.append("The learner has NOT answered this exercise yet: give hints, not the answer.")
     parts += _learning_signals(user)
-    ref_data = Reference.load(Path(settings.CONTENT_DIR))
+    ref_data = content.reference()
     hint = _hint_verb(revision.payload) if revision is not None else None
     # Verbs come from what the learner is working on, not from the lesson prose.
     exercise_text = _describe_exercise(revision.payload) if revision is not None else ""

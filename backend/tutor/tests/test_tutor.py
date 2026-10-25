@@ -239,7 +239,7 @@ def test_verb_facts_ground_the_tutor(setup: dict[str, Any]) -> None:
         "aller: auxiliary être; past participle allé; présent je vais, "
         "nous allons; passé composé je suis allé, nous sommes allés"
     )
-    with patch("tutor.context.Reference.load", return_value=ref):
+    with patch("tutor.context.content.reference", return_value=ref):
         ctx = build_context(
             setup["user"], {"attempt_id": setup["attempt"].pk}, "Pourquoi pas « nous avons allé » ?"
         )

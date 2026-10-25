@@ -1,0 +1,115 @@
+{
+  "$defs": {
+    "VerbSet": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 80,
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "title_en": {
+          "minLength": 1,
+          "title": "Title En",
+          "type": "string"
+        },
+        "level": {
+          "enum": [
+            "A1",
+            "A2",
+            "B1",
+            "B2",
+            "C1",
+            "C2"
+          ],
+          "title": "Level",
+          "type": "string"
+        },
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "verbs": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 3,
+          "title": "Verbs",
+          "type": "array"
+        },
+        "tenses": {
+          "items": {
+            "enum": [
+              "indicatif.present",
+              "indicatif.futur_proche",
+              "indicatif.passe_compose",
+              "indicatif.imparfait",
+              "indicatif.futur_simple",
+              "imperatif.present",
+              "conditionnel.present",
+              "indicatif.plus_que_parfait",
+              "subjonctif.present",
+              "conditionnel.passe",
+              "indicatif.futur_anterieur",
+              "subjonctif.passe"
+            ],
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Tenses",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "title_en",
+        "level",
+        "description",
+        "verbs",
+        "tenses"
+      ],
+      "title": "VerbSet",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "hidden": {
+      "default": [],
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Hidden",
+      "type": "array"
+    },
+    "sets": {
+      "items": {
+        "$ref": "#/$defs/VerbSet"
+      },
+      "minItems": 1,
+      "title": "Sets",
+      "type": "array"
+    }
+  },
+  "required": [
+    "sets"
+  ],
+  "title": "VerbSetRegistry",
+  "type": "object"
+}

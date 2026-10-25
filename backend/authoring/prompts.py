@@ -6,6 +6,9 @@ PROMPT_VERSIONS = {
     "author.steps": "3",
     "author.revise": "1",
     "author.critic": "1",
+    "bank.verb": "2",
+    "bank.vocab": "1",
+    "bank.revise": "1",
 }
 
 SYSTEM = """\
@@ -120,3 +123,67 @@ missing or wrong preposition, article, tense, spelling or accent, unnatural word
 'minor' = acceptable but could be more natural. Québec usage and informal spoken forms are \
 correct. Before concluding there are no errors, check verb constructions (parler à, penser à, \
 téléphoner à), agreement, articles, prepositions and elision. Do not invent errors."""
+
+
+# --- Verb and vocabulary banks (Phase 6) ---------------------------------------------------
+
+BANK_SYSTEM = """\
+You write short, original practice material for Frenchia, a French course for an English-speaking \
+adult learning Québec French (A1 to B2).
+Rules:
+- Québec usage is the default: everyday Québec life, places and vocabulary (dépanneur, souper, \
+fin de semaine, magasiner, chalet, hiver). Never use swear words or sacres.
+- Every French sentence must be grammatical and natural, with correct accents, agreement and \
+elision. Keep vocabulary at A2 level unless told otherwise.
+- Do not invent Québec expressions: only call something Québec usage when it is in the verified \
+list you are given; otherwise use standard French and mark it common.
+- Translations are natural English, not word-for-word."""
+
+VERB_BANK = """\
+Verb: {infinitive} (auxiliary {auxiliary}{pronominal}).
+{lexicon}Write one short, natural sentence (6-14 words) for each numbered slot below. Each \
+sentence must contain the exact verb form shown, written as one piece (do not split it with a \
+negation or an inserted word). You may add -e/-s to a past participle to agree with a feminine \
+or plural subject (elle est allée). For « il » slots use il, elle, on or a singular noun; for \
+« ils » slots use ils, elles or a plural noun. Subjunctive slots need a trigger (il faut que, \
+je veux que...). Imperative slots have no subject. Vary the situations and the subjects.
+
+Slots:
+{slots}
+
+Then fill "en" with only the verb's English gloss, e.g. "to go" (two or three meanings at most, \
+separated by commas), and "note" with one English sentence about its usage (a Québec usage, a \
+common construction like « aller + infinitive », or a trap), or "" if there is nothing useful."""
+
+VERB_REPAIR = """\
+These sentences were rejected:
+{problems}
+Rewrite only these slots, each containing the exact verb form shown, written as one piece."""
+
+VOCAB_WORDS = """\
+Vocabulary set: {title} ({title_en}), CEFR {level}.
+Scope: {scope}
+Québec angle: {quebec_focus}
+{lexicon}List {count} useful words and expressions for this set, most useful first. Give each \
+word without its article, with its gender for nouns ("none" otherwise), a short English gloss, \
+its part of speech, region ("qc" only for verified Québec terms, "common" otherwise) and \
+formality. For a Québec word, the France equivalent goes in the gloss's note later, not here. \
+Prefer words a Québec speaker actually uses. No duplicates; no proper nouns. Leave the examples \
+empty."""
+
+VOCAB_EXAMPLES = """\
+Vocabulary set: {title} ({title_en}), CEFR {level}.
+{lexicon}For each word below, write one short, natural example sentence (5-12 words) at \
+{level} level that uses the word (with its article for nouns), its English translation, and a \
+note: for Québec words, the France equivalent (e.g. "France: le week-end"); for others, a brief \
+usage tip only when genuinely useful, otherwise an empty string.
+
+Words:
+{words}"""
+
+BANK_REVISE = """\
+A proof-reader flagged this item:
+{item}
+Problem: {problem}
+Suggested fix: {fix}
+Rewrite the item so the problem is gone, keeping everything else that was correct."""

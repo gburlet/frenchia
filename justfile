@@ -80,6 +80,22 @@ content-review-export *args:
 content-review-import reviewer="claude-haiku-5-5" *args:
     {{compose}} exec backend python manage.py content_review_import --reviewer {{reviewer}} {{args}}
 
+# Generate verb banks or vocabulary sets into content/drafts/, e.g. `just bank-generate verbs --set essentiels`
+bank-generate kind *args:
+    {{compose}} exec backend python manage.py bank_generate {{kind}} {{args}}
+
+# Write proof-reading prompts for unreviewed bank drafts (content/drafts/review/)
+bank-review-export:
+    {{compose}} exec backend python manage.py bank_review_export
+
+# Apply reviewer findings to bank drafts; add --revise to let the local LLM fix flagged items
+bank-review-import reviewer="claude-haiku-5-5" *args:
+    {{compose}} exec backend python manage.py bank_review_import --reviewer {{reviewer}} {{args}}
+
+# Publish reviewed bank drafts into content/ and import them
+bank-promote *ids:
+    {{compose}} exec backend python manage.py bank_promote {{ids}}
+
 # Publish (or roll back to) a lesson version, e.g. `just content-publish a2-imparfait --version 2`
 content-publish lesson *args:
     {{compose}} exec backend python manage.py content_publish {{lesson}} {{args}}

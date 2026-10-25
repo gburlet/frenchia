@@ -5,7 +5,7 @@ import re
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 from pydantic import BaseModel, ValidationError
 
@@ -25,6 +25,9 @@ from .models import (
 )
 from .reference import Reference, normalize
 from .yamlio import load_yaml
+
+if TYPE_CHECKING:
+    from .banks import Banks
 
 Severity = Literal["error", "warning"]
 AddFn = Callable[[Severity, str, str], None]
@@ -47,6 +50,7 @@ class Repository:
     topics: GrammarTopicRegistry | None = None
     lessons: dict[str, tuple[Path, Lesson]] = field(default_factory=dict)
     issues: list[Issue] = field(default_factory=list)
+    banks: "Banks | None" = None
 
     @property
     def outlines(self) -> dict[str, tuple[str, str, LessonOutline]]:
@@ -153,6 +157,11 @@ def _strings(value: object, path: str = "") -> list[tuple[str, str]]:
 
 
 _ARTICLE = re.compile(r"^(le|la|les|un|une|des)\s|^l'", re.IGNORECASE)
+# Small models occasionally emit tokens from other scripts (CJK, Cyrillic...) mid-sentence.
+FOREIGN_SCRIPT = re.compile(
+    r"[\u0370-\u03ff\u0400-\u04ff\u0590-\u06ff\u0900-\u0dff\u0e00-\u0e7f"
+    r"\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af\uf900-\ufaff]"
+)
 _ENGLISH = re.compile(r"\b(the|and|is|are|of|to|you|with|this|that|it)\b", re.IGNORECASE)
 _WORD = re.compile(r"[\w'’-]+")
 
@@ -199,6 +208,8 @@ def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
                 _check_quebec(add, section.id, variant.qc, ref)
 
     for path, text in _strings(lesson.model_dump(mode="json", exclude={"provenance"})):
+        if FOREIGN_SCRIPT.search(text):
+            add("error", path, f"text contains another script: {text[:60]!r}")
         if _LATEX.search(text):
             add("warning", path, f"LaTeX markup in text: {_LATEX.search(text).group(0)!r}")  # type: ignore[union-attr]
 
@@ -273,7 +284,10 @@ def _is_verb_form(answer: str, forms: set[str]) -> bool:
 
 
 def validate_repository(root: Path, *, quality: bool = True) -> Repository:
+    from .banks import check_banks, load_banks  # banks builds on this module
+
     repo = load_repository(root)
+    repo.banks = load_banks(root)
     if quality:
         ref = Reference.load(root)
         if not ref.verbs or not ref.nouns:
@@ -282,6 +296,8 @@ def validate_repository(root: Path, *, quality: bool = True) -> Repository:
             )
         for _path, lesson in repo.lessons.values():
             repo.issues.extend(check_lesson_quality(lesson, ref))
+        check_banks(repo.banks, root, ref)
+    repo.issues.extend(repo.banks.issues)
     return repo
 
 

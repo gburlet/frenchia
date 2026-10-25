@@ -63,6 +63,46 @@ You can also edit lesson YAML by hand. Bump `content_version`, then run
 - **Confined writes.** The LLM never touches the filesystem. `authoring/writer.py` derives every path from
   validated ids and refuses anything outside `content/`.
 
+## Verb banks and vocabulary sets (Phase 6)
+
+The Verb and Vocabulary Stations use two more kinds of generated content. Both go through the
+same check → proof-read → publish loop, from the command line rather than Admin:
+
+| Content | Outline (hand-written) | Generated file |
+|---|---|---|
+| Verb drill sets | `verbs/sets.yaml` (which verbs, suggested tenses) | none: sets are structure only |
+| Verb banks | the reference verb + its sets' tenses | `verbs/bank/<verb>.yaml`: gloss, note, ~10–14 context sentences |
+| Vocabulary sets | `vocabulary/themes.yaml` (scope, Québec angle, size) | `vocabulary/sets/<theme>.yaml` |
+
+1. **Generate.** `just bank-generate verbs --set essentiels` (or a list of infinitives, or no
+   argument for every set verb) and `just bank-generate vocab a1-hiver` (or `--level A2`). Drafts
+   go to `content/drafts/{verbs,vocabulary}/`. Existing drafts and published files are skipped
+   unless you pass `--force`; a regenerated file gets the next `content_version`.
+   - Verb banks: the conjugation reference supplies the exact form for each (tense, person) slot
+     and Gemma only writes a sentence around it. A sentence is kept only if the form, or a
+     correctly agreed form (« est allée »), is in it. One repair round, then the slot is dropped.
+     Region "qc" is derived from the verified lexicon, not from the model.
+   - Vocabulary sets: articles are stripped, noun genders are corrected from Lexique, duplicates
+     are dropped, and Québec claims not in `reference/quebec.yaml` are downgraded to "common".
+2. **Proof-read.** `just bank-review-export` writes `drafts/review/<kind>-<id>.prompt.txt`.
+   A Claude Code Haiku subagent writes `<kind>-<id>.findings.json` next to each one (same schema
+   as for lessons). Then run `just bank-review-import claude-haiku-5-5 --revise`:
+   - an item with an error is rewritten by Gemma using the finding, and dropped if the rewrite
+     still fails the checks;
+   - without `--revise`, flagged items are dropped;
+   - a flagged note is removed;
+   - a draft whose review needed no rewrite is marked `provenance.reviewed_by`. Rewritten drafts
+     go back for another round (`bank-review-export` again).
+3. **Publish.** `just bank-promote` (optionally with ids) moves reviewed, error-free drafts into
+   `content/` and imports them. Then commit the YAML.
+
+Vocabulary from lessons needs none of this. Every published lesson's vocabulary sections and
+reading glossaries become a "From your lessons" set automatically, on import and on publish.
+
+Imported vocabulary follows the lesson rules: an unchanged version is a no-op, and changed
+content needs a version bump. Words are updated in place so learners keep their review history.
+Words dropped from a set are retired, never deleted.
+
 ## Prompts
 
 Prompts live in `backend/authoring/prompts.py` and each has a version. Bump the version whenever

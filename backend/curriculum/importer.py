@@ -62,7 +62,11 @@ def import_content(
 ) -> ImportResult:
     repo = validate_repository(root)
     result = ImportResult(issues=list(repo.issues))
-    structural = [i for i in repo.errors if not i.path.startswith(("lessons/", *repo.lessons))]
+    structural = [
+        i
+        for i in repo.errors
+        if not i.path.startswith(("lessons/", "verbs/", "vocabulary/", *repo.lessons))
+    ]
     record = ContentImport.objects.create(dry_run=dry_run, git_sha=_git_sha(root))
     result.record = record
     try:
@@ -85,6 +89,7 @@ def import_content(
             }
             for rel in sorted(unparsable - imported_paths):
                 result.refused.append(f"{rel}: invalid file")
+            _import_vocabulary(repo, result)
             if dry_run:
                 transaction.set_rollback(True)
         record.ok = not result.refused
@@ -195,6 +200,18 @@ def publish_revision(revision: LessonRevision) -> None:
         revision.published_at = timezone.now()
         revision.save(update_fields=["published_at"])
     Lesson.objects.filter(pk=revision.lesson_id).update(published_revision=revision)
+    from vocabulary.importer import sync_lesson_set  # vocabulary builds on curriculum
+
+    sync_lesson_set(Lesson.objects.get(pk=revision.lesson_id))
+
+
+def _import_vocabulary(repo: Repository, result: ImportResult) -> None:
+    from vocabulary.importer import import_theme_sets, sync_lesson_sets
+
+    import_theme_sets(
+        repo, created=result.created, unchanged=result.unchanged, refused=result.refused
+    )
+    sync_lesson_sets()
 
 
 def _level_rank(level: str) -> int:

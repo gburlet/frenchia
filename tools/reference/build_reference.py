@@ -72,6 +72,8 @@ CURATED = [
     "se promener", "se reposer", "se souvenir", "s'asseoir", "se dépêcher", "s'amuser",
     "se rencontrer", "se trouver", "se sentir", "s'occuper", "se marier", "s'ennuyer",
     "magasiner", "souper", "dîner", "déjeuner", "jaser", "niaiser", "placoter", "pogner",
+    "pelleter", "déneiger", "stationner", "chialer", "achaler", "capoter", "texter",
+    "voyager", "visiter", "louer", "nager", "chauffer",
 ]
 # Verbs that take either auxiliary (verbecc only gives its default one).
 BOTH_AUX = {"passer", "monter", "sortir", "descendre", "rentrer", "retourner"}

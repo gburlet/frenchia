@@ -1,0 +1,92 @@
+{
+  "$defs": {
+    "VocabTheme": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 80,
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "level": {
+          "enum": [
+            "A1",
+            "A2",
+            "B1",
+            "B2",
+            "C1",
+            "C2"
+          ],
+          "title": "Level",
+          "type": "string"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "title_en": {
+          "minLength": 1,
+          "title": "Title En",
+          "type": "string"
+        },
+        "scope": {
+          "minLength": 1,
+          "title": "Scope",
+          "type": "string"
+        },
+        "quebec_focus": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Quebec Focus"
+        },
+        "size": {
+          "default": 20,
+          "maximum": 40,
+          "minimum": 8,
+          "title": "Size",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "level",
+        "title",
+        "title_en",
+        "scope"
+      ],
+      "title": "VocabTheme",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "themes": {
+      "items": {
+        "$ref": "#/$defs/VocabTheme"
+      },
+      "minItems": 1,
+      "title": "Themes",
+      "type": "array"
+    }
+  },
+  "required": [
+    "themes"
+  ],
+  "title": "VocabThemeRegistry",
+  "type": "object"
+}

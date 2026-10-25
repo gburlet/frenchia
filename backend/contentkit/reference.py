@@ -146,10 +146,14 @@ class Reference:
         )
 
     def quebec_terms_in(self, *texts: str) -> list[QuebecTerm]:
+        """Lexicon entries found in the texts; a text that is exactly an entry's headword
+        counts too (a vocabulary word « liqueur » has no determiner for the pattern)."""
+        bare = {normalize(text) for text in texts}
         return [
             t
             for t in self.quebec
-            if any(re.search(p, text, re.IGNORECASE) for p in t.match for text in texts)
+            if normalize(t.term) in bare
+            or any(re.search(p, text, re.IGNORECASE) for p in t.match for text in texts)
         ]
 
 

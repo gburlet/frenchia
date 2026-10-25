@@ -1,0 +1,202 @@
+{
+  "$defs": {
+    "Provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "generator": {
+          "title": "Generator",
+          "type": "string"
+        },
+        "prompts": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {},
+          "title": "Prompts",
+          "type": "object"
+        },
+        "generated_at": {
+          "format": "date-time",
+          "title": "Generated At",
+          "type": "string"
+        },
+        "generated_hash": {
+          "title": "Generated Hash",
+          "type": "string"
+        },
+        "reviewed_by": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reviewed By"
+        },
+        "job_id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Job Id"
+        }
+      },
+      "required": [
+        "generator",
+        "generated_at",
+        "generated_hash"
+      ],
+      "title": "Provenance",
+      "type": "object"
+    },
+    "VerbSentence": {
+      "additionalProperties": false,
+      "properties": {
+        "tense": {
+          "enum": [
+            "indicatif.present",
+            "indicatif.futur_proche",
+            "indicatif.passe_compose",
+            "indicatif.imparfait",
+            "indicatif.futur_simple",
+            "imperatif.present",
+            "conditionnel.present",
+            "indicatif.plus_que_parfait",
+            "subjonctif.present",
+            "conditionnel.passe",
+            "indicatif.futur_anterieur",
+            "subjonctif.passe"
+          ],
+          "title": "Tense",
+          "type": "string"
+        },
+        "person": {
+          "enum": [
+            "je",
+            "tu",
+            "il",
+            "nous",
+            "vous",
+            "ils"
+          ],
+          "title": "Person",
+          "type": "string"
+        },
+        "fr": {
+          "minLength": 1,
+          "title": "Fr",
+          "type": "string"
+        },
+        "form": {
+          "minLength": 1,
+          "title": "Form",
+          "type": "string"
+        },
+        "en": {
+          "minLength": 1,
+          "title": "En",
+          "type": "string"
+        },
+        "region": {
+          "default": "common",
+          "enum": [
+            "qc",
+            "fr",
+            "common"
+          ],
+          "title": "Region",
+          "type": "string"
+        }
+      },
+      "required": [
+        "tense",
+        "person",
+        "fr",
+        "form",
+        "en"
+      ],
+      "title": "VerbSentence",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Gloss and context sentences for one reference verb (generated, then reviewed).",
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "id": {
+      "maxLength": 80,
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "title": "Id",
+      "type": "string"
+    },
+    "content_version": {
+      "minimum": 1,
+      "title": "Content Version",
+      "type": "integer"
+    },
+    "infinitive": {
+      "minLength": 1,
+      "title": "Infinitive",
+      "type": "string"
+    },
+    "en": {
+      "minLength": 1,
+      "title": "En",
+      "type": "string"
+    },
+    "note": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Note"
+    },
+    "sentences": {
+      "items": {
+        "$ref": "#/$defs/VerbSentence"
+      },
+      "maxItems": 30,
+      "minItems": 1,
+      "title": "Sentences",
+      "type": "array"
+    },
+    "provenance": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Provenance"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "id",
+    "content_version",
+    "infinitive",
+    "en",
+    "sentences"
+  ],
+  "title": "VerbBank",
+  "type": "object"
+}

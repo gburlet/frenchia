@@ -6,6 +6,10 @@ Files:
   content/curriculum/<level>.yaml   CurriculumLevel (units -> lesson outlines)
   content/grammar/topics.yaml       GrammarTopicRegistry
   content/lessons/<level>/<id>.yaml Lesson (sections + exercises)
+  content/verbs/sets.yaml           VerbSetRegistry (drill sets of reference verbs)
+  content/verbs/bank/<id>.yaml      VerbBank (gloss + context sentences for one verb)
+  content/vocabulary/themes.yaml    VocabThemeRegistry (themed set outlines)
+  content/vocabulary/sets/<id>.yaml VocabSet (one themed word list)
 """
 
 import re
@@ -280,6 +284,8 @@ class Provenance(Model):
     generated_at: datetime
     generated_hash: str
     """Content hash at generation time; a different current hash means manual edits."""
+    reviewed_by: str | None = None
+    """External proof-reader that reviewed this content (ADR 0003), if any."""
     job_id: int | None = None
 
 
@@ -308,4 +314,145 @@ class Lesson(Model):
         for ex in self.exercises:
             if isinstance(ex, ComprehensionExercise) and ex.reading_id not in readings:
                 raise ValueError(f"exercise {ex.id} refers to unknown reading {ex.reading_id!r}")
+        return self
+
+
+# --- Verb Station -------------------------------------------------------------------------
+
+TenseKey = Literal[
+    "indicatif.present",
+    "indicatif.futur_proche",
+    "indicatif.passe_compose",
+    "indicatif.imparfait",
+    "indicatif.futur_simple",
+    "imperatif.present",
+    "conditionnel.present",
+    "indicatif.plus_que_parfait",
+    "subjonctif.present",
+    "conditionnel.passe",
+    "indicatif.futur_anterieur",
+    "subjonctif.passe",
+]
+Person = Literal["je", "tu", "il", "nous", "vous", "ils"]
+
+
+class VerbSet(Model):
+    id: Slug
+    title: NonEmpty
+    title_en: NonEmpty
+    level: Level
+    description: NonEmpty
+    verbs: list[NonEmpty] = Field(min_length=3)
+    """Infinitives exactly as in content/reference/conjugations.json."""
+    tenses: list[TenseKey] = Field(min_length=1)
+    """Tenses suggested when drilling this set."""
+
+
+class VerbSetRegistry(Model):
+    schema_version: Literal[1] = SCHEMA_VERSION
+    hidden: list[NonEmpty] = []
+    """Reference verbs never offered for browsing or drills (vulgar or archaic)."""
+    sets: list[VerbSet] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _unique_ids(self) -> Self:
+        _unique([s.id for s in self.sets], "verb set ids")
+        return self
+
+
+class VerbSentence(Model):
+    tense: TenseKey
+    person: Person
+    fr: NonEmpty
+    form: NonEmpty
+    """The conjugated form exactly as written in `fr` (blanked out in context drills)."""
+    en: NonEmpty
+    region: Region = "common"
+
+    @model_validator(mode="after")
+    def _form_in_sentence(self) -> Self:
+        if _fold(self.form) not in _fold(self.fr):
+            raise ValueError(f"form {self.form!r} does not appear in {self.fr!r}")
+        return self
+
+
+class VerbBank(Model):
+    """Gloss and context sentences for one reference verb (generated, then reviewed)."""
+
+    schema_version: Literal[1] = SCHEMA_VERSION
+    id: Slug
+    content_version: int = Field(ge=1)
+    infinitive: NonEmpty
+    en: NonEmpty
+    """English gloss, e.g. "to go"."""
+    note: str | None = None
+    sentences: list[VerbSentence] = Field(min_length=1, max_length=30)
+    provenance: Provenance | None = None
+
+
+def _fold(text: str) -> str:
+    return " ".join(text.replace("’", "'").casefold().split())
+
+
+# --- Vocabulary Station -------------------------------------------------------------------
+
+
+class VocabTheme(Model):
+    id: Slug
+    level: Level
+    title: NonEmpty
+    """French title."""
+    title_en: NonEmpty
+    scope: NonEmpty
+    """What the set covers, for the generator (one or two lines)."""
+    quebec_focus: str | None = None
+    size: int = Field(default=20, ge=8, le=40)
+
+
+class VocabThemeRegistry(Model):
+    schema_version: Literal[1] = SCHEMA_VERSION
+    themes: list[VocabTheme] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _unique_ids(self) -> Self:
+        _unique([t.id for t in self.themes], "theme ids")
+        return self
+
+
+class VocabEntry(Model):
+    id: Slug
+    fr: NonEmpty
+    """Bare word or expression, without article."""
+    en: NonEmpty
+    pos: Literal["noun", "verb", "adjective", "adverb", "expression", "other"]
+    gender: Gender | None = None
+    plural: str | None = None
+    """Only for irregular plurals (un œil -> des yeux)."""
+    region: Region = "common"
+    formality: Formality = "standard"
+    example_fr: NonEmpty
+    example_en: NonEmpty
+    note: str | None = None
+    """Usage note, e.g. the France equivalent of a Québec word."""
+
+    @model_validator(mode="after")
+    def _noun_gender(self) -> Self:
+        if self.pos == "noun" and self.gender is None:
+            raise ValueError(f"noun {self.fr!r} needs a gender")
+        return self
+
+
+class VocabSet(Model):
+    schema_version: Literal[1] = SCHEMA_VERSION
+    id: Slug
+    content_version: int = Field(ge=1)
+    level: Level
+    title: NonEmpty
+    title_en: NonEmpty
+    entries: list[VocabEntry] = Field(min_length=5, max_length=40)
+    provenance: Provenance | None = None
+
+    @model_validator(mode="after")
+    def _unique_entries(self) -> Self:
+        _unique([e.id for e in self.entries], "entry ids")
         return self

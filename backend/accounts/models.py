@@ -15,6 +15,9 @@ class LearnerProfile(models.Model):
     region = models.CharField(max_length=10, default="qc", help_text="qc = Québec-first")
     explanation_language = models.CharField(max_length=5, default="en")
     tts_speed = models.FloatField(default=1.0)
+    daily_new_cards = models.PositiveSmallIntegerField(
+        default=15, help_text="New vocabulary cards introduced per day"
+    )
 
     def __str__(self) -> str:
         return f"{self.user} ({self.level} → {self.target_level})"

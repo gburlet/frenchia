@@ -12,6 +12,7 @@ from authoring.writer import HEADER, ContentWriter
 from contentkit.models import Lesson as LessonContent
 from contentkit.reference import Reference
 from contentkit.yamlio import dump_yaml, to_data, write_text_atomic
+from curriculum import content
 from curriculum.importer import import_content
 from curriculum.models import ExerciseRevision, GrammarTopic
 from inference.providers import get_chat_model
@@ -28,7 +29,7 @@ class AttemptError(Exception):
 
 
 def _reference() -> Reference:
-    return Reference.load(Path(settings.CONTENT_DIR))
+    return content.reference()
 
 
 def grade(revision: ExerciseRevision, answer: Any) -> Grade:

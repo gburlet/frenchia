@@ -334,6 +334,109 @@
    "participle_present": "accompagnant",
    "pronominal": false
   },
+  "achaler": {
+   "auxiliary": "avoir",
+   "forms": {
+    "conditionnel.passe": {
+     "il": "aurait achalé",
+     "ils": "auraient achalé",
+     "je": "aurais achalé",
+     "nous": "aurions achalé",
+     "tu": "aurais achalé",
+     "vous": "auriez achalé"
+    },
+    "conditionnel.present": {
+     "il": "achalerait",
+     "ils": "achaleraient",
+     "je": "achalerais",
+     "nous": "achalerions",
+     "tu": "achalerais",
+     "vous": "achaleriez"
+    },
+    "imperatif.present": {
+     "nous": "achalons",
+     "tu": "achale",
+     "vous": "achalez"
+    },
+    "indicatif.futur_anterieur": {
+     "il": "aura achalé",
+     "ils": "auront achalé",
+     "je": "aurai achalé",
+     "nous": "aurons achalé",
+     "tu": "auras achalé",
+     "vous": "aurez achalé"
+    },
+    "indicatif.futur_simple": {
+     "il": "achalera",
+     "ils": "achaleront",
+     "je": "achalerai",
+     "nous": "achalerons",
+     "tu": "achaleras",
+     "vous": "achalerez"
+    },
+    "indicatif.imparfait": {
+     "il": "achalait",
+     "ils": "achalaient",
+     "je": "achalais",
+     "nous": "achalions",
+     "tu": "achalais",
+     "vous": "achaliez"
+    },
+    "indicatif.passe_compose": {
+     "il": "a achalé",
+     "ils": "ont achalé",
+     "je": "ai achalé",
+     "nous": "avons achalé",
+     "tu": "as achalé",
+     "vous": "avez achalé"
+    },
+    "indicatif.passe_simple": {
+     "il": "achala",
+     "ils": "achalèrent",
+     "je": "achalai",
+     "nous": "achalâmes",
+     "tu": "achalas",
+     "vous": "achalâtes"
+    },
+    "indicatif.plus_que_parfait": {
+     "il": "avait achalé",
+     "ils": "avaient achalé",
+     "je": "avais achalé",
+     "nous": "avions achalé",
+     "tu": "avais achalé",
+     "vous": "aviez achalé"
+    },
+    "indicatif.present": {
+     "il": "achale",
+     "ils": "achalent",
+     "je": "achale",
+     "nous": "achalons",
+     "tu": "achales",
+     "vous": "achalez"
+    },
+    "subjonctif.passe": {
+     "il": "ait achalé",
+     "ils": "aient achalé",
+     "je": "aie achalé",
+     "nous": "ayons achalé",
+     "tu": "aies achalé",
+     "vous": "ayez achalé"
+    },
+    "subjonctif.present": {
+     "il": "achale",
+     "ils": "achalent",
+     "je": "achale",
+     "nous": "achalions",
+     "tu": "achales",
+     "vous": "achaliez"
+    }
+   },
+   "group": 1,
+   "inferred": false,
+   "participle_past": "achalé",
+   "participle_present": "achalant",
+   "pronominal": false
+  },
   "acheter": {
    "auxiliary": "avoir",
    "forms": {
@@ -4167,6 +4270,109 @@
    "participle_present": "calmant",
    "pronominal": false
   },
+  "capoter": {
+   "auxiliary": "avoir",
+   "forms": {
+    "conditionnel.passe": {
+     "il": "aurait capoté",
+     "ils": "auraient capoté",
+     "je": "aurais capoté",
+     "nous": "aurions capoté",
+     "tu": "aurais capoté",
+     "vous": "auriez capoté"
+    },
+    "conditionnel.present": {
+     "il": "capoterait",
+     "ils": "capoteraient",
+     "je": "capoterais",
+     "nous": "capoterions",
+     "tu": "capoterais",
+     "vous": "capoteriez"
+    },
+    "imperatif.present": {
+     "nous": "capotons",
+     "tu": "capote",
+     "vous": "capotez"
+    },
+    "indicatif.futur_anterieur": {
+     "il": "aura capoté",
+     "ils": "auront capoté",
+     "je": "aurai capoté",
+     "nous": "aurons capoté",
+     "tu": "auras capoté",
+     "vous": "aurez capoté"
+    },
+    "indicatif.futur_simple": {
+     "il": "capotera",
+     "ils": "capoteront",
+     "je": "capoterai",
+     "nous": "capoterons",
+     "tu": "capoteras",
+     "vous": "capoterez"
+    },
+    "indicatif.imparfait": {
+     "il": "capotait",
+     "ils": "capotaient",
+     "je": "capotais",
+     "nous": "capotions",
+     "tu": "capotais",
+     "vous": "capotiez"
+    },
+    "indicatif.passe_compose": {
+     "il": "a capoté",
+     "ils": "ont capoté",
+     "je": "ai capoté",
+     "nous": "avons capoté",
+     "tu": "as capoté",
+     "vous": "avez capoté"
+    },
+    "indicatif.passe_simple": {
+     "il": "capota",
+     "ils": "capotèrent",
+     "je": "capotai",
+     "nous": "capotâmes",
+     "tu": "capotas",
+     "vous": "capotâtes"
+    },
+    "indicatif.plus_que_parfait": {
+     "il": "avait capoté",
+     "ils": "avaient capoté",
+     "je": "avais capoté",
+     "nous": "avions capoté",
+     "tu": "avais capoté",
+     "vous": "aviez capoté"
+    },
+    "indicatif.present": {
+     "il": "capote",
+     "ils": "capotent",
+     "je": "capote",
+     "nous": "capotons",
+     "tu": "capotes",
+     "vous": "capotez"
+    },
+    "subjonctif.passe": {
+     "il": "ait capoté",
+     "ils": "aient capoté",
+     "je": "aie capoté",
+     "nous": "ayons capoté",
+     "tu": "aies capoté",
+     "vous": "ayez capoté"
+    },
+    "subjonctif.present": {
+     "il": "capote",
+     "ils": "capotent",
+     "je": "capote",
+     "nous": "capotions",
+     "tu": "capotes",
+     "vous": "capotiez"
+    }
+   },
+   "group": 1,
+   "inferred": false,
+   "participle_past": "capoté",
+   "participle_present": "capotant",
+   "pronominal": false
+  },
   "casser": {
    "auxiliary": "avoir",
    "forms": {
@@ -4785,6 +4991,109 @@
    "participle_present": "chargeant",
    "pronominal": false
   },
+  "chauffer": {
+   "auxiliary": "avoir",
+   "forms": {
+    "conditionnel.passe": {
+     "il": "aurait chauffé",
+     "ils": "auraient chauffé",
+     "je": "aurais chauffé",
+     "nous": "aurions chauffé",
+     "tu": "aurais chauffé",
+     "vous": "auriez chauffé"
+    },
+    "conditionnel.present": {
+     "il": "chaufferait",
+     "ils": "chaufferaient",
+     "je": "chaufferais",
+     "nous": "chaufferions",
+     "tu": "chaufferais",
+     "vous": "chaufferiez"
+    },
+    "imperatif.present": {
+     "nous": "chauffons",
+     "tu": "chauffe",
+     "vous": "chauffez"
+    },
+    "indicatif.futur_anterieur": {
+     "il": "aura chauffé",
+     "ils": "auront chauffé",
+     "je": "aurai chauffé",
+     "nous": "aurons chauffé",
+     "tu": "auras chauffé",
+     "vous": "aurez chauffé"
+    },
+    "indicatif.futur_simple": {
+     "il": "chauffera",
+     "ils": "chaufferont",
+     "je": "chaufferai",
+     "nous": "chaufferons",
+     "tu": "chaufferas",
+     "vous": "chaufferez"
+    },
+    "indicatif.imparfait": {
+     "il": "chauffait",
+     "ils": "chauffaient",
+     "je": "chauffais",
+     "nous": "chauffions",
+     "tu": "chauffais",
+     "vous": "chauffiez"
+    },
+    "indicatif.passe_compose": {
+     "il": "a chauffé",
+     "ils": "ont chauffé",
+     "je": "ai chauffé",
+     "nous": "avons chauffé",
+     "tu": "as chauffé",
+     "vous": "avez chauffé"
+    },
+    "indicatif.passe_simple": {
+     "il": "chauffa",
+     "ils": "chauffèrent",
+     "je": "chauffai",
+     "nous": "chauffâmes",
+     "tu": "chauffas",
+     "vous": "chauffâtes"
+    },
+    "indicatif.plus_que_parfait": {
+     "il": "avait chauffé",
+     "ils": "avaient chauffé",
+     "je": "avais chauffé",
+     "nous": "avions chauffé",
+     "tu": "avais chauffé",
+     "vous": "aviez chauffé"
+    },
+    "indicatif.present": {
+     "il": "chauffe",
+     "ils": "chauffent",
+     "je": "chauffe",
+     "nous": "chauffons",
+     "tu": "chauffes",
+     "vous": "chauffez"
+    },
+    "subjonctif.passe": {
+     "il": "ait chauffé",
+     "ils": "aient chauffé",
+     "je": "aie chauffé",
+     "nous": "ayons chauffé",
+     "tu": "aies chauffé",
+     "vous": "ayez chauffé"
+    },
+    "subjonctif.present": {
+     "il": "chauffe",
+     "ils": "chauffent",
+     "je": "chauffe",
+     "nous": "chauffions",
+     "tu": "chauffes",
+     "vous": "chauffiez"
+    }
+   },
+   "group": 1,
+   "inferred": false,
+   "participle_past": "chauffé",
+   "participle_present": "chauffant",
+   "pronominal": false
+  },
   "chercher": {
    "auxiliary": "avoir",
    "forms": {
@@ -4886,6 +5195,109 @@
    "inferred": false,
    "participle_past": "cherché",
    "participle_present": "cherchant",
+   "pronominal": false
+  },
+  "chialer": {
+   "auxiliary": "avoir",
+   "forms": {
+    "conditionnel.passe": {
+     "il": "aurait chialé",
+     "ils": "auraient chialé",
+     "je": "aurais chialé",
+     "nous": "aurions chialé",
+     "tu": "aurais chialé",
+     "vous": "auriez chialé"
+    },
+    "conditionnel.present": {
+     "il": "chialerait",
+     "ils": "chialeraient",
+     "je": "chialerais",
+     "nous": "chialerions",
+     "tu": "chialerais",
+     "vous": "chialeriez"
+    },
+    "imperatif.present": {
+     "nous": "chialons",
+     "tu": "chiale",
+     "vous": "chialez"
+    },
+    "indicatif.futur_anterieur": {
+     "il": "aura chialé",
+     "ils": "auront chialé",
+     "je": "aurai chialé",
+     "nous": "aurons chialé",
+     "tu": "auras chialé",
+     "vous": "aurez chialé"
+    },
+    "indicatif.futur_simple": {
+     "il": "chialera",
+     "ils": "chialeront",
+     "je": "chialerai",
+     "nous": "chialerons",
+     "tu": "chialeras",
+     "vous": "chialerez"
+    },
+    "indicatif.imparfait": {
+     "il": "chialait",
+     "ils": "chialaient",
+     "je": "chialais",
+     "nous": "chialions",
+     "tu": "chialais",
+     "vous": "chialiez"
+    },
+    "indicatif.passe_compose": {
+     "il": "a chialé",
+     "ils": "ont chialé",
+     "je": "ai chialé",
+     "nous": "avons chialé",
+     "tu": "as chialé",
+     "vous": "avez chialé"
+    },
+    "indicatif.passe_simple": {
+     "il": "chiala",
+     "ils": "chialèrent",
+     "je": "chialai",
+     "nous": "chialâmes",
+     "tu": "chialas",
+     "vous": "chialâtes"
+    },
+    "indicatif.plus_que_parfait": {
+     "il": "avait chialé",
+     "ils": "avaient chialé",
+     "je": "avais chialé",
+     "nous": "avions chialé",
+     "tu": "avais chialé",
+     "vous": "aviez chialé"
+    },
+    "indicatif.present": {
+     "il": "chiale",
+     "ils": "chialent",
+     "je": "chiale",
+     "nous": "chialons",
+     "tu": "chiales",
+     "vous": "chialez"
+    },
+    "subjonctif.passe": {
+     "il": "ait chialé",
+     "ils": "aient chialé",
+     "je": "aie chialé",
+     "nous": "ayons chialé",
+     "tu": "aies chialé",
+     "vous": "ayez chialé"
+    },
+    "subjonctif.present": {
+     "il": "chiale",
+     "ils": "chialent",
+     "je": "chiale",
+     "nous": "chialions",
+     "tu": "chiales",
+     "vous": "chialiez"
+    }
+   },
+   "group": 1,
+   "inferred": false,
+   "participle_past": "chialé",
+   "participle_present": "chialant",
    "pronominal": false
   },
   "chier": {
@@ -9109,6 +9521,109 @@
    "inferred": false,
    "participle_past": "déjeuné",
    "participle_present": "déjeunant",
+   "pronominal": false
+  },
+  "déneiger": {
+   "auxiliary": "avoir",
+   "forms": {
+    "conditionnel.passe": {
+     "il": "aurait déneigé",
+     "ils": "auraient déneigé",
+     "je": "aurais déneigé",
+     "nous": "aurions déneigé",
+     "tu": "aurais déneigé",
+     "vous": "auriez déneigé"
+    },
+    "conditionnel.present": {
+     "il": "déneigerait",
+     "ils": "déneigeraient",
+     "je": "déneigerais",
+     "nous": "déneigerions",
+     "tu": "déneigerais",
+     "vous": "déneigeriez"
+    },
+    "imperatif.present": {
+     "nous": "déneigeons",
+     "tu": "déneige",
+     "vous": "déneigez"
+    },
+    "indicatif.futur_anterieur": {
+     "il": "aura déneigé",
+     "ils": "auront déneigé",
+     "je": "aurai déneigé",
+     "nous": "aurons déneigé",
+     "tu": "auras déneigé",
+     "vous": "aurez déneigé"
+    },
+    "indicatif.futur_simple": {
+     "il": "déneigera",
+     "ils": "déneigeront",
+     "je": "déneigerai",
+     "nous": "déneigerons",
+     "tu": "déneigeras",
+     "vous": "déneigerez"
+    },
+    "indicatif.imparfait": {
+     "il": "déneigeait",
+     "ils": "déneigeaient",
+     "je": "déneigeais",
+     "nous": "déneigions",
+     "tu": "déneigeais",
+     "vous": "déneigiez"
+    },
+    "indicatif.passe_compose": {
+     "il": "a déneigé",
+     "ils": "ont déneigé",
+     "je": "ai déneigé",
+     "nous": "avons déneigé",
+     "tu": "as déneigé",
+     "vous": "avez déneigé"
+    },
+    "indicatif.passe_simple": {
+     "il": "déneigea",
+     "ils": "déneigèrent",
+     "je": "déneigeai",
+     "nous": "déneigeâmes",
+     "tu": "déneigeas",
+     "vous": "déneigeâtes"
+    },
+    "indicatif.plus_que_parfait": {
+     "il": "avait déneigé",
+     "ils": "avaient déneigé",
+     "je": "avais déneigé",
+     "nous": "avions déneigé",
+     "tu": "avais déneigé",
+     "vous": "aviez déneigé"
+    },
+    "indicatif.present": {
+     "il": "déneige",
+     "ils": "déneigent",
+     "je": "déneige",
+     "nous": "déneigeons",
+     "tu": "déneiges",
+     "vous": "déneigez"
+    },
+    "subjonctif.passe": {
+     "il": "ait déneigé",
+     "ils": "aient déneigé",
+     "je": "aie déneigé",
+     "nous": "ayons déneigé",
+     "tu": "aies déneigé",
+     "vous": "ayez déneigé"
+    },
+    "subjonctif.present": {
+     "il": "déneige",
+     "ils": "déneigent",
+     "je": "déneige",
+     "nous": "déneigions",
+     "tu": "déneiges",
+     "vous": "déneigiez"
+    }
+   },
+   "group": 1,
+   "inferred": false,
+   "participle_past": "déneigé",
+   "participle_present": "déneigeant",
    "pronominal": false
   },
   "dépêcher": {
@@ -15080,6 +15595,109 @@
    "participle_present": "lisant",
    "pronominal": false
   },
+  "louer": {
+   "auxiliary": "avoir",
+   "forms": {
+    "conditionnel.passe": {
+     "il": "aurait loué",
+     "ils": "auraient loué",
+     "je": "aurais loué",
+     "nous": "aurions loué",
+     "tu": "aurais loué",
+     "vous": "auriez loué"
+    },
+    "conditionnel.present": {
+     "il": "louerait",
+     "ils": "loueraient",
+     "je": "louerais",
+     "nous": "louerions",
+     "tu": "louerais",
+     "vous": "loueriez"
+    },
+    "imperatif.present": {
+     "nous": "louons",
+     "tu": "loue",
+     "vous": "louez"
+    },
+    "indicatif.futur_anterieur": {
+     "il": "aura loué",
+     "ils": "auront loué",
+     "je": "aurai loué",
+     "nous": "aurons loué",
+     "tu": "auras loué",
+     "vous": "aurez loué"
+    },
+    "indicatif.futur_simple": {
+     "il": "louera",
+     "ils": "loueront",
+     "je": "louerai",
+     "nous": "louerons",
+     "tu": "loueras",
+     "vous": "louerez"
+    },
+    "indicatif.imparfait": {
+     "il": "louait",
+     "ils": "louaient",
+     "je": "louais",
+     "nous": "louions",
+     "tu": "louais",
+     "vous": "louiez"
+    },
+    "indicatif.passe_compose": {
+     "il": "a loué",
+     "ils": "ont loué",
+     "je": "ai loué",
+     "nous": "avons loué",
+     "tu": "as loué",
+     "vous": "avez loué"
+    },
+    "indicatif.passe_simple": {
+     "il": "loua",
+     "ils": "louèrent",
+     "je": "louai",
+     "nous": "louâmes",
+     "tu": "louas",
+     "vous": "louâtes"
+    },
+    "indicatif.plus_que_parfait": {
+     "il": "avait loué",
+     "ils": "avaient loué",
+     "je": "avais loué",
+     "nous": "avions loué",
+     "tu": "avais loué",
+     "vous": "aviez loué"
+    },
+    "indicatif.present": {
+     "il": "loue",
+     "ils": "louent",
+     "je": "loue",
+     "nous": "louons",
+     "tu": "loues",
+     "vous": "louez"
+    },
+    "subjonctif.passe": {
+     "il": "ait loué",
+     "ils": "aient loué",
+     "je": "aie loué",
+     "nous": "ayons loué",
+     "tu": "aies loué",
+     "vous": "ayez loué"
+    },
+    "subjonctif.present": {
+     "il": "loue",
+     "ils": "louent",
+     "je": "loue",
+     "nous": "louions",
+     "tu": "loues",
+     "vous": "louiez"
+    }
+   },
+   "group": 1,
+   "inferred": false,
+   "participle_past": "loué",
+   "participle_present": "louant",
+   "pronominal": false
+  },
   "lâcher": {
    "auxiliary": "avoir",
    "forms": {
@@ -16623,6 +17241,109 @@
    "inferred": false,
    "participle_past": "mérité",
    "participle_present": "méritant",
+   "pronominal": false
+  },
+  "nager": {
+   "auxiliary": "avoir",
+   "forms": {
+    "conditionnel.passe": {
+     "il": "aurait nagé",
+     "ils": "auraient nagé",
+     "je": "aurais nagé",
+     "nous": "aurions nagé",
+     "tu": "aurais nagé",
+     "vous": "auriez nagé"
+    },
+    "conditionnel.present": {
+     "il": "nagerait",
+     "ils": "nageraient",
+     "je": "nagerais",
+     "nous": "nagerions",
+     "tu": "nagerais",
+     "vous": "nageriez"
+    },
+    "imperatif.present": {
+     "nous": "nageons",
+     "tu": "nage",
+     "vous": "nagez"
+    },
+    "indicatif.futur_anterieur": {
+     "il": "aura nagé",
+     "ils": "auront nagé",
+     "je": "aurai nagé",
+     "nous": "aurons nagé",
+     "tu": "auras nagé",
+     "vous": "aurez nagé"
+    },
+    "indicatif.futur_simple": {
+     "il": "nagera",
+     "ils": "nageront",
+     "je": "nagerai",
+     "nous": "nagerons",
+     "tu": "nageras",
+     "vous": "nagerez"
+    },
+    "indicatif.imparfait": {
+     "il": "nageait",
+     "ils": "nageaient",
+     "je": "nageais",
+     "nous": "nagions",
+     "tu": "nageais",
+     "vous": "nagiez"
+    },
+    "indicatif.passe_compose": {
+     "il": "a nagé",
+     "ils": "ont nagé",
+     "je": "ai nagé",
+     "nous": "avons nagé",
+     "tu": "as nagé",
+     "vous": "avez nagé"
+    },
+    "indicatif.passe_simple": {
+     "il": "nagea",
+     "ils": "nagèrent",
+     "je": "nageai",
+     "nous": "nageâmes",
+     "tu": "nageas",
+     "vous": "nageâtes"
+    },
+    "indicatif.plus_que_parfait": {
+     "il": "avait nagé",
+     "ils": "avaient nagé",
+     "je": "avais nagé",
+     "nous": "avions nagé",
+     "tu": "avais nagé",
+     "vous": "aviez nagé"
+    },
+    "indicatif.present": {
+     "il": "nage",
+     "ils": "nagent",
+     "je": "nage",
+     "nous": "nageons",
+     "tu": "nages",
+     "vous": "nagez"
+    },
+    "subjonctif.passe": {
+     "il": "ait nagé",
+     "ils": "aient nagé",
+     "je": "aie nagé",
+     "nous": "ayons nagé",
+     "tu": "aies nagé",
+     "vous": "ayez nagé"
+    },
+    "subjonctif.present": {
+     "il": "nage",
+     "ils": "nagent",
+     "je": "nage",
+     "nous": "nagions",
+     "tu": "nages",
+     "vous": "nagiez"
+    }
+   },
+   "group": 1,
+   "inferred": false,
+   "participle_past": "nagé",
+   "participle_present": "nageant",
    "pronominal": false
   },
   "naître": {
@@ -18553,6 +19274,109 @@
      ]
     }
    }
+  },
+  "pelleter": {
+   "auxiliary": "avoir",
+   "forms": {
+    "conditionnel.passe": {
+     "il": "aurait pelleté",
+     "ils": "auraient pelleté",
+     "je": "aurais pelleté",
+     "nous": "aurions pelleté",
+     "tu": "aurais pelleté",
+     "vous": "auriez pelleté"
+    },
+    "conditionnel.present": {
+     "il": "pelletterait",
+     "ils": "pelletteraient",
+     "je": "pelletterais",
+     "nous": "pelletterions",
+     "tu": "pelletterais",
+     "vous": "pelletteriez"
+    },
+    "imperatif.present": {
+     "nous": "pelletons",
+     "tu": "pellette",
+     "vous": "pelletez"
+    },
+    "indicatif.futur_anterieur": {
+     "il": "aura pelleté",
+     "ils": "auront pelleté",
+     "je": "aurai pelleté",
+     "nous": "aurons pelleté",
+     "tu": "auras pelleté",
+     "vous": "aurez pelleté"
+    },
+    "indicatif.futur_simple": {
+     "il": "pellettera",
+     "ils": "pelletteront",
+     "je": "pelletterai",
+     "nous": "pelletterons",
+     "tu": "pelletteras",
+     "vous": "pelletterez"
+    },
+    "indicatif.imparfait": {
+     "il": "pelletait",
+     "ils": "pelletaient",
+     "je": "pelletais",
+     "nous": "pelletions",
+     "tu": "pelletais",
+     "vous": "pelletiez"
+    },
+    "indicatif.passe_compose": {
+     "il": "a pelleté",
+     "ils": "ont pelleté",
+     "je": "ai pelleté",
+     "nous": "avons pelleté",
+     "tu": "as pelleté",
+     "vous": "avez pelleté"
+    },
+    "indicatif.passe_simple": {
+     "il": "pelleta",
+     "ils": "pelletèrent",
+     "je": "pelletai",
+     "nous": "pelletâmes",
+     "tu": "pelletas",
+     "vous": "pelletâtes"
+    },
+    "indicatif.plus_que_parfait": {
+     "il": "avait pelleté",
+     "ils": "avaient pelleté",
+     "je": "avais pelleté",
+     "nous": "avions pelleté",
+     "tu": "avais pelleté",
+     "vous": "aviez pelleté"
+    },
+    "indicatif.present": {
+     "il": "pellette",
+     "ils": "pellettent",
+     "je": "pellette",
+     "nous": "pelletons",
+     "tu": "pellettes",
+     "vous": "pelletez"
+    },
+    "subjonctif.passe": {
+     "il": "ait pelleté",
+     "ils": "aient pelleté",
+     "je": "aie pelleté",
+     "nous": "ayons pelleté",
+     "tu": "aies pelleté",
+     "vous": "ayez pelleté"
+    },
+    "subjonctif.present": {
+     "il": "pellette",
+     "ils": "pellettent",
+     "je": "pellette",
+     "nous": "pelletions",
+     "tu": "pellettes",
+     "vous": "pelletiez"
+    }
+   },
+   "group": 1,
+   "inferred": false,
+   "participle_past": "pelleté",
+   "participle_present": "pelletant",
+   "pronominal": false
   },
   "penser": {
    "auxiliary": "avoir",
@@ -29768,6 +30592,109 @@
    "participle_present": "souvenant",
    "pronominal": false
   },
+  "stationner": {
+   "auxiliary": "avoir",
+   "forms": {
+    "conditionnel.passe": {
+     "il": "aurait stationné",
+     "ils": "auraient stationné",
+     "je": "aurais stationné",
+     "nous": "aurions stationné",
+     "tu": "aurais stationné",
+     "vous": "auriez stationné"
+    },
+    "conditionnel.present": {
+     "il": "stationnerait",
+     "ils": "stationneraient",
+     "je": "stationnerais",
+     "nous": "stationnerions",
+     "tu": "stationnerais",
+     "vous": "stationneriez"
+    },
+    "imperatif.present": {
+     "nous": "stationnons",
+     "tu": "stationne",
+     "vous": "stationnez"
+    },
+    "indicatif.futur_anterieur": {
+     "il": "aura stationné",
+     "ils": "auront stationné",
+     "je": "aurai stationné",
+     "nous": "aurons stationné",
+     "tu": "auras stationné",
+     "vous": "aurez stationné"
+    },
+    "indicatif.futur_simple": {
+     "il": "stationnera",
+     "ils": "stationneront",
+     "je": "stationnerai",
+     "nous": "stationnerons",
+     "tu": "stationneras",
+     "vous": "stationnerez"
+    },
+    "indicatif.imparfait": {
+     "il": "stationnait",
+     "ils": "stationnaient",
+     "je": "stationnais",
+     "nous": "stationnions",
+     "tu": "stationnais",
+     "vous": "stationniez"
+    },
+    "indicatif.passe_compose": {
+     "il": "a stationné",
+     "ils": "ont stationné",
+     "je": "ai stationné",
+     "nous": "avons stationné",
+     "tu": "as stationné",
+     "vous": "avez stationné"
+    },
+    "indicatif.passe_simple": {
+     "il": "stationna",
+     "ils": "stationnèrent",
+     "je": "stationnai",
+     "nous": "stationnâmes",
+     "tu": "stationnas",
+     "vous": "stationnâtes"
+    },
+    "indicatif.plus_que_parfait": {
+     "il": "avait stationné",
+     "ils": "avaient stationné",
+     "je": "avais stationné",
+     "nous": "avions stationné",
+     "tu": "avais stationné",
+     "vous": "aviez stationné"
+    },
+    "indicatif.present": {
+     "il": "stationne",
+     "ils": "stationnent",
+     "je": "stationne",
+     "nous": "stationnons",
+     "tu": "stationnes",
+     "vous": "stationnez"
+    },
+    "subjonctif.passe": {
+     "il": "ait stationné",
+     "ils": "aient stationné",
+     "je": "aie stationné",
+     "nous": "ayons stationné",
+     "tu": "aies stationné",
+     "vous": "ayez stationné"
+    },
+    "subjonctif.present": {
+     "il": "stationne",
+     "ils": "stationnent",
+     "je": "stationne",
+     "nous": "stationnions",
+     "tu": "stationnes",
+     "vous": "stationniez"
+    }
+   },
+   "group": 1,
+   "inferred": false,
+   "participle_past": "stationné",
+   "participle_present": "stationnant",
+   "pronominal": false
+  },
   "suffire": {
    "auxiliary": "avoir",
    "forms": {
@@ -31002,6 +31929,109 @@
    "inferred": false,
    "participle_past": "terminé",
    "participle_present": "terminant",
+   "pronominal": false
+  },
+  "texter": {
+   "auxiliary": "avoir",
+   "forms": {
+    "conditionnel.passe": {
+     "il": "aurait texté",
+     "ils": "auraient texté",
+     "je": "aurais texté",
+     "nous": "aurions texté",
+     "tu": "aurais texté",
+     "vous": "auriez texté"
+    },
+    "conditionnel.present": {
+     "il": "texterait",
+     "ils": "texteraient",
+     "je": "texterais",
+     "nous": "texterions",
+     "tu": "texterais",
+     "vous": "texteriez"
+    },
+    "imperatif.present": {
+     "nous": "textons",
+     "tu": "texte",
+     "vous": "textez"
+    },
+    "indicatif.futur_anterieur": {
+     "il": "aura texté",
+     "ils": "auront texté",
+     "je": "aurai texté",
+     "nous": "aurons texté",
+     "tu": "auras texté",
+     "vous": "aurez texté"
+    },
+    "indicatif.futur_simple": {
+     "il": "textera",
+     "ils": "texteront",
+     "je": "texterai",
+     "nous": "texterons",
+     "tu": "texteras",
+     "vous": "texterez"
+    },
+    "indicatif.imparfait": {
+     "il": "textait",
+     "ils": "textaient",
+     "je": "textais",
+     "nous": "textions",
+     "tu": "textais",
+     "vous": "textiez"
+    },
+    "indicatif.passe_compose": {
+     "il": "a texté",
+     "ils": "ont texté",
+     "je": "ai texté",
+     "nous": "avons texté",
+     "tu": "as texté",
+     "vous": "avez texté"
+    },
+    "indicatif.passe_simple": {
+     "il": "texta",
+     "ils": "textèrent",
+     "je": "textai",
+     "nous": "textâmes",
+     "tu": "textas",
+     "vous": "textâtes"
+    },
+    "indicatif.plus_que_parfait": {
+     "il": "avait texté",
+     "ils": "avaient texté",
+     "je": "avais texté",
+     "nous": "avions texté",
+     "tu": "avais texté",
+     "vous": "aviez texté"
+    },
+    "indicatif.present": {
+     "il": "texte",
+     "ils": "textent",
+     "je": "texte",
+     "nous": "textons",
+     "tu": "textes",
+     "vous": "textez"
+    },
+    "subjonctif.passe": {
+     "il": "ait texté",
+     "ils": "aient texté",
+     "je": "aie texté",
+     "nous": "ayons texté",
+     "tu": "aies texté",
+     "vous": "ayez texté"
+    },
+    "subjonctif.present": {
+     "il": "texte",
+     "ils": "textent",
+     "je": "texte",
+     "nous": "textions",
+     "tu": "textes",
+     "vous": "textiez"
+    }
+   },
+   "group": 1,
+   "inferred": true,
+   "participle_past": "texté",
+   "participle_present": "textant",
    "pronominal": false
   },
   "tirer": {
@@ -32652,6 +33682,109 @@
    "participle_present": "virant",
    "pronominal": false
   },
+  "visiter": {
+   "auxiliary": "avoir",
+   "forms": {
+    "conditionnel.passe": {
+     "il": "aurait visité",
+     "ils": "auraient visité",
+     "je": "aurais visité",
+     "nous": "aurions visité",
+     "tu": "aurais visité",
+     "vous": "auriez visité"
+    },
+    "conditionnel.present": {
+     "il": "visiterait",
+     "ils": "visiteraient",
+     "je": "visiterais",
+     "nous": "visiterions",
+     "tu": "visiterais",
+     "vous": "visiteriez"
+    },
+    "imperatif.present": {
+     "nous": "visitons",
+     "tu": "visite",
+     "vous": "visitez"
+    },
+    "indicatif.futur_anterieur": {
+     "il": "aura visité",
+     "ils": "auront visité",
+     "je": "aurai visité",
+     "nous": "aurons visité",
+     "tu": "auras visité",
+     "vous": "aurez visité"
+    },
+    "indicatif.futur_simple": {
+     "il": "visitera",
+     "ils": "visiteront",
+     "je": "visiterai",
+     "nous": "visiterons",
+     "tu": "visiteras",
+     "vous": "visiterez"
+    },
+    "indicatif.imparfait": {
+     "il": "visitait",
+     "ils": "visitaient",
+     "je": "visitais",
+     "nous": "visitions",
+     "tu": "visitais",
+     "vous": "visitiez"
+    },
+    "indicatif.passe_compose": {
+     "il": "a visité",
+     "ils": "ont visité",
+     "je": "ai visité",
+     "nous": "avons visité",
+     "tu": "as visité",
+     "vous": "avez visité"
+    },
+    "indicatif.passe_simple": {
+     "il": "visita",
+     "ils": "visitèrent",
+     "je": "visitai",
+     "nous": "visitâmes",
+     "tu": "visitas",
+     "vous": "visitâtes"
+    },
+    "indicatif.plus_que_parfait": {
+     "il": "avait visité",
+     "ils": "avaient visité",
+     "je": "avais visité",
+     "nous": "avions visité",
+     "tu": "avais visité",
+     "vous": "aviez visité"
+    },
+    "indicatif.present": {
+     "il": "visite",
+     "ils": "visitent",
+     "je": "visite",
+     "nous": "visitons",
+     "tu": "visites",
+     "vous": "visitez"
+    },
+    "subjonctif.passe": {
+     "il": "ait visité",
+     "ils": "aient visité",
+     "je": "aie visité",
+     "nous": "ayons visité",
+     "tu": "aies visité",
+     "vous": "ayez visité"
+    },
+    "subjonctif.present": {
+     "il": "visite",
+     "ils": "visitent",
+     "je": "visite",
+     "nous": "visitions",
+     "tu": "visites",
+     "vous": "visitiez"
+    }
+   },
+   "group": 1,
+   "inferred": false,
+   "participle_past": "visité",
+   "participle_present": "visitant",
+   "pronominal": false
+  },
   "vivre": {
    "auxiliary": "avoir",
    "forms": {
@@ -33062,6 +34195,109 @@
    "inferred": false,
    "participle_past": "voulu",
    "participle_present": "voulant",
+   "pronominal": false
+  },
+  "voyager": {
+   "auxiliary": "avoir",
+   "forms": {
+    "conditionnel.passe": {
+     "il": "aurait voyagé",
+     "ils": "auraient voyagé",
+     "je": "aurais voyagé",
+     "nous": "aurions voyagé",
+     "tu": "aurais voyagé",
+     "vous": "auriez voyagé"
+    },
+    "conditionnel.present": {
+     "il": "voyagerait",
+     "ils": "voyageraient",
+     "je": "voyagerais",
+     "nous": "voyagerions",
+     "tu": "voyagerais",
+     "vous": "voyageriez"
+    },
+    "imperatif.present": {
+     "nous": "voyageons",
+     "tu": "voyage",
+     "vous": "voyagez"
+    },
+    "indicatif.futur_anterieur": {
+     "il": "aura voyagé",
+     "ils": "auront voyagé",
+     "je": "aurai voyagé",
+     "nous": "aurons voyagé",
+     "tu": "auras voyagé",
+     "vous": "aurez voyagé"
+    },
+    "indicatif.futur_simple": {
+     "il": "voyagera",
+     "ils": "voyageront",
+     "je": "voyagerai",
+     "nous": "voyagerons",
+     "tu": "voyageras",
+     "vous": "voyagerez"
+    },
+    "indicatif.imparfait": {
+     "il": "voyageait",
+     "ils": "voyageaient",
+     "je": "voyageais",
+     "nous": "voyagions",
+     "tu": "voyageais",
+     "vous": "voyagiez"
+    },
+    "indicatif.passe_compose": {
+     "il": "a voyagé",
+     "ils": "ont voyagé",
+     "je": "ai voyagé",
+     "nous": "avons voyagé",
+     "tu": "as voyagé",
+     "vous": "avez voyagé"
+    },
+    "indicatif.passe_simple": {
+     "il": "voyagea",
+     "ils": "voyagèrent",
+     "je": "voyageai",
+     "nous": "voyageâmes",
+     "tu": "voyageas",
+     "vous": "voyageâtes"
+    },
+    "indicatif.plus_que_parfait": {
+     "il": "avait voyagé",
+     "ils": "avaient voyagé",
+     "je": "avais voyagé",
+     "nous": "avions voyagé",
+     "tu": "avais voyagé",
+     "vous": "aviez voyagé"
+    },
+    "indicatif.present": {
+     "il": "voyage",
+     "ils": "voyagent",
+     "je": "voyage",
+     "nous": "voyageons",
+     "tu": "voyages",
+     "vous": "voyagez"
+    },
+    "subjonctif.passe": {
+     "il": "ait voyagé",
+     "ils": "aient voyagé",
+     "je": "aie voyagé",
+     "nous": "ayons voyagé",
+     "tu": "aies voyagé",
+     "vous": "ayez voyagé"
+    },
+    "subjonctif.present": {
+     "il": "voyage",
+     "ils": "voyagent",
+     "je": "voyage",
+     "nous": "voyagions",
+     "tu": "voyages",
+     "vous": "voyagiez"
+    }
+   },
+   "group": 1,
+   "inferred": false,
+   "participle_past": "voyagé",
+   "participle_present": "voyageant",
    "pronominal": false
   },
   "vérifier": {

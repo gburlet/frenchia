@@ -10,12 +10,6 @@ function ComingSoon({ title, description }: { title: string; description: string
   );
 }
 
-export const VerbsPage = () => (
-  <ComingSoon title="Verbs" description="Drill conjugations until they feel natural." />
-);
-export const VocabPage = () => (
-  <ComingSoon title="Vocabulary" description="Build and review your vocabulary." />
-);
 export const ProgressPage = () => (
   <ComingSoon title="Progress" description="Track how far you have come." />
 );

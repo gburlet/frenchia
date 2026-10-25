@@ -335,6 +335,18 @@
           "title": "Generated Hash",
           "type": "string"
         },
+        "reviewed_by": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reviewed By"
+        },
         "job_id": {
           "anyOf": [
             {
