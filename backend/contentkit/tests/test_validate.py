@@ -208,3 +208,27 @@ def test_vulgar_words_are_errors() -> None:
     assert [i.message for i in issues] == ["vulgar or swear word 'cul'"]
     data["exercises"][1]["accepted_answers"] = ["On a reculé.", "Nous avons reculé."]
     assert check_lesson_quality(Lesson.model_validate(data), reference()) == []
+
+
+def test_hints_must_be_short_and_not_give_the_answer_away() -> None:
+    data = lesson_data()
+    data["exercises"][0]["hint"] = "Use « ai mangé »: avoir + participle."
+    data["exercises"][1]["hint"] = "Remember:\n\nNote: on is common in Québec. " + "x" * 160
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert found == [
+        "error:the hint gives away the answer 'ai mangé'",
+        "error:the hint must be one short line (≤160 characters)",
+    ]
+
+
+def test_repeated_exercises_and_markup_are_errors() -> None:
+    data = lesson_data()
+    data["exercises"][2]["question"] = "Hier, j'___ une poutine ?"
+    data["exercises"][1]["hint"] = "Not ~~On a magasiner~~"
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert "error:repeats ex-01" in found
+    assert "error:exercises are plain text: nothing is underlined or bold" in found
+    data["exercises"][1]["hint"] = None
+    data["exercises"][2]["question"] = "Qu'est-ce qu'ils ont fait ?"
+    data["exercises"][2]["explanation"] = "« j'ai **magasiné** »"  # bold is rendered here
+    assert check_lesson_quality(Lesson.model_validate(data), reference()) == []

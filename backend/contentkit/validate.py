@@ -182,8 +182,10 @@ _VULGAR = re.compile(
 # Exercise text is shown without formatting, so a question about "the underlined words" is
 # unanswerable (Gemma writes these).
 _FORMATTING_REF = re.compile(
-    r"\b(underlined|in bold|bolded|in italics|soulign[ée]e?s?|en gras|en italique)\b", re.I
+    r"\b(underlined|in bold|bolded|in italics|soulign[ée]e?s?|en gras|en italique)\b|~~", re.I
 )
+_BOLD = re.compile(r"\*\*")  # rendered only in explanations
+HINT_MAX = 160
 
 
 def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
@@ -233,9 +235,20 @@ def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
     passages = {
         s.id: normalize(s.passage_fr) for s in lesson.sections if isinstance(s, ReadingSection)
     }
+    seen: dict[str, str] = {}
     for ex in lesson.exercises:
+        hint = getattr(ex, "hint", None)
+        if hint and (len(hint) > HINT_MAX or "\n" in hint.strip()):
+            add("error", ex.id, f"the hint must be one short line (≤{HINT_MAX} characters)")
+        text = next(getattr(ex, f) for f in ("sentence", "prompt", "question") if hasattr(ex, f))
+        stem = normalize(text).strip(" ?.!")
+        if stem in seen:
+            add("error", ex.id, f"repeats {seen[stem]}")
+        seen.setdefault(stem, ex.id)
         for path, text in _strings(ex.model_dump(mode="json")):
-            if _FORMATTING_REF.search(text):
+            if _FORMATTING_REF.search(text) or (
+                _BOLD.search(text) and not path.endswith("explanation")
+            ):
                 add(
                     "error",
                     f"{ex.id}.{path}",
@@ -274,6 +287,10 @@ def _check_fill_blank(add: AddFn, ex: FillBlankExercise, ref: Reference) -> None
         filled = normalize(ex.sentence.replace(BLANK, answer)).split()
         if any(a == b and len(a) > 2 for a, b in zip(filled, filled[1:], strict=False)):
             add("error", ex.id, f"word repeated after filling the blank with {answer!r}")
+    hint_words = f" {' '.join(_WORD.findall(normalize(ex.hint or '')))} "
+    for answer in ex.answers:
+        if f" {' '.join(_WORD.findall(normalize(answer)))} " in hint_words:
+            add("error", ex.id, f"the hint gives away the answer {answer!r}")
     if ex.hint and ex.hint.strip() in ex.sentence:
         add("warning", ex.id, f"the hint {ex.hint.strip()!r} is also written inside the sentence")
     infinitive = _hint_infinitive(ex.hint)

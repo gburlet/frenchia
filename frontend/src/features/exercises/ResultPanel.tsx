@@ -194,7 +194,11 @@ export function ResultPanel({ exercise, result, chosenIndex, onChange, onRetry }
           })}
         </ol>
       )}
-      {result.explanation && <p className="text-sm text-detail">{result.explanation}</p>}
+      {result.explanation && (
+        <p className="text-sm text-detail">
+          <BoldText text={result.explanation} />
+        </p>
+      )}
 
       {feedback.register_note && <p className="text-sm text-muted">{feedback.register_note}</p>}
 
@@ -221,5 +225,18 @@ export function ResultPanel({ exercise, result, chosenIndex, onChange, onRetry }
       </div>
       {result.grading === "llm" && <p className="text-xs text-muted">Feedback by the local AI tutor</p>}
     </div>
+  );
+}
+
+/** Explanations are plain text apart from **bold** (cheaper than a Markdown renderer here). */
+function BoldText({ text }: { text: string }) {
+  return text.split(/\*\*(.+?)\*\*/g).map((part, i) =>
+    i % 2 ? (
+      <strong key={i} className="font-bold text-heading">
+        {part}
+      </strong>
+    ) : (
+      part
+    ),
   );
 }

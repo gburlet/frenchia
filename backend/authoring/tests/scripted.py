@@ -103,11 +103,11 @@ def fill_batch(n: int, bad: bool) -> dict[str, Any]:
     return {"items": [first, *rest]}
 
 
-def choice_batch(n: int) -> dict[str, Any]:
+def choice_batch(n: int, batch: int = 0) -> dict[str, Any]:
     return {
         "items": [
             {
-                "question": f"Question {i} ?",
+                "question": f"Question {batch}.{i} ?",
                 "options": ["a", "b", "c"],
                 "answer_index": 1,
                 "explanation": "Because.",
@@ -117,11 +117,11 @@ def choice_batch(n: int) -> dict[str, Any]:
     }
 
 
-def translate_batch(n: int) -> dict[str, Any]:
+def translate_batch(n: int, batch: int = 0) -> dict[str, Any]:
     return {
         "items": [
             {
-                "prompt": f"I ate {i}.",
+                "prompt": f"I ate {i}." if not batch else f"I ate {i} ({batch}).",
                 "accepted_answers": [f"J'ai mangé {i}.", f"Moi, j'ai mangé {i}."],
                 "hint": "manger",
             }
@@ -160,9 +160,12 @@ class ScriptedChat:
                 self.bad_fill_first and first_attempt,
             )
         elif title.startswith("TranslateDraftBatch"):
-            data = translate_batch(int(title.removeprefix("TranslateDraftBatch")))
+            first = not any(t.startswith("TranslateDraftBatch") for t, _ in self.calls[:-1])
+            data = translate_batch(
+                int(title.removeprefix("TranslateDraftBatch")), 0 if first else len(self.calls)
+            )
         elif title.startswith("ChoiceDraftBatch"):
-            data = choice_batch(int(title.removeprefix("ChoiceDraftBatch")))
+            data = choice_batch(int(title.removeprefix("ChoiceDraftBatch")), len(self.calls))
         else:  # revision of an existing item: echo it back with a marker in a text field
             current = json.loads(messages[-1].content.split("Current content (JSON):\n", 1)[1])
             current["id"] = "renamed-by-llm"
