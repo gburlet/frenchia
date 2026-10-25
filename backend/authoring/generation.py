@@ -671,6 +671,11 @@ def verify_regions(data: Any, ref: Reference) -> Any:
         for entry in [*words, *section.get("examples", [])]:
             if entry.get("region") == "qc" and not ref.quebec_terms_in(entry.get("fr", "")):
                 entry["region"] = "common"
+        # A regional-note variant is a Québec claim too: keep only those the lexicon supports.
+        if "variants" in section:
+            section["variants"] = [
+                v for v in section["variants"] if ref.quebec_terms_in(v.get("qc", ""))
+            ]
         # ...and a word that *is* a lexicon term is Québec usage (exact match only:
         # « magasin » must not become qc because « magasiner » is).
         for entry in words:

@@ -430,7 +430,17 @@ def test_only_lexicon_words_keep_a_quebec_tag() -> None:
             },
         ]
     }
+    data["sections"].append(
+        {
+            "type": "regional_note",
+            "variants": [
+                {"en": "corner store", "fr": "l'épicerie", "qc": "le dépanneur"},
+                {"en": "hardware store", "fr": "la quincaillerie", "qc": "la quincaillerie"},
+            ],
+        }
+    )
     out = verify_regions(data, ref)
+    assert [v["qc"] for v in out["sections"][2]["variants"]] == ["le dépanneur"]
     assert [i["region"] for i in out["sections"][0]["items"]] == ["qc", "common", "qc", "common"]
     assert [e["region"] for e in out["sections"][1]["examples"]] == ["qc", "common"]
 
