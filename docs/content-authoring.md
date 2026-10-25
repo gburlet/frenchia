@@ -96,6 +96,21 @@ same check → proof-read → publish loop, from the command line rather than Ad
 3. **Publish.** `just bank-promote` (optionally with ids) moves reviewed, error-free drafts into
    `content/` and imports them. Then commit the YAML.
 
+What the deterministic checks catch, because Gemma does these and Haiku misses some:
+
+- a sentence translation that is only the gloss ("Choose"), runs on into the prompt's slot list
+  (« 2. Présent (tu) … »), lists alternatives (" / ") or leaks the next JSON key;
+- a je/tu/nous/vous sentence with no subject: « Choisissez… » in a present-tense slot is an
+  imperative;
+- a pronominal nous/vous form without its subject: « Nous levons » for *se lever* needs
+  « Nous nous levons »;
+- notes that describe the edit ("The original example was replaced…"), or that give a
+  Québec/France equivalent on a word that isn't Québec usage.
+
+Québec lexicon entries can carry a `gender`, which overrides Lexique (« un party »). Only
+entries the theme or the verb actually mentions go into a prompt: a generic sample ended up in
+every set and sentence.
+
 Vocabulary from lessons needs none of this. Every published lesson's vocabulary sections and
 reading glossaries become a "From your lessons" set automatically, on import and on publish.
 
