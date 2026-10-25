@@ -13,6 +13,7 @@ from django.utils import timezone
 from pydantic import BaseModel, ConfigDict, ValidationError
 
 from contentkit.reference import Reference
+from contentkit.validate import UNVERIFIED_QUEBEC
 
 from .models import GenerationJob
 
@@ -145,4 +146,25 @@ def revision_notes(
         for f in findings
     )
     targets = sorted({f["item_id"] for f in findings if not f.get("unknown_item")})
+    return notes, targets
+
+
+def needs_attention(job: GenerationJob) -> list[dict[str, str]]:
+    """Warnings that must not be published without a revision or a human: Québec claims
+    missing from the verified lexicon and sentences the AI critic flagged. Haiku misses these
+    (it passed « avoir le feu au cul » as a Québec expression)."""
+    return [
+        v
+        for v in job.validation
+        if UNVERIFIED_QUEBEC in v["message"] or v["message"].startswith("AI critic")
+    ]
+
+
+def warning_notes(warnings: list[dict[str, str]]) -> tuple[str, list[str]]:
+    notes = "\n".join(
+        f"- {w['path'].split(':', 1)[-1]}: {w['message']} Fix: use only verified Québec usage "
+        "(otherwise standard French, region common), and correct or replace the sentence."
+        for w in warnings
+    )
+    targets = sorted({w["path"].split(":", 1)[-1] for w in warnings if ":" in w["path"]})
     return notes, targets

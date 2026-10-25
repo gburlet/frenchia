@@ -138,3 +138,26 @@ def test_review_page_shows_findings_and_prefills_revision(
     assert 'value="ex-01, table"' in html
     notes, _ = revision_notes(job)
     assert "ex-01 (error): Missing preposition." in notes
+
+
+def test_unverified_quebec_claims_block_approval_and_go_to_the_reviser(
+    job: GenerationJob, settings: Any, django_capture_on_commit_callbacks: Any
+) -> None:
+    job.validation = [
+        {
+            "severity": "warning",
+            "path": "a2-passe-compose-er:vocabulary",
+            "message": "Québec usage 'C'est de la roche' is not in the verified lexicon; check it",
+        }
+    ]
+    job.save()
+    folder = Path(settings.CONTENT_DIR) / REVIEW_DIR
+    call_command("content_review_export")
+    (folder / f"job-{job.pk}.findings.json").write_text('{"issues": []}')
+    with django_capture_on_commit_callbacks(execute=False):
+        call_command(
+            "content_review_import", reviewer="claude-haiku-5-5", revise=True, approve_clean=True
+        )
+    child = GenerationJob.objects.get(parent=job)
+    assert child.targets == ["vocabulary"] and "C'est de la roche" in child.notes
+    assert not Lesson.objects.get(slug="a2-passe-compose-er").published_revision

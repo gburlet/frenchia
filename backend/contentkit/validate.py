@@ -171,6 +171,14 @@ def _looks_english(text: str) -> bool:
     return len(words) >= 4 and len(_ENGLISH.findall(text)) / len(words) > 0.2
 
 
+UNVERIFIED_QUEBEC = "is not in the verified lexicon"
+# The course uses standard language only (prompts.SYSTEM): no vulgarity or sacres.
+_VULGAR = re.compile(
+    r"\b(cul|merde|chier|foutre|putain|salope|tabarnak|tabarnac|tabarouette|câlisse|calisse|"
+    r"crisse|ostie|osti|hostie|ciboire|sacrament)\b",
+    re.I,
+)
+
 # Exercise text is shown without formatting, so a question about "the underlined words" is
 # unanswerable (Gemma writes these).
 _FORMATTING_REF = re.compile(
@@ -217,6 +225,8 @@ def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
     for path, text in _strings(lesson.model_dump(mode="json", exclude={"provenance"})):
         if FOREIGN_SCRIPT.search(text):
             add("error", path, f"text contains another script: {text[:60]!r}")
+        if _VULGAR.search(text):
+            add("error", path, f"vulgar or swear word {_VULGAR.search(text).group(0)!r}")  # type: ignore[union-attr]
         if _LATEX.search(text):
             add("warning", path, f"LaTeX markup in text: {_LATEX.search(text).group(0)!r}")  # type: ignore[union-attr]
 
@@ -256,7 +266,7 @@ def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
 
 def _check_quebec(add: AddFn, where: str, term: str, ref: Reference) -> None:
     if ref.quebec and not ref.quebec_terms_in(term):
-        add("warning", where, f"Québec usage {term!r} is not in the verified lexicon; check it")
+        add("warning", where, f"Québec usage {term!r} {UNVERIFIED_QUEBEC}; check it")
 
 
 def _check_fill_blank(add: AddFn, ex: FillBlankExercise, ref: Reference) -> None:

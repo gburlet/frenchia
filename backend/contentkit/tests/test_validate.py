@@ -199,3 +199,12 @@ def test_exercises_cannot_refer_to_formatting() -> None:
     assert [(i.path, i.severity) for i in issues] == [
         ("a2-passe-compose-er:ex-03.question", "error")
     ]
+
+
+def test_vulgar_words_are_errors() -> None:
+    data = lesson_data()
+    data["exercises"][1]["accepted_answers"] = ["Il a le feu au cul.", "Il est pressé."]
+    issues = check_lesson_quality(Lesson.model_validate(data), reference())
+    assert [i.message for i in issues] == ["vulgar or swear word 'cul'"]
+    data["exercises"][1]["accepted_answers"] = ["On a reculé.", "Nous avons reculé."]
+    assert check_lesson_quality(Lesson.model_validate(data), reference()) == []

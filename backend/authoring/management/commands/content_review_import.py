@@ -4,7 +4,12 @@ from typing import Any
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError, CommandParser
 
-from authoring.external_review import import_findings, revision_notes
+from authoring.external_review import (
+    import_findings,
+    needs_attention,
+    revision_notes,
+    warning_notes,
+)
 from authoring.models import GenerationJob
 from authoring.services import ReviewError, approve, request_revision
 
@@ -28,7 +33,8 @@ class Command(BaseCommand):
         parser.add_argument(
             "--approve-clean",
             action="store_true",
-            help="publish drafts with no reviewer or validation errors (suggestions are ignored)",
+            help="publish drafts with no reviewer or validation errors, unverified Québec claims "
+            "or AI-critic flags (reviewer suggestions are ignored)",
         )
         parser.add_argument(
             "--max-rounds",
@@ -50,17 +56,22 @@ class Command(BaseCommand):
                 f"{counts['error']} errors, {counts['suggestion']} suggestions"
             )
             clean = not counts["error"] and not job.error_count
-            if options["approve_clean"] and clean:
+            attention = needs_attention(job)
+            if options["approve_clean"] and clean and not attention:
                 try:
                     line += f" -> approved {approve(job).name}"
                 except ReviewError as exc:
                     line += f" -> not approved: {exc}"
-            elif options["revise"] and job.external_review:
+            elif options["revise"] and (job.external_review or attention):
+                if attention:
+                    line += f", {len(attention)} unverified Québec claims or critic flags"
                 if _round(job) >= options["max_rounds"]:
                     line += f" -> left for manual review after {options['max_rounds']} rounds"
                 else:
                     notes, targets = revision_notes(job)
-                    child = request_revision(job, notes, targets)
+                    extra_notes, extra_targets = warning_notes(attention)
+                    notes = "\n".join(n for n in (notes, extra_notes) if n)
+                    child = request_revision(job, notes, sorted({*targets, *extra_targets}))
                     line += f" -> revision job {child.pk} queued"
             self.stdout.write(line)
         for error in errors:
