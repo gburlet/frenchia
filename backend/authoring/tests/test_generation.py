@@ -2,7 +2,8 @@ import json
 from pathlib import Path
 from typing import Any
 
-from authoring.generation import LessonBrief, LessonGenerator, LessonReviser
+from authoring.generation import LessonBrief, LessonGenerator, LessonReviser, verify_regions
+from authoring.schemas import tidy
 from contentkit.models import FillBlankExercise, Lesson, LessonOutline
 from contentkit.reference import QuebecTerm, Reference
 from contentkit.yamlio import content_hash
@@ -396,3 +397,41 @@ def test_revision_repairs_what_the_checks_reject() -> None:
     assert revised.hint == "(aller)"  # type: ignore[union-attr]
     assert result.stats.repairs == 1
     assert not [i for i in result.issues if i.severity == "error"]
+
+
+def test_only_lexicon_words_keep_a_quebec_tag() -> None:
+    ref = Reference(Path("."))
+    ref.quebec = [
+        QuebecTerm(
+            term="dépanneur",
+            match=[r"\bdépanneur"],
+            meaning="corner store",
+            france="épicerie",
+            formality="standard",
+        )
+    ]
+    data = {
+        "sections": [
+            {
+                "type": "vocabulary",
+                "items": [
+                    {"fr": "dépanneur", "region": "qc"},
+                    {"fr": "quincaillerie", "region": "qc"},
+                ],
+            },
+            {
+                "type": "examples",
+                "examples": [
+                    {"fr": "Je vais au dépanneur.", "region": "qc"},
+                    {"fr": "Il fait beau.", "region": "qc"},
+                ],
+            },
+        ]
+    }
+    out = verify_regions(data, ref)
+    assert [i["region"] for i in out["sections"][0]["items"]] == ["qc", "common"]
+    assert [e["region"] for e in out["sections"][1]["examples"]] == ["qc", "common"]
+
+
+def test_tidy_turns_literal_backslash_n_into_a_newline() -> None:
+    assert tidy({"body": "- les\\n- leur"}) == {"body": "- les\n- leur"}

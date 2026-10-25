@@ -136,6 +136,7 @@ _LATEX = {
     r"\to ": "→ ",
     r"$\times$": "×",
     r"$\cdot$": "·",
+    "\\n": "\n",  # a literal backslash-n from JSON escaped twice
 }
 
 

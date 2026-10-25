@@ -465,7 +465,9 @@ class LessonGenerator:
             exercises=exercises,
         )
         # Tidy before hashing: the generated hash must match the content as written.
-        lesson = Lesson.model_validate(tidy(lesson.model_dump(mode="json", exclude_none=True)))
+        lesson = Lesson.model_validate(
+            verify_regions(tidy(lesson.model_dump(mode="json", exclude_none=True)), self.ref)
+        )
         provenance = Provenance(
             generator=f"llm/{self.chat.model}",
             prompts=dict(prompts.PROMPT_VERSIONS),
@@ -540,9 +542,12 @@ class LessonReviser:
             issues += critique(self.chat, revised, self.stats.record)
         return GenerationResult(revised, issues, self.stats)
 
-    @staticmethod
     def _build(
-        base: dict[str, Any], sections: list[Any], exercises: list[Any], content_version: int
+        self,
+        base: dict[str, Any],
+        sections: list[Any],
+        exercises: list[Any],
+        content_version: int,
     ) -> Lesson:
         topics = list(base.get("grammar_topics", []))
         exercises = [
@@ -555,7 +560,7 @@ class LessonReviser:
             "sections": [s.model_dump(mode="json", exclude_none=True) for s in sections],
             "exercises": [e.model_dump(mode="json", exclude_none=True) for e in exercises],
         }
-        return Lesson.model_validate(tidy(data))
+        return Lesson.model_validate(verify_regions(tidy(data), self.ref))
 
     def _item_errors(self, lesson: Lesson) -> dict[str, list[str]]:
         """Deterministic errors by item id ("ex-07.hint" belongs to "ex-07")."""
@@ -648,6 +653,24 @@ class LessonReviser:
         out[list_key] = [vocab_item(d) for d in getattr(revised, list_key)]
         out.update(id=data["id"], type=data["type"])
         return model.model_validate(out)
+
+
+def verify_regions(data: Any, ref: Reference) -> Any:
+    """Only the verified lexicon may make a word or sentence "qc": other Québec tags become
+    "common" (as for vocabulary banks). The model tags standard words like « quincaillerie »
+    as Québec usage and keeps doing so when asked to revise."""
+    if not ref.quebec:
+        return data
+    for section in data["sections"]:
+        entries = [
+            *section.get("items", []),
+            *section.get("glossary", []),
+            *section.get("examples", []),
+        ]
+        for entry in entries:
+            if entry.get("region") == "qc" and not ref.quebec_terms_in(entry.get("fr", "")):
+                entry["region"] = "common"
+    return data
 
 
 def _clean_vocab(section: Any) -> Any:
