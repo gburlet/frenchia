@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 from django.conf import settings
 
-from contentkit.banks import check_verb_bank
+from contentkit.banks import check_verb_bank, uses_word
 from contentkit.conjugation import (
     accepted_forms,
     conjugation_table,
@@ -155,3 +155,10 @@ def test_gloss_is_not_a_sentence_translation() -> None:
     )
     issues = check_verb_bank(bank, REF, "verbs/bank/choisir.yaml")
     assert any("not a translation" in i.message for i in issues)
+
+
+def test_uses_word_handles_elision_and_conjugated_expressions() -> None:
+    assert uses_word("bien que", "Bien qu'il fasse froid, nous sortons.")
+    assert uses_word("avoir mal à", "J'ai mal à la tête ce matin.")
+    assert uses_word("cheval", "Les chevaux sont dans le champ.")
+    assert not uses_word("tuque", "Il porte un chapeau.")

@@ -118,7 +118,8 @@ def check_verb_bank(bank: VerbBank, ref: Reference, where: str) -> list[Issue]:
                 add("error", at, f"form should be {found!r} (as written in the sentence)")
         if s.person in _SUBJECT and not s.tense.startswith("imperatif"):
             if not re.search(_SUBJECT[s.person], s.fr, re.IGNORECASE):
-                add("warning", at, f"no « {s.person} » subject in the sentence")
+                # Without its pronoun a « vous » sentence reads as an imperative.
+                add("error", at, f"no « {s.person} » subject in the sentence")
         if _looks_english(s.fr):
             add("error", at, "sentence does not look French")
         if _is_gloss(s.en, bank.en):
@@ -179,9 +180,17 @@ def uses_word(word: str, sentence: str) -> bool:
     """Loose check that a sentence contains a word or an inflection of it (stem match on each
     content word: cheval/chevaux, aller/allons is beyond it, hence a warning only)."""
     text = normalize(sentence)
-    parts = [p for p in normalize(word).replace("'", " ").replace("-", " ").split() if len(p) > 2]
-    for part in parts or normalize(word).split():
+    words = normalize(word).replace("'", " ").replace("-", " ").split()
+    if len(words) > 1 and words[0] in _CONJUGATED_HEADS:
+        words = words[1:]  # avoir mal à -> « j'ai mal à »
+    parts = [p for p in words if len(p) > 2]
+    for part in parts or words:
         stem = part[: max(3, len(part) - 3)]
+        if part in ("que", "jusque", "lorsque", "puisque"):
+            stem = part[:-1]  # bien qu'il
         if stem not in text:
             return False
     return True
+
+
+_CONJUGATED_HEADS = {"avoir", "etre", "être", "faire", "aller"}
