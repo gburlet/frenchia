@@ -287,9 +287,9 @@ def _check_fill_blank(add: AddFn, ex: FillBlankExercise, ref: Reference) -> None
         filled = normalize(ex.sentence.replace(BLANK, answer)).split()
         if any(a == b and len(a) > 2 for a, b in zip(filled, filled[1:], strict=False)):
             add("error", ex.id, f"word repeated after filling the blank with {answer!r}")
-    hint_words = f" {' '.join(_WORD.findall(normalize(ex.hint or '')))} "
+    hint_words = f" {_words(ex.hint or '')} "
     for answer in ex.answers:
-        if f" {' '.join(_WORD.findall(normalize(answer)))} " in hint_words:
+        if f" {_words(answer)} " in hint_words:
             add("error", ex.id, f"the hint gives away the answer {answer!r}")
     if ex.hint and ex.hint.strip() in ex.sentence:
         add("warning", ex.id, f"the hint {ex.hint.strip()!r} is also written inside the sentence")
@@ -303,6 +303,11 @@ def _check_fill_blank(add: AddFn, ex: FillBlankExercise, ref: Reference) -> None
     for answer in ex.answers:
         if not _is_verb_form(normalize(answer), forms):
             add("error", ex.id, f"{answer!r} is not a form of {infinitive!r} in the reference")
+
+
+def _words(text: str) -> str:
+    """Normalized words without surrounding quotes: « 'le' » is the word « le »."""
+    return " ".join(w.strip("'’-") for w in _WORD.findall(normalize(text)))
 
 
 def _hint_infinitive(hint: str | None) -> str | None:

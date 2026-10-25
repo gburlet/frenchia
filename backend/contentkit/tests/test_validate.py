@@ -232,3 +232,12 @@ def test_repeated_exercises_and_markup_are_errors() -> None:
     data["exercises"][2]["question"] = "Qu'est-ce qu'ils ont fait ?"
     data["exercises"][2]["explanation"] = "« j'ai **magasiné** »"  # bold is rendered here
     assert check_lesson_quality(Lesson.model_validate(data), reference()) == []
+
+
+def test_a_quoted_answer_in_the_hint_is_still_the_answer() -> None:
+    data = lesson_data()
+    data["exercises"][0]["sentence"] = "Le café ? Je ___ prends."
+    data["exercises"][0]["answers"] = ["le"]
+    data["exercises"][0]["hint"] = "Direct object pronoun 'le' replaces a masculine noun."
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert "error:the hint gives away the answer 'le'" in found
