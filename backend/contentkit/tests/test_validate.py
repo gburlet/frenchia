@@ -190,3 +190,12 @@ def test_quebec_gender_wins_over_lexique() -> None:
         )
     ]
     assert ref.noun_gender("party") == "m"
+
+
+def test_exercises_cannot_refer_to_formatting() -> None:
+    data = lesson_data()
+    data["exercises"][2]["question"] = "Que remplace le pronom souligné ?"
+    issues = check_lesson_quality(Lesson.model_validate(data), reference())
+    assert [(i.path, i.severity) for i in issues] == [
+        ("a2-passe-compose-er:ex-03.question", "error")
+    ]

@@ -29,5 +29,7 @@ class Command(BaseCommand):
                     started_at=None,
                     progress=[*job.progress, note],
                 )
-                transaction.on_commit(partial(run_generation_job.enqueue, job.pk))
+                # It was already running, so it was next in line: keep it ahead of the queue.
+                task = run_generation_job.using(priority=100)
+                transaction.on_commit(partial(task.enqueue, job.pk))
         self.stdout.write(f"Requeued {len(stale)} interrupted generation job(s)")

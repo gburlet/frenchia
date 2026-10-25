@@ -171,6 +171,13 @@ def _looks_english(text: str) -> bool:
     return len(words) >= 4 and len(_ENGLISH.findall(text)) / len(words) > 0.2
 
 
+# Exercise text is shown without formatting, so a question about "the underlined words" is
+# unanswerable (Gemma writes these).
+_FORMATTING_REF = re.compile(
+    r"\b(underlined|in bold|bolded|in italics|soulign[ée]e?s?|en gras|en italique)\b", re.I
+)
+
+
 def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
     issues: list[Issue] = []
 
@@ -217,6 +224,13 @@ def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
         s.id: normalize(s.passage_fr) for s in lesson.sections if isinstance(s, ReadingSection)
     }
     for ex in lesson.exercises:
+        for path, text in _strings(ex.model_dump(mode="json")):
+            if _FORMATTING_REF.search(text):
+                add(
+                    "error",
+                    f"{ex.id}.{path}",
+                    "exercises are plain text: nothing is underlined or bold",
+                )
         if isinstance(ex, ComprehensionExercise) and ex.reading_id in passages:
             for quote in _QUOTE.findall(ex.explanation):
                 text = next(q for q in quote if q)
