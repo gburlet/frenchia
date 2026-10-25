@@ -123,6 +123,8 @@ def check_verb_bank(bank: VerbBank, ref: Reference, where: str) -> list[Issue]:
             add("error", at, "sentence does not look French")
         if _is_gloss(s.en, bank.en):
             add("error", at, f"the English {s.en!r} is not a translation of the sentence")
+        elif re.search(r"«|\d+\.\s+\w+ \(", s.en):
+            add("error", at, "the English runs on into other text")
         if s.region == "qc" and not quebec_verb:
             _check_quebec(add, at, s.fr, ref)
         for text in (s.fr, s.en):

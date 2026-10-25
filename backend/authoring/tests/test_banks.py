@@ -14,7 +14,7 @@ from authoring.bank_workflow import (
     read,
     write,
 )
-from authoring.bankgen import BankGenerator
+from authoring.bankgen import BankGenerator, translation
 from contentkit.models import VocabTheme
 from contentkit.reference import Reference
 from inference.llm import Completion, Message
@@ -238,3 +238,10 @@ def test_review_round_trip_revise_drop_and_promote(tmp_path: Path) -> None:
     assert promoted == ["aller v1"]
     assert (root / "verbs" / "bank" / "aller.yaml").exists()
     assert not (root / "drafts" / "verbs" / "aller.yaml").exists()
+
+
+def test_translation_drops_run_on_text() -> None:
+    assert translation("You have fun. (common) 2. Présent (tu): « t'amuses »") == "You have fun."
+    assert translation("I choose a coffee. / I am choosing a coffee.") == "I choose a coffee."
+    assert translation("Choose a dessert.2. Présent (vous): « choisissez »") == "Choose a dessert."
+    assert translation("We left at 5 p.m. yesterday.") == "We left at 5 p.m. yesterday."

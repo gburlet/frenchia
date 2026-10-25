@@ -69,8 +69,9 @@ WORD_BATCH = 12
 
 class SentenceDraft(BaseModel):
     slot: int
-    fr: str
-    en: str = Field(description="English translation of the whole sentence")
+    # Length caps stop runaway strings (lists of alternative translations to the token limit).
+    fr: str = Field(max_length=160)
+    en: str = Field(description="One English translation of the sentence", max_length=160)
 
 
 class VerbBankDraft(BaseModel):
@@ -232,7 +233,7 @@ class BankGenerator:
             if not 1 <= draft.slot <= len(slots) or draft.slot in accepted:
                 continue
             tense, person = slots[draft.slot - 1]
-            fr, en = str(tidy(draft.fr.strip())), str(tidy(draft.en.strip()))
+            fr, en = str(tidy(draft.fr.strip())), translation(draft.en)
             found = find_form(self.ref, infinitive, tense, person, fr)
             if found is None:
                 form = forms_for(self.ref, infinitive, tense)[person][0]
@@ -540,6 +541,19 @@ def _gloss(text: str) -> str:
     return text.splitlines()[0].strip(" .") if text else ""
 
 
+# Where a translation runs on into the prompt's slot list or into alternatives:
+# "Hi. (common) 2. Présent (tu): « vas »", "I eat. / I am eating.", "... | gloss: to eat".
+_RUN_ON = re.compile(r"\s*(?:\((?:common|qu[ée]bec usage)\)|\s/\s|«|\||\d+\.\s|gloss\s*:)", re.I)
+
+
+def translation(text: str) -> str:
+    """The first English translation alone, without run-on text."""
+    text = str(tidy(text.strip()))
+    if match := _RUN_ON.search(text):
+        text = text[: match.start()]
+    return text.strip()
+
+
 def _note(text: str) -> str | None:
     text = str(tidy(text.strip()))
     if match := re.search(r"(?:usage )?note\s*:\s*(.+)", text, re.IGNORECASE | re.DOTALL):
@@ -579,12 +593,12 @@ def _entry(entry_id: str, word: WordDraft, example: ExampleDraft) -> VocabEntry:
 
 
 def clean_note(region: str, note: str) -> str | None:
-    """Drop notes small models attach where they don't belong: a France equivalent on a word
-    that isn't Québec usage, or a comment about the prompt itself."""
+    """Drop notes small models attach where they don't belong: a Québec/France equivalent on
+    a word that isn't Québec usage, or a comment about the prompt itself."""
     text = str(tidy(note.strip()))
     if not text:
         return None
-    if region != "qc" and text.casefold().startswith("france"):
+    if region != "qc" and text.casefold().startswith(("france", "québec", "quebec")):
         return None
     if re.search(r"\b(previous|above|this) (example|sentence|word)\b", text, re.IGNORECASE):
         return None
