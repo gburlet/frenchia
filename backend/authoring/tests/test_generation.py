@@ -417,6 +417,8 @@ def test_only_lexicon_words_keep_a_quebec_tag() -> None:
                 "items": [
                     {"fr": "dépanneur", "region": "qc"},
                     {"fr": "quincaillerie", "region": "qc"},
+                    {"fr": "le dépanneur", "region": "common"},
+                    {"fr": "dépanneurs du coin", "region": "common"},
                 ],
             },
             {
@@ -429,7 +431,7 @@ def test_only_lexicon_words_keep_a_quebec_tag() -> None:
         ]
     }
     out = verify_regions(data, ref)
-    assert [i["region"] for i in out["sections"][0]["items"]] == ["qc", "common"]
+    assert [i["region"] for i in out["sections"][0]["items"]] == ["qc", "common", "qc", "common"]
     assert [e["region"] for e in out["sections"][1]["examples"]] == ["qc", "common"]
 
 

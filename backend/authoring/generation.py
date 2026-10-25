@@ -5,6 +5,7 @@ schema-constrained call per section or exercise batch, deterministic checks afte
 Plain Python on top of ChatModel/Reference: no Django, so it is testable with fakes."""
 
 import json
+import re
 import time
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
@@ -30,7 +31,7 @@ from contentkit.models import (
     VocabItem,
     VocabularySection,
 )
-from contentkit.reference import Reference
+from contentkit.reference import Reference, normalize
 from contentkit.validate import Issue, check_lesson_quality
 from contentkit.yamlio import content_hash
 from inference.errors import InvalidOutput
@@ -655,21 +656,27 @@ class LessonReviser:
         return model.model_validate(out)
 
 
+_ARTICLE = re.compile(r"^(le|la|les|un|une|des)\s+|^l'")
+
+
 def verify_regions(data: Any, ref: Reference) -> Any:
-    """Only the verified lexicon may make a word or sentence "qc": other Québec tags become
-    "common" (as for vocabulary banks). The model tags standard words like « quincaillerie »
-    as Québec usage and keeps doing so when asked to revise."""
+    """Regions follow the verified lexicon: a "qc" tag it doesn't support becomes "common" (as
+    for vocabulary banks), and a word that is a lexicon term becomes "qc". The model tags
+    standard words like « quincaillerie » as Québec usage and keeps doing so when revising."""
     if not ref.quebec:
         return data
+    terms = {normalize(t.term) for t in ref.quebec}
     for section in data["sections"]:
-        entries = [
-            *section.get("items", []),
-            *section.get("glossary", []),
-            *section.get("examples", []),
-        ]
-        for entry in entries:
+        words = [*section.get("items", []), *section.get("glossary", [])]
+        for entry in [*words, *section.get("examples", [])]:
             if entry.get("region") == "qc" and not ref.quebec_terms_in(entry.get("fr", "")):
                 entry["region"] = "common"
+        # ...and a word that *is* a lexicon term is Québec usage (exact match only:
+        # « magasin » must not become qc because « magasiner » is).
+        for entry in words:
+            word = normalize(entry.get("fr", ""))
+            if _ARTICLE.sub("", word) in terms:
+                entry["region"] = "qc"
     return data
 
 
