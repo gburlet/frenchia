@@ -1,15 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useTutorChat } from "@/features/tutor/useTutorChat";
 import type { TutorContextInfo, TutorContextRef } from "@/features/tutor/types";
+import { isTypingTarget, shortcutsEnabled } from "./shortcuts";
 import { TutorDrawerContext, type OpenTutorOptions } from "./TutorDrawerContext";
 
-function isTypingTarget(target: EventTarget | null): boolean {
-  if (!(target instanceof HTMLElement)) return false;
-  return (
-    target.isContentEditable ||
-    ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName)
-  );
-}
 
 interface Registration {
   key: string;
@@ -74,7 +68,7 @@ export function TutorDrawerProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
-      if (event.key !== "t" || event.ctrlKey || event.metaKey || event.altKey) return;
+      if (event.key !== "t" || event.ctrlKey || event.metaKey || event.altKey || !shortcutsEnabled()) return;
       if (event.defaultPrevented || isTypingTarget(event.target)) return;
       toggle();
     }

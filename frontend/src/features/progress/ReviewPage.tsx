@@ -126,7 +126,7 @@ function Session({ review }: { review: ReviewSet }) {
   return (
     <div className="flex flex-col gap-4">
       <ItemHeader item={item} position={index + 1} total={review.items.length} />
-      <ExerciseCard
+      <ExerciseCard headingLevel={2}
         key={item.exercise.exercise_revision_id}
         exercise={item.exercise}
         lessonId={item.lesson.id}

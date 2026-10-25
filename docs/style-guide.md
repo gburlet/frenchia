@@ -10,12 +10,19 @@ Dark-only theme for the MVP. Implement every value below as a CSS custom propert
 | Header / footer background | `#212121` |
 | Card / panel background | `#333333` |
 | Borders / dividers | `#444444` (or white at 5–8% opacity) |
-| Body text | `#949494` |
+| Body text | `#A3A3A3` (was `#949494`) |
 | Headings, button text | `#FFFFFF` |
-| Muted text (timestamps) | `#6F6F6F` |
+| Muted text (timestamps) | `#9B9B9B` (was `#6F6F6F`) |
 | Secondary detail text | `#B5B5B5` |
-| Primary accent (links, "Admin" button) | `#5E95AB`, hover `#4E8297` |
+| Primary accent: links, text, chart marks | `#67A4BC` (was `#5E95AB`), link hover `#82B6CA` |
+| Teal fill under white text (secondary button, teal badge) | `#4D7A8C` |
 | Purple accent | `#7E57C2`, hover `#6A45AD` |
+
+**Contrast (Phase 7 accessibility pass).** Every text colour meets WCAG AA (4.5:1) on the page,
+header and card backgrounds, and white text meets it on every filled button and badge. The
+original muted grey, teal, body grey, error text, success and blocked fills fell short; the
+adjusted values above are the nearest that pass. Muted text is now almost as light as body text:
+keep the hierarchy with size and weight rather than a darker grey.
 
 Use purple for the main action buttons (submit, "run task"), range sliders, the drawer tab, and highlighted values. White text on `#7E57C2` has about 5:1 contrast (WCAG AA).
 
@@ -23,18 +30,18 @@ Use purple for the main action buttons (submit, "run task"), range sliders, the 
 
 | Status | Color |
 |---|---|
-| Success | `#4F8A5D` |
+| Success | `#4A8257` (was `#4F8A5D`) |
 | Failure / error | `#B55252` |
-| Blocked / stalled | `#B8862F` |
+| Blocked / stalled | `#976E27` (was `#B8862F`) |
 | Skipped / neutral | `#5A5A5A` |
 | Kept / correct item text | `#8FC79C` |
-| Error text | `#E07A7A` |
+| Error text | `#E97F7F` (was `#E07A7A`) |
 | Warning text | `#E0B252` |
 
 ## Typography
 
 - Headings: Avenir LT Pro Heavy, weight 800. Fallbacks: Avenir, Helvetica Neue, Helvetica, Arial, sans-serif. Color `#FFFFFF`. (macOS ships Avenir with an 800 "Heavy" face.)
-- Body: Avenir LT Pro Roman, same fallbacks. Color `#949494`.
+- Body: Avenir LT Pro Roman, same fallbacks. Color `#A3A3A3`.
 - Logs and tracebacks: system monospace (ui-monospace, SFMono-Regular, Menlo, Consolas) on a `#1B1B1B` background.
 - Text is antialiased.
 

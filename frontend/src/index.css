@@ -7,20 +7,21 @@
   --chrome: #212121;
   --surface: #333333;
   --line: #444444;
-  --body: #949494;
+  --body: #a3a3a3;
   --heading: #ffffff;
-  --muted: #6f6f6f;
+  --muted: #9b9b9b;
   --detail: #b5b5b5;
-  --teal: #5e95ab;
-  --teal-hover: #4e8297;
+  --teal: #67a4bc; /* links, text and chart marks */
+  --teal-hover: #82b6ca; /* link hover: lighter, so contrast goes up */
+  --teal-strong: #4d7a8c; /* fills under white text */
   --purple: #7e57c2;
   --purple-hover: #6a45ad;
-  --success: #4f8a5d;
+  --success: #4a8257;
   --failure: #b55252;
-  --blocked: #b8862f;
+  --blocked: #976e27;
   --neutral: #5a5a5a;
   --kept: #8fc79c;
-  --error-text: #e07a7a;
+  --error-text: #e97f7f;
   --warning-text: #e0b252;
   --log: #1b1b1b;
   --card-border: rgb(255 255 255 / 0.05);
@@ -46,6 +47,7 @@
   --color-detail: var(--detail);
   --color-teal: var(--teal);
   --color-teal-hover: var(--teal-hover);
+  --color-teal-strong: var(--teal-strong);
   --color-purple: var(--purple);
   --color-purple-hover: var(--purple-hover);
   --color-success: var(--success);

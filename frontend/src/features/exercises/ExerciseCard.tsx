@@ -20,6 +20,8 @@ interface ExerciseCardProps {
   lessonTitle?: string;
   /** Register with the tutor immediately instead of on first interaction (single-card pages). */
   autoActivate?: boolean;
+  /** 2 on pages where the card sits directly under the page's h1. */
+  headingLevel?: 2 | 3;
 }
 
 const typeLabel: Record<PublicExercise["type"], string> = {
@@ -32,7 +34,8 @@ const typeLabel: Record<PublicExercise["type"], string> = {
 const textareaClass =
   "w-full rounded-control border border-line bg-chrome p-3 text-base text-heading placeholder:text-muted focus-visible:border-purple disabled:cursor-not-allowed disabled:opacity-60";
 
-export function ExerciseCard({ exercise, number, onResult, className, lessonId, lessonTitle, autoActivate }: ExerciseCardProps) {
+export function ExerciseCard({ exercise, number, onResult, className, lessonId, lessonTitle, autoActivate, headingLevel = 3 }: ExerciseCardProps) {
+  const Heading = headingLevel === 2 ? "h2" : "h3";
   const uid = useId();
   const submit = useSubmitAttempt();
   const startedAt = useRef<number | null>(null);
@@ -127,10 +130,10 @@ export function ExerciseCard({ exercise, number, onResult, className, lessonId, 
       role="group"
       aria-labelledby={headingId}
     >
-      <h3 id={headingId} className="mb-3 flex items-baseline gap-2 text-base">
+      <Heading id={headingId} className="mb-3 flex items-baseline gap-2 text-base">
         {number !== undefined && <span className="text-teal">{number}.</span>}
         <span>{typeLabel[exercise.type]}</span>
-      </h3>
+      </Heading>
 
       {exercise.type === "translate" && (
         <div className="flex flex-col gap-3">

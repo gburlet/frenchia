@@ -15,7 +15,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary: "bg-purple p-4 text-base",
-        secondary: "h-[38px] bg-teal px-4 text-[0.9rem]",
+        secondary: "h-[38px] bg-teal-strong px-4 text-[0.9rem]",
         ghost: "h-[38px] border border-solid border-body bg-transparent px-4 text-[0.85rem] text-body",
         pill: "rounded-full bg-purple px-3 py-1.5 text-xs",
       },

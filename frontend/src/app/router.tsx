@@ -1,46 +1,49 @@
 import { createBrowserRouter, type RouteObject } from "react-router";
+import { FullPageLoader } from "@/components/FullPageLoader";
 import { AppShell } from "@/components/layout/AppShell";
+import { RouteError } from "@/components/RouteError";
 import { LoginPage } from "@/features/auth/LoginPage";
 import { RequireAuth } from "@/features/auth/RequireAuth";
 import { Dashboard } from "@/routes/Dashboard";
 import { NotFound } from "@/routes/NotFound";
-import { CurriculumPage } from "@/features/curriculum/CurriculumPage";
-import { LessonPage } from "@/features/lessons/LessonPage";
-import { TranslatePage } from "@/features/practice/TranslatePage";
-import { ProgressPage } from "@/features/progress/ProgressPage";
-import { ReviewPage } from "@/features/progress/ReviewPage";
-import { VerbsPage } from "@/features/verbs/VerbsPage";
-import { VerbDetailPage } from "@/features/verbs/VerbDetailPage";
-import { VerbDrillPage } from "@/features/verbs/VerbDrillPage";
-import { VocabPage } from "@/features/vocab/VocabPage";
-import { VocabSetPage } from "@/features/vocab/VocabSetPage";
-import { VocabReviewPage } from "@/features/vocab/VocabReviewPage";
 
 export const routes: RouteObject[] = [
-  { path: "/login", element: <LoginPage /> },
   {
-    element: <RequireAuth />,
+    hydrateFallbackElement: <FullPageLoader />,
+    errorElement: <RouteError fullPage />,
     children: [
+      { path: "/login", element: <LoginPage /> },
       {
-        element: <AppShell />,
+        element: <RequireAuth />,
         children: [
-          { index: true, element: <Dashboard /> },
-          { path: "curriculum", element: <CurriculumPage /> },
-          { path: "lessons/:lessonId", element: <LessonPage /> },
-          { path: "practice/translate", element: <TranslatePage /> },
-          { path: "practice/verbs", element: <VerbsPage /> },
-          { path: "practice/verbs/drill", element: <VerbDrillPage /> },
-          { path: "practice/verbs/:slug", element: <VerbDetailPage /> },
-          { path: "practice/vocab", element: <VocabPage /> },
-          { path: "practice/vocab/review", element: <VocabReviewPage /> },
-          { path: "practice/vocab/sets/:slug", element: <VocabSetPage /> },
-          { path: "practice/review", element: <ReviewPage /> },
-          { path: "progress", element: <ProgressPage /> },
+          {
+            element: <AppShell />,
+            children: [
+              {
+                // Pages other than the dashboard load on first visit (smaller first download).
+                errorElement: <RouteError />,
+                children: [
+                  { index: true, element: <Dashboard /> },
+                  { path: "curriculum", lazy: () => import("@/features/curriculum/CurriculumPage").then((m) => ({ Component: m.CurriculumPage })) },
+                  { path: "lessons/:lessonId", lazy: () => import("@/features/lessons/LessonPage").then((m) => ({ Component: m.LessonPage })) },
+                  { path: "practice/translate", lazy: () => import("@/features/practice/TranslatePage").then((m) => ({ Component: m.TranslatePage })) },
+                  { path: "practice/verbs", lazy: () => import("@/features/verbs/VerbsPage").then((m) => ({ Component: m.VerbsPage })) },
+                  { path: "practice/verbs/drill", lazy: () => import("@/features/verbs/VerbDrillPage").then((m) => ({ Component: m.VerbDrillPage })) },
+                  { path: "practice/verbs/:slug", lazy: () => import("@/features/verbs/VerbDetailPage").then((m) => ({ Component: m.VerbDetailPage })) },
+                  { path: "practice/vocab", lazy: () => import("@/features/vocab/VocabPage").then((m) => ({ Component: m.VocabPage })) },
+                  { path: "practice/vocab/review", lazy: () => import("@/features/vocab/VocabReviewPage").then((m) => ({ Component: m.VocabReviewPage })) },
+                  { path: "practice/vocab/sets/:slug", lazy: () => import("@/features/vocab/VocabSetPage").then((m) => ({ Component: m.VocabSetPage })) },
+                  { path: "practice/review", lazy: () => import("@/features/progress/ReviewPage").then((m) => ({ Component: m.ReviewPage })) },
+                  { path: "progress", lazy: () => import("@/features/progress/ProgressPage").then((m) => ({ Component: m.ProgressPage })) },
+                ],
+              },
+            ],
+          },
         ],
       },
+      { path: "*", element: <NotFound /> },
     ],
   },
-  { path: "*", element: <NotFound /> },
 ];
 
 export const createRouter = () => createBrowserRouter(routes);

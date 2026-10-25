@@ -11,7 +11,7 @@ const badgeVariants = cva(
         failure: "bg-failure",
         blocked: "bg-blocked",
         neutral: "bg-neutral",
-        teal: "bg-teal",
+        teal: "bg-teal-strong",
         outline: "border border-line bg-transparent text-detail",
         warning: "bg-blocked/25 text-warning-text",
       },

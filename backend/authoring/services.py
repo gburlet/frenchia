@@ -72,7 +72,10 @@ def create_job(
         if enqueue:
             from .tasks import run_generation_job
 
-            transaction.on_commit(lambda: run_generation_job.enqueue(job.pk))
+            # A revision is short and finishes a lesson that is nearly done: run it before new
+            # drafts queued in bulk.
+            task = run_generation_job.using(priority=100) if parent else run_generation_job
+            transaction.on_commit(lambda: task.enqueue(job.pk))
     return job
 
 

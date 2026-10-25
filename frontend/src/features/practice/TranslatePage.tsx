@@ -126,7 +126,7 @@ export function TranslatePage() {
 
       {exercise && !(next.isFetching && answered === false && next.isRefetching) && (
         <>
-          <ExerciseCard
+          <ExerciseCard headingLevel={2}
             key={`${exercise.exercise_revision_id}-${next.dataUpdatedAt}`}
             exercise={exercise}
             lessonId={exercise.lesson.id}
