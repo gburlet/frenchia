@@ -17,7 +17,7 @@ from contentkit.validate import UNVERIFIED_QUEBEC
 
 from .models import GenerationJob
 
-PROMPT_VERSION = "2"
+PROMPT_VERSION = "3"
 REVIEW_DIR = Path("drafts") / "review"
 
 
@@ -53,9 +53,15 @@ errors teach mistakes. Review it as an expert teacher and report every real prob
 - every French sentence: grammar, agreement, prepositions (parler à…), articles, accents, \
 naturalness;
 - translations in both directions;
-- answer keys: each fill-in-the-blank must be fully correct once filled; each multiple-choice \
-question must have exactly one correct option (an option that is the right answer with different \
-punctuation is also correct);
+- answer keys: each fill-in-the-blank must be fully correct once filled, and must not have \
+another equally correct answer that is not listed (e.g. any pronoun fits « Je ___ dis la \
+vérité »); each multiple-choice question must have exactly one correct option (work it out \
+yourself before reading answer_index; an option that is the right answer with different \
+punctuation is also correct); an answer must not repeat an object already replaced by a \
+pronoun (« Je lui parle à Marie »); a hint must not give the answer away. These grade the \
+learner unfairly, so they are errors;
+- expressions must be real and in standard register: an invented idiom or a vulgar one is an \
+error;
 - Québec usage: Québec usage is the default (déjeuner = breakfast, dîner = lunch, souper = supper; \
 « la fin de semaine », not « le week-end »). Flag claims about Québec usage that are wrong or \
 misplaced, but only when you are certain;
