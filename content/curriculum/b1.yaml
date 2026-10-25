@@ -322,12 +322,13 @@ units:
       classic faux amis
     reference: clemence:day-89
   - id: b1-expressions-3
-    title: Expressions québécoises (3)
+    title: Expressions idiomatiques (3)
     kind: expressions
     objectives:
-    - Understand 10 idiomatic Québec expressions
+    - Understand 10 idiomatic expressions heard in Québec
     grammar_topics: []
     vocabulary_theme: expressions
     prerequisites:
     - a2-expressions-2
     reference: clemence:day-90
+    quebec_focus: Québec-specific expressions only from the verified lexicon, never invented ones; the rest are common idioms used in Québec and France (region common). No vulgar expressions.

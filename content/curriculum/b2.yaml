@@ -321,7 +321,7 @@ units:
     - a1-subject-pronouns
     reference: clemence:day-119
   - id: b2-expressions-4
-    title: Expressions québécoises (4)
+    title: Expressions idiomatiques (4)
     kind: expressions
     objectives:
     - Understand idioms common in Québec media and conversation
@@ -330,3 +330,4 @@ units:
     prerequisites:
     - b1-expressions-3
     reference: clemence:day-120
+    quebec_focus: Québec-specific expressions only from the verified lexicon, never invented ones; the rest are common idioms used in Québec and France (region common). No vulgar expressions.

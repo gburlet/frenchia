@@ -334,9 +334,10 @@ units:
     title: Expressions québécoises (2)
     kind: expressions
     objectives:
-    - Understand 10 more common Québec expressions
+    - Understand 10 more everyday expressions heard in Québec
     grammar_topics: []
     vocabulary_theme: expressions
     prerequisites:
     - a1-expressions-1
     reference: clemence:day-60
+    quebec_focus: Québec-specific expressions only from the verified lexicon, never invented ones; the rest are common idioms used in Québec and France (region common). No vulgar expressions.
