@@ -5,7 +5,7 @@ chat completions API (Ollama, llama.cpp server, LM Studio, ...)."""
 import json
 import logging
 import time
-from collections.abc import Sequence
+from collections.abc import AsyncIterator, Sequence
 from dataclasses import dataclass
 from typing import Any, Literal, Protocol
 
@@ -49,6 +49,20 @@ class ChatModel(Protocol):
         temperature: float = 0.0,
         max_tokens: int = 800,
     ) -> Completion: ...
+
+    def stream(
+        self,
+        messages: Sequence[Message],
+        *,
+        temperature: float = 0.3,
+        max_tokens: int = 800,
+    ) -> AsyncIterator[str]:
+        """Yield the reply's text as it is generated."""
+        ...
+
+    def warm(self) -> None:
+        """Load the model ahead of the first real request."""
+        ...
 
     def health(self) -> bool: ...
 
@@ -147,6 +161,58 @@ class OpenAICompatibleChatModel:
             prompt_tokens=usage.get("prompt_tokens"),
             completion_tokens=usage.get("completion_tokens"),
         )
+
+    async def stream(
+        self,
+        messages: Sequence[Message],
+        *,
+        temperature: float = 0.3,
+        max_tokens: int = 800,
+    ) -> AsyncIterator[str]:
+        body = {
+            "model": self.model,
+            "messages": [{"role": m.role, "content": m.content} for m in messages],
+            "temperature": temperature,
+            "max_tokens": max_tokens,
+            "stream": True,
+            **self.extra_body,
+        }
+        self.breaker.before_call()
+        try:
+            async with (
+                httpx.AsyncClient(
+                    base_url=self._http.base_url, timeout=self._http.timeout
+                ) as client,
+                client.stream("POST", "chat/completions", json=body) as response,
+            ):
+                if response.status_code == 404:
+                    raise InferenceUnavailable("llm", f"Model {self.model!r} is not available")
+                if response.status_code >= 400:
+                    detail = (await response.aread()).decode(errors="replace")[:200]
+                    raise InferenceError("llm", f"LLM error {response.status_code}: {detail}")
+                self.breaker.record_success()
+                async for line in response.aiter_lines():
+                    if not line.startswith("data:"):
+                        continue
+                    payload = line.removeprefix("data:").strip()
+                    if payload == "[DONE]":
+                        return
+                    try:
+                        delta = json.loads(payload)["choices"][0]["delta"].get("content")
+                    except (json.JSONDecodeError, KeyError, IndexError, TypeError):
+                        continue
+                    if delta:
+                        yield delta
+        except (httpx.ConnectError, httpx.ConnectTimeout) as exc:
+            self.breaker.record_failure()
+            raise InferenceUnavailable("llm", "The language model service is not running") from exc
+        except httpx.TimeoutException as exc:
+            self.breaker.record_failure()
+            raise InferenceTimeout("llm", "The language model took too long to answer") from exc
+
+    def warm(self) -> None:
+        """Make sure the model is loaded (a one-token completion works on any runtime)."""
+        self.complete([Message("user", "OK")], max_tokens=1)
 
     def health(self) -> bool:
         """True when the server answers and the configured model is available."""

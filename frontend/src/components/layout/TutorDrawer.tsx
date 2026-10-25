@@ -1,4 +1,5 @@
-import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription } from "@/components/ui/sheet";
+import { TutorPanel } from "@/features/tutor/TutorPanel";
 import { useTutorDrawer } from "./TutorDrawerContext";
 
 export function TutorDrawer() {
@@ -18,11 +19,18 @@ export function TutorDrawer() {
         <span className="block [writing-mode:vertical-rl]">Tuteur</span>
       </button>
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent aria-describedby="tutor-description">
-          <SheetTitle>Tuteur</SheetTitle>
-          <SheetDescription id="tutor-description">
-            Your contextual tutor will live here.
+        <SheetContent
+          aria-describedby="tutor-description"
+          className="max-w-none gap-0 p-0 sm:w-[420px]"
+          onOpenAutoFocus={(event) => {
+            event.preventDefault();
+            document.querySelector<HTMLTextAreaElement>("[data-tutor-input]")?.focus();
+          }}
+        >
+          <SheetDescription id="tutor-description" className="sr-only">
+            Ask the local AI tutor about what is on your screen.
           </SheetDescription>
+          <TutorPanel />
         </SheetContent>
       </Sheet>
     </>

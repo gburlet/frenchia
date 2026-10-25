@@ -129,6 +129,9 @@ export function TranslatePage() {
           <ExerciseCard
             key={`${exercise.exercise_revision_id}-${next.dataUpdatedAt}`}
             exercise={exercise}
+            lessonId={exercise.lesson.id}
+            lessonTitle={exercise.lesson.title}
+            autoActivate
             onResult={() => setAnswered(true)}
           />
           <div className="flex flex-wrap items-center justify-between gap-3">

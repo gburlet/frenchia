@@ -5,7 +5,7 @@ import io
 import json
 import struct
 import wave
-from collections.abc import Callable, Sequence
+from collections.abc import AsyncIterator, Callable, Sequence
 from typing import Any
 
 from .llm import Completion, Message
@@ -34,6 +34,17 @@ class FakeChatModel:
         else:
             content = "Ceci est une réponse de test."
         return Completion(content=content, model=self.model, latency_ms=1)
+
+    async def stream(
+        self, messages: Sequence[Message], *, temperature: float = 0.3, max_tokens: int = 800
+    ) -> AsyncIterator[str]:
+        self.calls.append({"messages": list(messages), "json_schema": None, "stream": True})
+        text = self.responder(messages) if self.responder else "Voici une réponse de test."
+        for word in text.split(" "):
+            yield word + " "
+
+    def warm(self) -> None:
+        self.calls.append({"warm": True})
 
     def health(self) -> bool:
         return True

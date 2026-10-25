@@ -6,7 +6,7 @@ model=$(grep '^INFERENCE_LLM_MODEL=' .env | cut -d= -f2)
 host=$(grep '^OLLAMA_HOST=' services/llm/ollama.env | cut -d= -f2)
 start=$(date +%s)
 if curl -fsS --max-time 180 "http://${host}/api/generate" \
-     -d "{\"model\":\"${model}\",\"prompt\":\"\",\"keep_alive\":\"30m\"}" >/dev/null; then
+     -d "{\"model\":\"${model}\",\"prompt\":\"\",\"keep_alive\":\"2h\"}" >/dev/null; then
   echo "✓ llm: ${model} loaded in $(( $(date +%s) - start ))s"
 else
   echo "⚠ llm: could not load ${model} (is it pulled? run 'just setup-native')"

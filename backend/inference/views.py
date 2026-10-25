@@ -1,3 +1,7 @@
+import logging
+import threading
+import time
+
 from django.http import FileResponse, Http404
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiResponse, extend_schema
@@ -5,8 +9,11 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .providers import get_audio_cache
+from .errors import InferenceError
+from .providers import get_audio_cache, get_chat_model
 from .serializers import AudioClipSerializer, InferenceErrorSerializer, SpeechRequestSerializer
+
+logger = logging.getLogger(__name__)
 
 
 class AudioView(APIView):
@@ -44,3 +51,30 @@ class AudioFileView(APIView):
         # Content-addressed: a key's bytes never change.
         response["Cache-Control"] = "private, max-age=31536000, immutable"
         return response
+
+
+_WARM_INTERVAL_S = 300
+_last_warm = 0.0
+_warm_lock = threading.Lock()
+
+
+def _warm_in_background() -> None:
+    try:
+        get_chat_model().warm()
+    except InferenceError:
+        logger.info("LLM warm-up skipped: service unavailable")
+
+
+class WarmView(APIView):
+    """Fire-and-forget: load the LLM before the learner's first question (cold load ~30-40 s)."""
+
+    @extend_schema(operation_id="llm_warm", request=None, responses={202: OpenApiTypes.OBJECT})
+    def post(self, request: Request) -> Response:
+        global _last_warm
+        with _warm_lock:
+            due = time.monotonic() - _last_warm > _WARM_INTERVAL_S
+            if due:
+                _last_warm = time.monotonic()
+        if due:
+            threading.Thread(target=_warm_in_background, daemon=True).start()
+        return Response({"warming": due}, status=202)

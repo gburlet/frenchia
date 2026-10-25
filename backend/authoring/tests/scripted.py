@@ -1,7 +1,7 @@
 """A scripted ChatModel that answers each generation step with valid content."""
 
 import json
-from collections.abc import Sequence
+from collections.abc import AsyncIterator, Sequence
 from typing import Any
 
 from inference.llm import Completion, Message
@@ -175,6 +175,14 @@ class ScriptedChat:
             latency_ms=1,
             completion_tokens=10,
         )
+
+    async def stream(
+        self, messages: Sequence[Message], *, temperature: float = 0.3, max_tokens: int = 800
+    ) -> AsyncIterator[str]:
+        yield "Réponse."
+
+    def warm(self) -> None:
+        pass
 
     def health(self) -> bool:
         return True

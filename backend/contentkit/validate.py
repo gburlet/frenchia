@@ -239,6 +239,8 @@ def _check_fill_blank(add: AddFn, ex: FillBlankExercise, ref: Reference) -> None
         filled = normalize(ex.sentence.replace(BLANK, answer)).split()
         if any(a == b and len(a) > 2 for a, b in zip(filled, filled[1:], strict=False)):
             add("error", ex.id, f"word repeated after filling the blank with {answer!r}")
+    if ex.hint and ex.hint.strip() in ex.sentence:
+        add("warning", ex.id, f"the hint {ex.hint.strip()!r} is also written inside the sentence")
     infinitive = _hint_infinitive(ex.hint)
     if infinitive is None or not ref.verbs:
         return

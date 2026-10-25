@@ -13,6 +13,7 @@ urlpatterns = [
     path("api/auth/", include("accounts.urls")),
     path("api/", include("inference.urls")),
     path("api/", include("exercises.urls")),
+    path("api/", include("tutor.urls")),
     path("api/curriculum", CurriculumView.as_view(), name="curriculum"),
     path("api/lessons/<slug:slug>", LessonView.as_view(), name="lesson"),
     path("api/lessons/<slug:slug>/progress", LessonProgressView.as_view(), name="lesson-progress"),

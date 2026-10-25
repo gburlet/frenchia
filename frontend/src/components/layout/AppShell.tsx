@@ -1,4 +1,6 @@
+import { useEffect } from "react";
 import { Outlet } from "react-router";
+import { api } from "@/lib/api/client";
 import { AudioPlayerProvider } from "@/features/audio/AudioPlayerProvider";
 import { Footer } from "./Footer";
 import { Header } from "./Header";
@@ -6,6 +8,12 @@ import { TutorDrawer } from "./TutorDrawer";
 import { TutorDrawerProvider } from "./TutorDrawerProvider";
 
 export function AppShell() {
+  // Start loading the local LLM as soon as the app opens: a cold load takes ~30-40 s, and the
+  // server throttles repeats. Opportunistic, so failures are ignored.
+  useEffect(() => {
+    api.post("/api/llm/warm").catch(() => {});
+  }, []);
+
   return (
     <TutorDrawerProvider>
       <AudioPlayerProvider>

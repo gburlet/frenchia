@@ -3,6 +3,7 @@ import { Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SpeakButton } from "@/features/audio/SpeakButton";
+import { useOpenTutor } from "@/components/layout/TutorDrawerContext";
 import { cn } from "@/lib/utils";
 import type { AttemptResult, PublicExercise, Verdict } from "@/lib/api/types";
 import { useDispute, useRegrade } from "./hooks";
@@ -71,6 +72,7 @@ interface ResultPanelProps {
 
 export function ResultPanel({ exercise, result, chosenIndex, onChange, onRetry }: ResultPanelProps) {
   const regrade = useRegrade();
+  const openTutor = useOpenTutor();
   const pending = result.status === "pending" || result.grading === "pending" || result.verdict === null;
   const verdict = VERDICT[pending ? "pending" : result.verdict!];
   const { feedback } = result;
@@ -204,6 +206,17 @@ export function ResultPanel({ exercise, result, chosenIndex, onChange, onRetry }
         )}
         {!pending && !isChoice && result.verdict === "incorrect" && (
           <DisputeControl attemptId={result.attempt_id} />
+        )}
+        {!pending && (
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() =>
+              openTutor({ prompt: result.verdict === "incorrect" ? "Why is my answer wrong?" : "Explain this point" })
+            }
+          >
+            Ask the tutor about this
+          </Button>
         )}
       </div>
       {result.grading === "llm" && <p className="text-xs text-muted">Feedback by the local AI tutor</p>}

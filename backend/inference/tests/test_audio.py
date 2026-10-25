@@ -85,3 +85,13 @@ def test_tts_down_returns_typed_503(auth_client: Client) -> None:
         "detail": "The speech service is not running",
         "code": "tts_unavailable",
     }
+
+
+def test_warm_is_throttled(auth_client: Client) -> None:
+    import inference.views as views
+
+    views._last_warm = 0.0
+    with patch("inference.views.threading.Thread") as thread:
+        assert auth_client.post("/api/llm/warm").json() == {"warming": True}
+        assert auth_client.post("/api/llm/warm").json() == {"warming": False}
+    assert thread.call_count == 1

@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, CheckCircle2, Clock } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useOpenTutor, useTutorContext } from "@/components/layout/TutorDrawerContext";
 import { ExerciseCard } from "@/features/exercises/ExerciseCard";
 import { ApiError } from "@/lib/api/client";
 import { useLesson, useUpdateProgress } from "./hooks";
@@ -27,6 +28,8 @@ export function LessonPage() {
   const markedRef = useRef<string | null>(null);
   const lesson = lessonQuery.data;
   const status = lesson?.progress.status;
+  const openTutor = useOpenTutor();
+  useTutorContext(lesson ? { lesson_id: lesson.id } : null, lesson?.title ?? "");
   const { mutate } = progress;
 
   useEffect(() => {
@@ -74,6 +77,9 @@ export function LessonPage() {
           <Link to="/curriculum" className="text-sm text-teal underline">
             {l.unit.title}
           </Link>
+          <button type="button" onClick={() => openTutor()} className="ml-auto cursor-pointer text-sm text-teal underline hover:text-teal-hover">
+            Ask the tutor
+          </button>
         </div>
         <h1 lang="fr" className="text-3xl sm:text-4xl">{l.title}</h1>
         <p className="text-lg text-detail">{l.title_en}</p>
@@ -101,7 +107,7 @@ export function LessonPage() {
         <section aria-labelledby="practice-heading" className="flex flex-col gap-4">
           <h2 id="practice-heading" className="text-2xl">Practice</h2>
           {l.exercises.map((ex, i) => (
-            <ExerciseCard key={ex.exercise_revision_id} exercise={ex} number={i + 1} />
+            <ExerciseCard key={ex.exercise_revision_id} exercise={ex} number={i + 1} lessonId={l.id} lessonTitle={l.title} />
           ))}
         </section>
       )}

@@ -3,6 +3,7 @@ import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { SpeakButton } from "@/features/audio/SpeakButton";
+import { useTutorContext } from "@/components/layout/TutorDrawerContext";
 import { cn } from "@/lib/utils";
 import type { AttemptResult, PublicExercise } from "@/lib/api/types";
 import { useSubmitAttempt } from "./hooks";
@@ -14,6 +15,11 @@ interface ExerciseCardProps {
   number?: number;
   onResult?: (result: AttemptResult) => void;
   className?: string;
+  /** Lesson this exercise belongs to; enables the tutor context. */
+  lessonId?: string;
+  lessonTitle?: string;
+  /** Register with the tutor immediately instead of on first interaction (single-card pages). */
+  autoActivate?: boolean;
 }
 
 const typeLabel: Record<PublicExercise["type"], string> = {
@@ -26,7 +32,7 @@ const typeLabel: Record<PublicExercise["type"], string> = {
 const textareaClass =
   "w-full rounded-control border border-line bg-chrome p-3 text-base text-heading placeholder:text-muted focus-visible:border-purple disabled:cursor-not-allowed disabled:opacity-60";
 
-export function ExerciseCard({ exercise, number, onResult, className }: ExerciseCardProps) {
+export function ExerciseCard({ exercise, number, onResult, className, lessonId, lessonTitle, autoActivate }: ExerciseCardProps) {
   const uid = useId();
   const submit = useSubmitAttempt();
   const startedAt = useRef<number | null>(null);
@@ -34,6 +40,20 @@ export function ExerciseCard({ exercise, number, onResult, className }: Exercise
   const [choice, setChoice] = useState<number | null>(null);
   const [showHint, setShowHint] = useState(false);
   const [result, setResult] = useState<AttemptResult | null>(null);
+
+  const [activation, setActivation] = useState(autoActivate ? 1 : 0);
+  const activate = () => setActivation((n) => n + 1);
+  useTutorContext(
+    activation > 0 && lessonId !== undefined
+      ? {
+          lesson_id: lessonId,
+          exercise_revision_id: exercise.exercise_revision_id,
+          attempt_id: result?.attempt_id,
+        }
+      : null,
+    `${number !== undefined ? `Exercise ${number}` : "Exercise"}${lessonTitle ? ` · ${lessonTitle}` : ""}`,
+    activation,
+  );
 
   useEffect(() => {
     startedAt.current = Date.now();
@@ -57,6 +77,7 @@ export function ExerciseCard({ exercise, number, onResult, className }: Exercise
       {
         onSuccess: (data) => {
           setResult(data);
+          activate();
           onResult?.(data);
         },
       },
@@ -101,6 +122,8 @@ export function ExerciseCard({ exercise, number, onResult, className }: Exercise
     <Card
       className={cn("p-5", className)}
       onKeyDown={onCardKeyDown}
+      onFocusCapture={activate}
+      onPointerDownCapture={activate}
       role="group"
       aria-labelledby={headingId}
     >

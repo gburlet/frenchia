@@ -1,0 +1,61 @@
+# Tutor scenarios, run through the production prompt (manage.py tutor_eval < this file).
+# must: every group needs one regex match (case-insensitive). must_not: no regex may match.
+# exercise follows the lesson schema; answer = the learner's graded answer (omit if unanswered).
+- id: aux-partir
+  exercise: {type: fill_blank, id: ex-01, sentence: "Hier, nous ___ très tôt pour aller au chalet.", answers: ["sommes partis"], hint: "(partir)"}
+  answer: "a allé"
+  question: "Why is my answer wrong?"
+  must: [["être"], ["sommes partis"]]
+  must_not: ['(aller|partir)\W[^.]{0,60}\b(uses|takes|use|take|prend)\s+(\*|_)?avoir']
+- id: penser-a
+  exercise: {type: translate, id: ex-02, direction: en_fr, prompt: "I'm thinking about my vacation.", accepted_answers: ["Je pense à mes vacances."]}
+  answer: "Je pense de mes vacances."
+  question: "Why is it « à » here?"
+  must: [["penser à"]]
+  must_not: ['penser de [^.]{0,40}(correct|right|also works)']
+- id: au-canada
+  exercise: {type: translate, id: ex-03, direction: en_fr, prompt: "We are going to Canada.", accepted_answers: ["Nous allons au Canada."]}
+  answer: "Nous allons en Canada."
+  question: "Why « au » and not « en »?"
+  must: [["mascul"], ["au Canada"]]
+  must_not: ['en Canada[^.]{0,30}(correct|fine|acceptable)']
+- id: qc-shopping
+  exercise: {type: translate, id: ex-04, direction: en_fr, prompt: "I'm going shopping this weekend.", accepted_answers: ["Je vais faire du shopping ce week-end."]}
+  answer: "Je vais faire du shopping ce week-end."
+  question: "How would someone in Québec say this?"
+  must: [["magasiner"], ["fin de semaine"]]
+  must_not: []
+- id: qc-diner
+  exercise: {type: translate, id: ex-05, direction: fr_en, prompt: "On dîne à midi.", accepted_answers: ["We have lunch at noon."]}
+  question: "In Québec, which meal is « le dîner »?"
+  must: [["lunch", "midi", "noon"]]
+  must_not: ['(le )?dîner[^.]{0,25}\b(means|is)\b[^.]{0,15}\b(dinner|supper|evening)']
+- id: pc-vs-imparfait
+  exercise: {type: fill_blank, id: ex-06, sentence: "Hier soir, j'___ une poutine.", answers: ["ai mangé"], hint: "(manger)"}
+  answer: "ai mangé"
+  question: "Can I use the imparfait instead?"
+  must: [["complet", "finished", "specific", "single", "one-time", "ponctuel", "once"]]
+  must_not: []
+- id: pronominal-agreement
+  exercise: {type: fill_blank, id: ex-07, sentence: "Les enfants se sont ___ les mains.", answers: ["lavé"], hint: "(se laver)"}
+  answer: "lavés"
+  question: "Why is there no -s on « lavé »?"
+  must: [["direct object", "COD", "objet direct"], ["les mains"]]
+  must_not: []
+- id: subjonctif
+  exercise: {type: fill_blank, id: ex-08, sentence: "Il faut que tu ___ tes devoirs.", answers: ["fasses"], hint: "(faire)"}
+  answer: "fais"
+  question: "Why is « fais » wrong?"
+  must: [["subjonctif", "subjunctive"], ["fasses"]]
+  must_not: []
+- id: hint-only
+  exercise: {type: fill_blank, id: ex-09, sentence: "Hier, elles ___ au dépanneur.", answers: ["sont allées"], hint: "(aller)"}
+  question: "What's the answer?"
+  must: [["être", "auxiliary", "hint", "agree"]]
+  must_not: ['sont allées']
+- id: qc-tu-particle
+  exercise: {type: translate, id: ex-10, direction: en_fr, prompt: "Are you coming tonight?", accepted_answers: ["Est-ce que tu viens ce soir ?"]}
+  answer: "Tu viens-tu ce soir ?"
+  question: "Is « Tu viens-tu ? » correct?"
+  must: [["Québec"], ["informal", "familiar", "spoken", "familier"]]
+  must_not: ["(it's|it is|is) (incorrect|a mistake|wrong)\\b"]

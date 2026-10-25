@@ -101,6 +101,50 @@ class Reference:
         """Every reference form of a verb (all tenses/persons), or None if unknown."""
         return self._forms.get(normalize(infinitive))
 
+    # Auxiliary forms say nothing about which verb is meant; skip them when finding verbs.
+    _AUX_FORMS = frozenset(
+        "ai as a avons avez ont suis es est sommes êtes sont avais avait étais était eu été "
+        "aie aies ait soit sois soient aura serai sera".split()
+    )
+
+    @cached_property
+    def _verb_index(self) -> dict[str, str]:
+        """Single-word form -> infinitive (first verb wins for ambiguous forms)."""
+        index: dict[str, str] = {}
+        for infinitive, forms in self._forms.items():
+            for form in forms:
+                word = form.split()[-1]
+                if " " not in form or word not in self._AUX_FORMS:
+                    index.setdefault(word, infinitive)
+        return index
+
+    def verbs_in(self, *texts: str, limit: int = 4) -> list[str]:
+        """Infinitives of the reference verbs that appear in the texts (in order of appearance)."""
+        found: list[str] = []
+        for text in texts:
+            for word in re.findall(r"[\w'’-]+", normalize(text)):
+                word = word.split("'")[-1]
+                infinitive = self._verb_index.get(word)
+                skip = word in self._AUX_FORMS or infinitive in ("avoir", "être")
+                if infinitive and not skip and infinitive not in found:
+                    found.append(infinitive)
+        return found[:limit]
+
+    def verb_facts(self, infinitive: str) -> str | None:
+        """One line of authoritative facts for the tutor, e.g. aller: auxiliary être, ..."""
+        verb = self.verbs.get(infinitive)
+        if verb is None:
+            return None
+        forms = verb["forms"]
+        present = forms.get("indicatif.present", {})
+        compound = forms.get("indicatif.passe_compose", {})
+        return (
+            f"{infinitive}: auxiliary {verb['auxiliary']}; "
+            f"past participle {verb['participle_past']}; "
+            f"présent {_je(present.get('je', '?'))}, nous {present.get('nous', '?')}; "
+            f"passé composé {_je(compound.get('je', '?'))}, nous {compound.get('nous', '?')}"
+        )
+
     def quebec_terms_in(self, *texts: str) -> list[QuebecTerm]:
         return [
             t
@@ -113,3 +157,8 @@ def participle_agreements(participle: str) -> set[str]:
     """allé -> allé, allée, allés, allées; pris -> pris, prise, prises."""
     plural = participle if participle.endswith(("s", "x")) else participle + "s"
     return {participle, participle + "e", plural, participle + "es"}
+
+
+def _je(form: str) -> str:
+    """Subject pronoun with elision: j'ai, j'habite, je pars."""
+    return f"j'{form}" if form[:1].lower() in "aeiouyhéèêàâîôûœ" else f"je {form}"

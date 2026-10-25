@@ -19,7 +19,7 @@ describe("TutorDrawer", () => {
     const user = setup();
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Tuteur" }));
-    expect(await screen.findByRole("dialog")).toHaveTextContent("Your contextual tutor will live here.");
+    expect(await screen.findByRole("dialog")).toHaveTextContent("Tuteur");
     await user.keyboard("{Escape}");
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
