@@ -33,8 +33,8 @@ class Command(BaseCommand):
         parser.add_argument(
             "--approve-clean",
             action="store_true",
-            help="publish drafts with no reviewer or validation errors, unverified Québec claims "
-            "or AI-critic flags (reviewer suggestions are ignored)",
+            help="publish drafts with no reviewer or validation errors and no unverified Québec "
+            "claims (reviewer suggestions are ignored)",
         )
         parser.add_argument(
             "--max-rounds",
@@ -64,7 +64,7 @@ class Command(BaseCommand):
                     line += f" -> not approved: {exc}"
             elif options["revise"] and (job.external_review or attention):
                 if attention:
-                    line += f", {len(attention)} unverified Québec claims or critic flags"
+                    line += f", {len(attention)} unverified Québec claims"
                 if _round(job) >= options["max_rounds"]:
                     line += f" -> left for manual review after {options['max_rounds']} rounds"
                 else:

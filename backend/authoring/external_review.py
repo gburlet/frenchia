@@ -17,7 +17,7 @@ from contentkit.validate import UNVERIFIED_QUEBEC
 
 from .models import GenerationJob
 
-PROMPT_VERSION = "1"
+PROMPT_VERSION = "2"
 REVIEW_DIR = Path("drafts") / "review"
 
 
@@ -66,7 +66,7 @@ be better. Do not report style preferences as errors, and do not invent problems
 
 Verified Québec usage:
 {lexicon}
-
+{flags}
 Lesson (JSON):
 {lesson}
 
@@ -74,12 +74,23 @@ Answer with a single JSON object matching this JSON Schema:
 {schema}"""
 
 
-def build_prompt(lesson: dict[str, object], ref: Reference) -> str:
+FLAGS = """
+An automatic checker (a small model, often wrong) flagged the items below. Decide each one \
+yourself: report it as an error only if it is a real problem; otherwise ignore it.
+{items}
+"""
+
+
+def build_prompt(
+    lesson: dict[str, object], ref: Reference, flags: list[dict[str, str]] | None = None
+) -> str:
     lexicon = "\n".join(f"- {t.term}: {t.meaning} (France: {t.france})" for t in ref.quebec)
     lesson_data = {k: v for k, v in lesson.items() if k != "provenance"}
+    items = "\n".join(f"- {f['path'].split(':', 1)[-1]}: {f['message']}" for f in flags or [])
     return PROMPT.format(
         level=lesson["level"],
         lexicon=lexicon or "(none)",
+        flags=FLAGS.format(items=items) if items else "",
         lesson=json.dumps(lesson_data, ensure_ascii=False, indent=1),
         schema=json.dumps(Review.model_json_schema(), indent=1),
     )
@@ -100,7 +111,7 @@ def export(content_root: Path, jobs: list[GenerationJob]) -> Path:
     for job in jobs:
         assert job.output is not None
         (out / f"job-{job.pk}.prompt.txt").write_text(
-            build_prompt(job.output, ref), encoding="utf-8"
+            build_prompt(job.output, ref, critic_flags(job)), encoding="utf-8"
         )
     return out
 
@@ -149,15 +160,17 @@ def revision_notes(
     return notes, targets
 
 
+def critic_flags(job: GenerationJob) -> list[dict[str, str]]:
+    """Sentences the local AI critic flagged. It is often wrong, so the external reviewer
+    decides each one (they are listed in its prompt) instead of the flags blocking anything."""
+    return [v for v in job.validation if v["message"].startswith("AI critic")]
+
+
 def needs_attention(job: GenerationJob) -> list[dict[str, str]]:
     """Warnings that must not be published without a revision or a human: Québec claims
-    missing from the verified lexicon and sentences the AI critic flagged. Haiku misses these
-    (it passed « avoir le feu au cul » as a Québec expression)."""
-    return [
-        v
-        for v in job.validation
-        if UNVERIFIED_QUEBEC in v["message"] or v["message"].startswith("AI critic")
-    ]
+    missing from the verified lexicon. Haiku misses these (it passed « avoir le feu au cul »
+    as a Québec expression)."""
+    return [v for v in job.validation if UNVERIFIED_QUEBEC in v["message"]]
 
 
 def warning_notes(warnings: list[dict[str, str]]) -> tuple[str, list[str]]:

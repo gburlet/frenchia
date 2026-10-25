@@ -161,3 +161,24 @@ def test_unverified_quebec_claims_block_approval_and_go_to_the_reviser(
     child = GenerationJob.objects.get(parent=job)
     assert child.targets == ["vocabulary"] and "C'est de la roche" in child.notes
     assert not Lesson.objects.get(slug="a2-passe-compose-er").published_revision
+
+
+def test_critic_flags_are_listed_for_the_reviewer_not_blocking(
+    job: GenerationJob, settings: Any
+) -> None:
+    job.validation = [
+        {
+            "severity": "warning",
+            "path": "a2-passe-compose-er:ex-01",
+            "message": "AI critic on 'Je les ai finis.': 'finis': no agreement here",
+        }
+    ]
+    job.save()
+    call_command("content_review_export")
+    folder = Path(settings.CONTENT_DIR) / REVIEW_DIR
+    prompt = (folder / f"job-{job.pk}.prompt.txt").read_text()
+    assert "often wrong" in prompt and "- ex-01: AI critic on 'Je les ai finis.'" in prompt
+    (folder / f"job-{job.pk}.findings.json").write_text('{"issues": []}')
+    call_command("content_review_import", reviewer="claude-haiku-5-5", approve_clean=True)
+    job.refresh_from_db()
+    assert job.status == GenerationJob.Status.APPROVED
