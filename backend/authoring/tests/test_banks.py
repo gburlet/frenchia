@@ -245,3 +245,4 @@ def test_translation_drops_run_on_text() -> None:
     assert translation("I choose a coffee. / I am choosing a coffee.") == "I choose a coffee."
     assert translation("Choose a dessert.2. Présent (vous): « choisissez »") == "Choose a dessert."
     assert translation("We left at 5 p.m. yesterday.") == "We left at 5 p.m. yesterday."
+    assert translation('I rested. \n\ngloss": "to rest",') == "I rested."

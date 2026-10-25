@@ -145,7 +145,7 @@ def review_prompt(bank: Bank, ref: Reference) -> str:
             lexicon=_lexicon(ref),
             infinitive=bank.infinitive,
             gloss=bank.en,
-            note=bank.note or "-",
+            note=bank.note or "(none)",
             sentences="\n".join(lines),
             schema=schema,
         )

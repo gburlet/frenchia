@@ -8,7 +8,7 @@ PROMPT_VERSIONS = {
     "author.critic": "1",
     "bank.verb": "4",
     "bank.vocab": "2",
-    "bank.revise": "1",
+    "bank.revise": "2",
 }
 
 SYSTEM = """\
@@ -188,4 +188,5 @@ A proof-reader flagged this item:
 {item}
 Problem: {problem}
 Suggested fix: {fix}
-Rewrite the item so the problem is gone, keeping everything else that was correct."""
+Rewrite the item so the problem is gone, keeping everything else that was correct. Notes are \
+for the learner: never mention the correction or the original version."""

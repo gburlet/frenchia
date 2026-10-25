@@ -543,7 +543,7 @@ def _gloss(text: str) -> str:
 
 # Where a translation runs on into the prompt's slot list or into alternatives:
 # "Hi. (common) 2. Présent (tu): « vas »", "I eat. / I am eating.", "... | gloss: to eat".
-_RUN_ON = re.compile(r"\s*(?:\((?:common|qu[ée]bec usage)\)|\s/\s|«|\||\d+\.\s|gloss\s*:)", re.I)
+_RUN_ON = re.compile(r"\s*(?:\((?:common|qu[ée]bec usage)\)|\s/\s|«|\||\d+\.\s|\n|gloss\W*:)", re.I)
 
 
 def translation(text: str) -> str:
@@ -601,5 +601,10 @@ def clean_note(region: str, note: str) -> str | None:
     if region != "qc" and text.casefold().startswith(("france", "québec", "quebec")):
         return None
     if re.search(r"\b(previous|above|this) (example|sentence|word)\b", text, re.IGNORECASE):
+        return None
+    # Revisions describe their own edit: "The original example was replaced with…"
+    if re.search(
+        r"\b(original|replaced|corrected|revised|rewritten|headword|proof-?reader)\b", text, re.I
+    ):
         return None
     return text
