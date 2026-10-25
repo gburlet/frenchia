@@ -174,3 +174,19 @@ def test_quebec_word_needs_a_bare_pattern_match() -> None:
     assert ref.is_quebec_word("magasiner")
     assert not ref.is_quebec_word("chauffer")
     assert ref.quebec_terms_in("chauffer")  # still a headword for vocabulary entries
+
+
+def test_quebec_gender_wins_over_lexique() -> None:
+    ref = Reference(Path("."))
+    ref.nouns = {"party": {"gender": "f", "freq": 1.0}}
+    ref.quebec = [
+        QuebecTerm(
+            term="party",
+            match=[r"\bun party\b"],
+            meaning="party",
+            france="une fête",
+            formality="familiar",
+            gender="m",
+        )
+    ]
+    assert ref.noun_gender("party") == "m"

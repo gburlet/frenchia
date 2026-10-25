@@ -8,7 +8,7 @@ import unicodedata
 from dataclasses import dataclass, field
 from functools import cached_property
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict
 
@@ -30,6 +30,8 @@ class QuebecTerm(BaseModel):
     meaning: str
     france: str
     formality: str
+    gender: Literal["m", "f"] | None = None
+    """Gender in Québec usage, which wins over Lexique (« un party », not « une party »)."""
     notes: str | None = None
 
 
@@ -53,7 +55,11 @@ class Reference:
         return ref
 
     def noun_gender(self, lemma: str) -> str | None:
-        entry = self.nouns.get(normalize(lemma))
+        key = normalize(lemma)
+        for term in self.quebec:
+            if term.gender and normalize(term.term) == key:
+                return term.gender
+        entry = self.nouns.get(key)
         return entry["gender"] if entry else None
 
     @cached_property
