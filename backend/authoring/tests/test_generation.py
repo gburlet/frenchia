@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from typing import Any
 
 from authoring.generation import LessonBrief, LessonGenerator, LessonReviser
 from contentkit.models import FillBlankExercise, Lesson, LessonOutline
@@ -362,3 +363,36 @@ def test_reading_revisions_use_the_gender_required_shape() -> None:
     )
     reading = next(s for s in result.lesson.sections if s.type == "reading")
     assert (reading.glossary[0].fr, reading.glossary[0].gender) == ("souper", "m")
+
+
+class HintFixingChat(ScriptedChat):
+    """Revises the fill-in exercise without fixing its hint; fixes it only when asked to repair."""
+
+    def complete(self, messages: Any, **kwargs: Any) -> Completion:
+        title = (kwargs.get("json_schema") or {}).get("title", "")
+        if title == "FillBlankExercise":
+            self.calls.append((title, list(messages)))
+            current = json.loads(messages[-1].content.split("Current content (JSON):\n", 1)[1])
+            if "gives away the answer" in messages[-1].content:
+                current["hint"] = "(aller)"
+            return Completion(json.dumps(current), self.model, 1, 10)
+        return super().complete(messages, **kwargs)
+
+
+def test_revision_repairs_what_the_checks_reject() -> None:
+    lesson = (
+        LessonGenerator(ScriptedChat(), reference(), critic=False)
+        .generate(brief(), content_version=1, job_id=None)
+        .lesson
+    )
+    data = lesson.model_dump(mode="json", exclude_none=True)
+    fill = next(e for e in data["exercises"] if e["type"] == "fill_blank")
+    fill["hint"] = f"Use « {fill['answers'][0]} »."
+    chat = HintFixingChat()
+    result = LessonReviser(chat, reference(), critic=False).revise(
+        data, "Shorter hints", [fill["id"]], content_version=2, job_id=None
+    )
+    revised = next(e for e in result.lesson.exercises if e.id == fill["id"])
+    assert revised.hint == "(aller)"  # type: ignore[union-attr]
+    assert result.stats.repairs == 1
+    assert not [i for i in result.issues if i.severity == "error"]

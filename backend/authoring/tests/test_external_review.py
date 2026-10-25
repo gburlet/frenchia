@@ -182,3 +182,21 @@ def test_critic_flags_are_listed_for_the_reviewer_not_blocking(
     call_command("content_review_import", reviewer="claude-haiku-5-5", approve_clean=True)
     job.refresh_from_db()
     assert job.status == GenerationJob.Status.APPROVED
+
+
+def test_validation_errors_alone_queue_a_revision(
+    job: GenerationJob, settings: Any, django_capture_on_commit_callbacks: Any
+) -> None:
+    job.validation = [
+        {"severity": "error", "path": "a2-passe-compose-er:ex-02.hint", "message": "too long"}
+    ]
+    job.save()
+    folder = Path(settings.CONTENT_DIR) / REVIEW_DIR
+    call_command("content_review_export")
+    (folder / f"job-{job.pk}.findings.json").write_text('{"issues": []}')
+    with django_capture_on_commit_callbacks(execute=False):
+        call_command(
+            "content_review_import", reviewer="claude-haiku-5-5", revise=True, approve_clean=True
+        )
+    child = GenerationJob.objects.get(parent=job)
+    assert child.targets == ["ex-02"] and "ex-02.hint: too long" in child.notes

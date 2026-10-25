@@ -17,7 +17,7 @@ from contentkit.validate import UNVERIFIED_QUEBEC
 
 from .models import GenerationJob
 
-PROMPT_VERSION = "3"
+PROMPT_VERSION = "4"
 REVIEW_DIR = Path("drafts") / "review"
 
 
@@ -58,8 +58,10 @@ another equally correct answer that is not listed (e.g. any pronoun fits « Je _
 vérité »); each multiple-choice question must have exactly one correct option (work it out \
 yourself before reading answer_index; an option that is the right answer with different \
 punctuation is also correct); an answer must not repeat an object already replaced by a \
-pronoun (« Je lui parle à Marie »); a hint must not give the answer away. These grade the \
-learner unfairly, so they are errors;
+pronoun (« Je lui parle à Marie »); a fill-in-the-blank hint must not contain the answer. \
+These grade the learner unfairly, so they are errors. Translations are different: a model \
+grades answers that are not listed, so a missing alternative translation is not an error, and \
+a translation hint may give vocabulary;
 - expressions must be real and in standard register: an invented idiom or a vulgar one is an \
 error;
 - Québec usage: Québec usage is the default (déjeuner = breakfast, dîner = lunch, souper = supper; \
@@ -186,4 +188,14 @@ def warning_notes(warnings: list[dict[str, str]]) -> tuple[str, list[str]]:
         for w in warnings
     )
     targets = sorted({w["path"].split(":", 1)[-1] for w in warnings if ":" in w["path"]})
+    return notes, targets
+
+
+def validation_notes(job: GenerationJob) -> tuple[str, list[str]]:
+    """Deterministic errors the draft still has, as revision notes."""
+    errors = [v for v in job.validation if v["severity"] == "error"]
+    notes = "\n".join(f"- {v['path'].split(':', 1)[-1]}: {v['message']}" for v in errors)
+    targets = sorted(
+        {v["path"].split(":", 1)[1].split(".", 1)[0] for v in errors if ":" in v["path"]}
+    )
     return notes, targets

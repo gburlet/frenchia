@@ -515,18 +515,17 @@ class LessonReviser:
             for d in base["exercises"]
             if (item := self._item(d, EXERCISE_TYPES, notes, d["id"] in wanted, droppable=True))
         ]
-        topics = list(base.get("grammar_topics", []))
-        exercises = [
-            e if e.grammar_topics or not topics else e.model_copy(update={"grammar_topics": topics})
-            for e in exercises
-        ]
-        data = {
-            **{k: v for k, v in base.items() if k != "provenance"},
-            "content_version": content_version,
-            "sections": [s.model_dump(mode="json", exclude_none=True) for s in sections],
-            "exercises": [e.model_dump(mode="json", exclude_none=True) for e in exercises],
-        }
-        revised = Lesson.model_validate(tidy(data))
+        revised = self._build(base, sections, exercises, content_version)
+        # One repair round, as in generation: the revision must pass the deterministic checks.
+        broken = self._item_errors(revised)
+        if broken:
+            self.stats.repairs += 1
+            self.progress(f"Repairing: {'; '.join(m for ms in broken.values() for m in ms)[:200]}")
+            sections = [_clean_vocab(self._repair(x, SECTION_TYPES, broken)) for x in sections]
+            exercises = [self._repair(x, EXERCISE_TYPES, broken) for x in exercises]
+            repaired = self._build(base, sections, exercises, content_version)
+            if len(self._item_errors(repaired)) < len(broken):
+                revised = repaired
         provenance = Provenance(
             generator=f"llm/{self.chat.model}",
             prompts=dict(prompts.PROMPT_VERSIONS),
@@ -540,6 +539,47 @@ class LessonReviser:
             self.progress("AI critic: proof-reading graded French sentences")
             issues += critique(self.chat, revised, self.stats.record)
         return GenerationResult(revised, issues, self.stats)
+
+    @staticmethod
+    def _build(
+        base: dict[str, Any], sections: list[Any], exercises: list[Any], content_version: int
+    ) -> Lesson:
+        topics = list(base.get("grammar_topics", []))
+        exercises = [
+            e if e.grammar_topics or not topics else e.model_copy(update={"grammar_topics": topics})
+            for e in exercises
+        ]
+        data = {
+            **{k: v for k, v in base.items() if k != "provenance"},
+            "content_version": content_version,
+            "sections": [s.model_dump(mode="json", exclude_none=True) for s in sections],
+            "exercises": [e.model_dump(mode="json", exclude_none=True) for e in exercises],
+        }
+        return Lesson.model_validate(tidy(data))
+
+    def _item_errors(self, lesson: Lesson) -> dict[str, list[str]]:
+        """Deterministic errors by item id ("ex-07.hint" belongs to "ex-07")."""
+        found: dict[str, list[str]] = {}
+        for issue in check_lesson_quality(lesson, self.ref):
+            if issue.severity == "error" and ":" in issue.path:
+                item = issue.path.split(":", 1)[1].split(".", 1)[0]
+                found.setdefault(item, []).append(issue.message)
+        return found
+
+    def _repair(
+        self, item: Any, types: dict[str, type[BaseModel]], broken: dict[str, list[str]]
+    ) -> Any:
+        if item.id not in broken:
+            return item
+        problems = "\n".join(f"- {m}" for m in broken[item.id])
+        try:
+            return self._revise_item(
+                types[item.type],
+                item.model_dump(mode="json", exclude_none=True),
+                prompts.REPAIR.format(problems=problems),
+            )
+        except InvalidOutput:
+            return item
 
     def _item(
         self,
