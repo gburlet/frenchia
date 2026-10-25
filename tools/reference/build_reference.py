@@ -127,6 +127,12 @@ def load_lexique() -> list[dict]:
     return rows
 
 
+def build_words(rows) -> dict:
+    """Every Lexique word form (lower-case): lets validation catch non-words in answer keys."""
+    words = sorted({r["ortho"].strip().lower() for r in rows if r["ortho"].strip()})
+    return {"schema_version": 1, "source": lexique_source(), "words": words}
+
+
 WORD_RE = re.compile(r"^[a-zàâäçéèêëîïôöùûüÿœæ]+(-[a-zàâäçéèêëîïôöùûüÿœæ]+)*$")
 
 
@@ -370,6 +376,11 @@ def cross_check(verbs: dict) -> list[dict]:
 
 
 def main() -> None:
+    if sys.argv[1:] == ["--only", "words"]:
+        words = build_words(load_lexique())
+        dump_json(OUT / "words.json", words, sort_keys=False)
+        print(f"words: {len(words['words'])}")
+        return
     logging.disable(logging.CRITICAL)
     from verbecc import CompleteConjugator, LangCodeISO639_1
 
@@ -401,6 +412,7 @@ def main() -> None:
         "verbs": verbs,
     }
     dump_json(OUT / "nouns.json", nouns, sort_keys=False)
+    dump_json(OUT / "words.json", build_words(rows), sort_keys=False)
     dump_json(OUT / "conjugations.json", conj_out)
     (OUT / "conjugation_disagreements.yaml").write_text(
         yaml.safe_dump(dis, allow_unicode=True, sort_keys=True, width=1000, default_flow_style=False),

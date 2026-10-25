@@ -241,3 +241,30 @@ def test_a_quoted_answer_in_the_hint_is_still_the_answer() -> None:
     data["exercises"][0]["hint"] = "Direct object pronoun 'le' replaces a masculine noun."
     found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
     assert "error:the hint gives away the answer 'le'" in found
+
+
+def test_answer_keys_must_be_real_french_words() -> None:
+    ref = reference()
+    ref.words = frozenset(
+        {
+            "hier",
+            "une",
+            "poutine",
+            "aujourd'hui",
+            "soeur",
+            "magasiné",
+            "nous",
+            "avons",
+            "mangé",
+            "ont",
+        }
+    )
+    data = lesson_data()
+    data["exercises"][0]["sentence"] = "Aujourd'hui, ma sœur ___ une poutine."
+    data["exercises"][0]["answers"] = ["ai bonned"]
+    data["exercises"][0]["hint"] = None
+    data["exercises"][1]["accepted_answers"] = ["On a magasiné.", "Nous avons magasiné."]
+    found = messages(check_lesson_quality(Lesson.model_validate(data), ref))
+    assert found == ["error:'bonned' is not a French word (not in Lexique)"]
+    data["exercises"][0]["answers"] = ["ai mangé"]
+    assert check_lesson_quality(Lesson.model_validate(data), ref) == []

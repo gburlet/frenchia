@@ -18,6 +18,7 @@ from .models import (
     GrammarTopicRegistry,
     Lesson,
     LessonOutline,
+    MultipleChoiceExercise,
     ReadingSection,
     RegionalNoteSection,
     TranslateExercise,
@@ -266,6 +267,9 @@ def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
                         ex.id,
                         f"explanation quotes text that is not in the reading: {text!r}",
                     )
+        for text in _graded_french(ex):
+            for word in _unknown_words(text, ref):
+                add("error", ex.id, f"{word!r} is not a French word (not in Lexique)")
         if isinstance(ex, FillBlankExercise):
             _check_fill_blank(add, ex, ref)
         if isinstance(ex, TranslateExercise):
@@ -308,6 +312,37 @@ def _check_fill_blank(add: AddFn, ex: FillBlankExercise, ref: Reference) -> None
 def _words(text: str) -> str:
     """Normalized words without surrounding quotes: « 'le' » is the word « le »."""
     return " ".join(w.strip("'’-") for w in _WORD.findall(normalize(text)))
+
+
+_TOKEN = re.compile(r"[^\W\d_]+(?:['’-][^\W\d_]+)*")
+
+
+def _unknown_words(text: str, ref: Reference) -> list[str]:
+    """Words in French text that no dictionary knows (« bonned »). Capitalised words are
+    skipped as likely names; hyphenated words pass if the whole or every part is known."""
+    unknown = []
+    for token in _TOKEN.findall(text):
+        if len(token) < 3 or token[0].isupper() or ref.is_word(token):
+            continue
+        # « aujourd'hui » is one word; « l'épicerie », « est-ce » are known parts.
+        parts = re.split(r"['’-]", token)
+        if len(parts) > 1 and all(len(p) < 3 or ref.is_word(p) for p in parts):
+            continue
+        unknown.append(token)
+    return unknown
+
+
+def _graded_french(ex: object) -> list[str]:
+    """French text a learner is graded against."""
+    if isinstance(ex, FillBlankExercise):
+        return [ex.sentence.replace(BLANK, a) for a in ex.answers]
+    if isinstance(ex, TranslateExercise):
+        return list(ex.accepted_answers) if ex.direction == "en_fr" else [ex.prompt]
+    if isinstance(ex, MultipleChoiceExercise | ComprehensionExercise):
+        # Only the right answer: wrong options are often deliberately wrong forms (« j'ai finé »).
+        right = ex.options[ex.answer_index]
+        return [] if _looks_english(right) else [right]
+    return []
 
 
 def _hint_infinitive(hint: str | None) -> str | None:

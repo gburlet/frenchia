@@ -41,6 +41,8 @@ class Reference:
     nouns: dict[str, dict[str, Any]] = field(default_factory=dict)
     verbs: dict[str, dict[str, Any]] = field(default_factory=dict)
     quebec: list[QuebecTerm] = field(default_factory=list)
+    words: frozenset[str] = frozenset()
+    """Every Lexique word form, lower-case (empty when words.json is absent)."""
 
     @classmethod
     def load(cls, content_root: Path) -> "Reference":
@@ -52,7 +54,26 @@ class Reference:
             ref.verbs = json.loads(p.read_text(encoding="utf-8"))["verbs"]
         if (p := root / "quebec.yaml").exists():
             ref.quebec = [QuebecTerm.model_validate(e) for e in load_yaml(p) or []]
+        if (p := root / "words.json").exists():
+            ref.words = frozenset(json.loads(p.read_text(encoding="utf-8"))["words"])
         return ref
+
+    def is_word(self, word: str) -> bool:
+        """A French word form we know: Lexique, the conjugation reference or the Québec lexicon.
+        Always true when no word list is loaded."""
+        key = normalize(word)
+        if "œ" in key or "æ" in key:  # Lexique spells « soeur », « coeur »
+            return self.is_word(key.replace("œ", "oe").replace("æ", "ae")) or key in self.words
+        return (
+            not self.words
+            or key in self.words
+            or key in self._verb_index
+            or key in self._lexicon_words
+        )
+
+    @cached_property
+    def _lexicon_words(self) -> frozenset[str]:
+        return frozenset(w for t in self.quebec for w in re.findall(r"[\w-]+", normalize(t.term)))
 
     def noun_gender(self, lemma: str) -> str | None:
         key = normalize(lemma)

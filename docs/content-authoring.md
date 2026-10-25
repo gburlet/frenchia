@@ -114,6 +114,23 @@ What the deterministic checks catch, because Gemma does these and Haiku misses s
 - notes that describe the edit ("The original example was replaced…"), or that give a
   Québec/France equivalent on a word that isn't Québec usage.
 
+Lessons get the same treatment. Deterministic errors, all things the local LLM produced and
+Haiku passed at least once:
+
+- a fill-in hint that contains the answer (« lui » in the hint), or a hint longer than one line;
+- an exercise that repeats another, or refers to "the underlined words" (exercises are plain
+  text), or contains ~~markup~~;
+- a word in an answer key that no dictionary knows (« bonned »): checked against every Lexique
+  word form (`reference/words.json`), the conjugation reference and the Québec lexicon. Wrong
+  options in multiple-choice questions are not checked, because they are often deliberately
+  wrong forms;
+- vulgar words and sacres.
+
+Region tags follow the lexicon automatically: a "qc" tag on a vocabulary item, glossary entry
+or example that the lexicon doesn't support becomes "common", a word that is exactly a lexicon
+term becomes "qc", and a regional-note variant whose Québec form the lexicon doesn't support is
+dropped.
+
 Québec lexicon entries can carry a `gender`, which overrides Lexique (« un party »). Only
 entries the theme or the verb actually mentions go into a prompt: a generic sample ended up in
 every set and sentence.

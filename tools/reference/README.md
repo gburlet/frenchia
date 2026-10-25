@@ -25,6 +25,8 @@ model only loads on Python 3.10), so `mlconjug_dump.py` (its own PEP 723 script)
   film subtitles per million; ties alphabetical; this dict is the one deliberately not key-sorted so order = rank).
   `gender` is `m`/`f` if the gendered rows agree, `mf` if both occur or Lexique leaves gender blank (epicene or
   meaning-dependent: élève, livre, tour; this also catches a few nouns whose gender Lexique simply doesn't record).
+- `words.json`: every distinct Lexique 3.83 word form (`ortho`, lower-cased, ~125,000), used to catch non-words
+  in answer keys. Rebuild only this file with `uv run tools/reference/build_reference.py --only words`.
 - `conjugations.json`: ~320 verbs (top 300 Lexique `VER` lemmas that verbecc knows and fully conjugates, plus the
   curated pronominal/Québec set). Per verb: `group`, `auxiliary` (`avoir`/`être`/`both`), `pronominal`, `inferred`,
   participles, `forms` for 12 tense keys, and optional `variants` (alternate valid forms, e.g. assois/assieds).
