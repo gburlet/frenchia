@@ -358,12 +358,19 @@ def find_form(
     """The accepted form of (verb, tense, person) as written in a sentence (longest match), or
     None. Used to validate generated context sentences."""
     text = unicodedata.normalize("NFC", sentence)
+    # « nous levons » of se lever starts with the reflexive pronoun; the subject must come
+    # before it (« nous nous levons »), or « Nous levons les rideaux » would pass.
+    doubled = bool(ref.verbs[infinitive].get("pronominal")) and person in ("nous", "vous")
     best: str | None = None
     for form in accepted_forms(ref, infinitive, tense, person):
         escaped = re.escape(form).replace("'", "['’]").replace(r"\ ", r"\s+")
-        match = re.search(r"(?<![\w-])" + escaped + r"(?![\w-])", text, re.IGNORECASE)
-        if match and (best is None or len(match.group(0)) > len(best)):
-            best = match.group(0)
+        subject = ""
+        if doubled and form.casefold().startswith(person + " "):
+            subject = person + r"\s+"
+        pattern = r"(?<![\w-])" + subject + "(" + escaped + r")(?![\w-])"
+        match = re.search(pattern, text, re.IGNORECASE)
+        if match and (best is None or len(match.group(1)) > len(best)):
+            best = match.group(1)
     return best
 
 

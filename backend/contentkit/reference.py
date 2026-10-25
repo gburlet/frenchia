@@ -156,6 +156,11 @@ class Reference:
             or any(re.search(p, text, re.IGNORECASE) for p in t.match for text in texts)
         ]
 
+    def is_quebec_word(self, word: str) -> bool:
+        """The word is Québec usage in any context: a lexicon pattern matches it bare
+        (« magasiner » does; « chauffer » only counts in « chauffer son char »)."""
+        return any(re.search(p, word, re.IGNORECASE) for t in self.quebec for p in t.match)
+
 
 def participle_agreements(participle: str) -> set[str]:
     """allé -> allé, allée, allés, allées; pris -> pris, prise, prises."""

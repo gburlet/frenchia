@@ -70,12 +70,12 @@ WORD_BATCH = 12
 class SentenceDraft(BaseModel):
     slot: int
     fr: str
-    en: str
+    en: str = Field(description="English translation of the whole sentence")
 
 
 class VerbBankDraft(BaseModel):
     sentences: list[SentenceDraft]
-    en: str = Field(description="Only the English gloss, e.g. 'to go'", max_length=60)
+    gloss: str = Field(description="Only the verb's English gloss, e.g. 'to go'", max_length=60)
     note: str = Field(description="One English sentence, or empty", max_length=240)
 
 
@@ -249,7 +249,9 @@ class BankGenerator:
                         "fr": fr,
                         "form": found,
                         "en": en,
-                        "region": "qc" if self.ref.quebec_terms_in(fr) else "common",
+                        "region": "qc"
+                        if self.ref.is_quebec_word(infinitive) or self.ref.quebec_terms_in(fr)
+                        else "common",
                     }
                 )
             except ValidationError as exc:
@@ -268,7 +270,7 @@ class BankGenerator:
             "id": verb_slug(infinitive),
             "content_version": version,
             "infinitive": infinitive,
-            "en": _gloss(draft.en) or infinitive,
+            "en": _gloss(draft.gloss) or infinitive,
             "note": _note(draft.note),
             "sentences": [s.model_dump() for s in sentences],
         }
@@ -501,9 +503,11 @@ class BankGenerator:
     # plumbing ------------------------------------------------------------------------------
 
     def _lexicon(self, *texts: str) -> str:
+        # Only the entries the texts mention: a generic sample ends up in every set and
+        # sentence (souper in a nature set, « ouvrir le souper »).
         terms = self.ref.quebec_terms_in(*texts) if texts else []
         if not terms:
-            terms = self.ref.quebec[:12]
+            return ""
         entries = "\n".join(
             f"- {t.term}: {t.meaning} (France: {t.france}; {t.formality})" for t in terms
         )
@@ -540,7 +544,9 @@ def _note(text: str) -> str | None:
     text = str(tidy(text.strip()))
     if match := re.search(r"(?:usage )?note\s*:\s*(.+)", text, re.IGNORECASE | re.DOTALL):
         text = match.group(1).strip()
-    if not text or "frenchia" in text.casefold() or len(text) > 240 or "\n" in text:
+    if not re.search(r"\w{2}", text) or "frenchia" in text.casefold():
+        return None
+    if len(text) > 240 or "\n" in text:
         return None
     return text
 
@@ -568,5 +574,18 @@ def _entry(entry_id: str, word: WordDraft, example: ExampleDraft) -> VocabEntry:
         formality=word.formality,
         example_fr=str(tidy(example.example_fr.strip())),
         example_en=str(tidy(example.example_en.strip())),
-        note=str(tidy(example.note.strip())) or None,
+        note=clean_note(word.region, example.note),
     )
+
+
+def clean_note(region: str, note: str) -> str | None:
+    """Drop notes small models attach where they don't belong: a France equivalent on a word
+    that isn't Québec usage, or a comment about the prompt itself."""
+    text = str(tidy(note.strip()))
+    if not text:
+        return None
+    if region != "qc" and text.casefold().startswith("france"):
+        return None
+    if re.search(r"\b(previous|above|this) (example|sentence|word)\b", text, re.IGNORECASE):
+        return None
+    return text

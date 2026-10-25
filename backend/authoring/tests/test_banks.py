@@ -82,11 +82,15 @@ def aller_responder(title: str, messages: list[Message]) -> Any:
                 fr = "Je mange une pomme."
             else:
                 fr = SENTENCES.get(form, f"Hier, c'est vrai, {form} tout le temps.")
-            sentences.append({"slot": slot, "fr": fr, "en": "A sentence."})
-        return {"sentences": sentences, "en": "Gloss: to go", "note": "Frenchia note"}
+            sentences.append({"slot": slot, "fr": fr, "en": "This is a sentence."})
+        return {"sentences": sentences, "gloss": "Gloss: to go", "note": "Frenchia note"}
     if title == "SentenceRepair":
         slot = int(re.search(r"slot (\d+)", prompt).group(1))  # type: ignore[union-attr]
-        return {"sentences": [{"slot": slot, "fr": "Elles vont au dépanneur.", "en": "x"}]}
+        return {
+            "sentences": [
+                {"slot": slot, "fr": "Elles vont au dépanneur.", "en": "They go to the store."}
+            ]
+        }
     raise AssertionError(title)
 
 

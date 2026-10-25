@@ -151,3 +151,26 @@ def test_comprehension_explanations_must_quote_the_passage() -> None:
     assert any("quotes text that is not in the reading" in m for m in found)
     data["exercises"][2]["explanation"] = "The text says: « j'ai magasiné avec ma blonde »."
     assert check_lesson_quality(Lesson.model_validate(data), reference()) == []
+
+
+def test_quebec_word_needs_a_bare_pattern_match() -> None:
+    ref = Reference(Path("."))
+    ref.quebec = [
+        QuebecTerm(
+            term="magasiner",
+            match=[r"\bmagasin(er|e|ons)\b"],
+            meaning="to shop",
+            france="faire les magasins",
+            formality="neutral",
+        ),
+        QuebecTerm(
+            term="chauffer",
+            match=[r"\bchauff(er|e)\b (son )?char\b"],
+            meaning="to drive",
+            france="conduire",
+            formality="familiar",
+        ),
+    ]
+    assert ref.is_quebec_word("magasiner")
+    assert not ref.is_quebec_word("chauffer")
+    assert ref.quebec_terms_in("chauffer")  # still a headword for vocabulary entries

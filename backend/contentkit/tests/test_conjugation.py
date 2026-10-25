@@ -126,3 +126,32 @@ def test_verb_bank_checks() -> None:
     errors = [(i.path.split(":")[-1], i.message) for i in issues if i.severity == "error"]
     assert [path for path, _ in errors] == ["sentences.1", "sentences.2"]
     assert "Imparfait" in errors[0][1]
+
+
+def test_find_form_needs_the_reflexive_pronoun_after_nous_and_vous() -> None:
+    present = "indicatif.present"
+    assert find_form(REF, "se lever", present, "nous", "Nous levons les rideaux.") is None
+    assert find_form(REF, "se lever", present, "vous", "Vous vous levez tôt ?") == "vous levez"
+    assert find_form(REF, "lever", present, "nous", "Nous levons les rideaux.") == "levons"
+
+
+def test_gloss_is_not_a_sentence_translation() -> None:
+    bank = VerbBank.model_validate(
+        {
+            "id": "choisir",
+            "content_version": 1,
+            "infinitive": "choisir",
+            "en": "to choose",
+            "sentences": [
+                {
+                    "tense": "indicatif.present",
+                    "person": "nous",
+                    "fr": "Nous choisissons un bon dessert pour ce soir.",
+                    "form": "choisissons",
+                    "en": "to choose",
+                }
+            ],
+        }
+    )
+    issues = check_verb_bank(bank, REF, "verbs/bank/choisir.yaml")
+    assert any("not a translation" in i.message for i in issues)

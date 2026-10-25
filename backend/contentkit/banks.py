@@ -79,6 +79,14 @@ _SUBJECT = {
 }
 
 
+def _is_gloss(en: str, gloss: str) -> bool:
+    """« Choose » or « to like, to love » where a sentence translation belongs."""
+    words = re.findall(r"[\w']+", en.casefold())
+    glosses = {g.strip().removeprefix("to ").strip() for g in gloss.casefold().split(",")}
+    bare = " ".join(w for w in words if w != "to")
+    return len(words) <= 2 or bare in glosses or normalize(en) == normalize(gloss)
+
+
 def check_verb_bank(bank: VerbBank, ref: Reference, where: str) -> list[Issue]:
     issues: list[Issue] = []
 
@@ -90,6 +98,8 @@ def check_verb_bank(bank: VerbBank, ref: Reference, where: str) -> list[Issue]:
         return issues
     if bank.id != verb_slug(bank.infinitive):
         add("error", "id", f"id must be {verb_slug(bank.infinitive)!r}")
+    # A Québec verb (magasiner, jaser) makes every sentence Québec usage, whatever the form.
+    quebec_verb = ref.is_quebec_word(bank.infinitive)
     seen: set[str] = set()
     for i, s in enumerate(bank.sentences):
         at = f"sentences.{i}"
@@ -111,7 +121,9 @@ def check_verb_bank(bank: VerbBank, ref: Reference, where: str) -> list[Issue]:
                 add("warning", at, f"no « {s.person} » subject in the sentence")
         if _looks_english(s.fr):
             add("error", at, "sentence does not look French")
-        if s.region == "qc":
+        if _is_gloss(s.en, bank.en):
+            add("error", at, f"the English {s.en!r} is not a translation of the sentence")
+        if s.region == "qc" and not quebec_verb:
             _check_quebec(add, at, s.fr, ref)
         for text in (s.fr, s.en):
             if _LATEX.search(text):

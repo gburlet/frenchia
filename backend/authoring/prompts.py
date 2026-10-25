@@ -6,8 +6,8 @@ PROMPT_VERSIONS = {
     "author.steps": "3",
     "author.revise": "1",
     "author.critic": "1",
-    "bank.verb": "2",
-    "bank.vocab": "1",
+    "bank.verb": "4",
+    "bank.vocab": "2",
     "bank.revise": "1",
 }
 
@@ -137,7 +137,8 @@ fin de semaine, magasiner, chalet, hiver). Never use swear words or sacres.
 elision. Keep vocabulary at A2 level unless told otherwise.
 - Do not invent Québec expressions: only call something Québec usage when it is in the verified \
 list you are given; otherwise use standard French and mark it common.
-- Translations are natural English, not word-for-word."""
+- Translations are natural English, not word-for-word. Québec meals: le déjeuner = breakfast, \
+le dîner = lunch, le souper = supper (never "dinner")."""
 
 VERB_BANK = """\
 Verb: {infinitive} (auxiliary {auxiliary}{pronominal}).
@@ -151,8 +152,9 @@ je veux que...). Imperative slots have no subject. Vary the situations and the s
 Slots:
 {slots}
 
-Then fill "en" with only the verb's English gloss, e.g. "to go" (two or three meanings at most, \
-separated by commas), and "note" with one English sentence about its usage (a Québec usage, a \
+Each sentence's "en" is a full English translation of that sentence. Then fill "gloss" \
+with only the verb's English gloss, e.g. "to go" (two or three meanings at most, separated by \
+commas), and "note" with one English sentence about its usage (a Québec usage, a \
 common construction like « aller + infinitive », or a trap), or "" if there is nothing useful."""
 
 VERB_REPAIR = """\
