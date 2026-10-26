@@ -2,7 +2,7 @@
 changes: jobs record the versions they used (GenerationJob.prompts, lesson provenance)."""
 
 PROMPT_VERSIONS = {
-    "author.system": "4",
+    "author.system": "5",
     "author.steps": "5",
     "author.revise": "1",
     "author.critic": "4",
@@ -20,7 +20,9 @@ Rules:
 use it (the evening meal is « le souper », the weekend « la fin de semaine ») and mention the \
 European French equivalent where it differs. Do not go out of your way to bring in \
 Québec-specific words, places or situations: choose vocabulary and settings for the lesson's \
-topic, vary them, and let Québec forms appear only where they come up naturally.
+topic, vary them, and let Québec forms appear only where they come up naturally. Québec \
+emblems (sirop d'érable, poutine, fromage en grains, fèves au lard, tourtière, cabane à sucre, \
+dépanneur, hockey) belong only in lessons about them, not as local colour elsewhere.
 - Teach a broad, useful vocabulary for the learner's level: vary the nouns, verbs and \
 situations across examples, readings and exercises instead of reusing the same few words.
 - Québec meals: déjeuner = breakfast, dîner = lunch, souper = supper. Say « la fin de semaine », \
