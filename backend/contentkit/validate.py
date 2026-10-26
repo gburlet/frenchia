@@ -202,7 +202,9 @@ _FRENCH_FIELDS = {"fr", "passage_fr", "example_fr", "sentence", "answers"}
 _DOUBLE_ARTICLE = re.compile(r"\b(du|au|aux) (?:(le|la|les)\b|l['’])", re.I)
 # Bits of the generation prompt that reach the learner (« no slang that isn't in the verified
 # list »).
-_PROMPT_LEAK = re.compile(r"verified (list|lexicon|usage)|\bthe lexicon\b|\bJSON\b", re.I)
+_PROMPT_LEAK = re.compile(
+    r"verified (list|lexicon|usage)|\bthe lexicon\b|\bJSON\b|≤\s*\d+ char", re.I
+)
 
 
 def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:

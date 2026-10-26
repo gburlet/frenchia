@@ -367,3 +367,10 @@
   france: un moustique
   formality: standard
   gender: m
+# --- Added 2026-10-26 (lesson review), pending learner review ---------------------------------
+- term: job
+  match: ['\b(une|la|ma|ta|sa|cette|ta) jobs?\b']
+  meaning: "job (familiar); feminine in Québec: « une job »"
+  france: un job, un boulot
+  formality: familiar
+  gender: f

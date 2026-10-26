@@ -64,11 +64,13 @@ class Grade:
 # --- normalisation ------------------------------------------------------------------------
 
 _PUNCT = re.compile(r"[^\w\s'-]")
+_HYPHENS = str.maketrans({"\u2010": "-", "\u2011": "-"})
 
 
 def normalize(text: str) -> str:
     """Case-, spacing- and punctuation-insensitive form (accents kept)."""
     text = unicodedata.normalize("NFC", text).casefold().replace("’", "'").replace("‘", "'")
+    text = text.translate(_HYPHENS)  # « centre‑ville » (non-breaking hyphen) = centre-ville
     text = _PUNCT.sub(" ", text)
     return " ".join(text.split())
 

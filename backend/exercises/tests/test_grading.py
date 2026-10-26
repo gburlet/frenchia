@@ -134,3 +134,9 @@ def test_quebec_lexicon_grounds_the_prompt() -> None:
 def test_placeholder_register_notes_are_dropped() -> None:
     output = JudgeOutput(errors=[], corrected="On a mangé.", register_note="None")
     assert _from_judge(output, "On a mangé.", "m", 10).feedback["register_note"] is None
+
+
+def test_normalize_treats_a_non_breaking_hyphen_as_a_hyphen() -> None:
+    assert normalize("Est‑ce que tu vas au centre‑ville ?") == normalize(
+        "Est-ce que tu vas au centre-ville?"
+    )
