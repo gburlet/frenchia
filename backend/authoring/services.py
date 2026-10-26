@@ -193,7 +193,11 @@ def auto_review(job: GenerationJob, progress: Callable[[str], None] | None = Non
             note(f"Auto-review: not published: {exc}")
         return
     if generation_round(job) >= MAX_ROUNDS:
-        note(f"Auto-review: still has problems after {MAX_ROUNDS} rounds; left for review")
+        try:  # the learner's rule: publish after the last round rather than wait in Admin
+            path = approve(job, allow_errors=True)
+            note(f"Auto-review: published after {MAX_ROUNDS} rounds: {path.name}")
+        except ReviewError as exc:
+            note(f"Auto-review: not published after {MAX_ROUNDS} rounds: {exc}")
         return
     parts = [validation_notes(job), warning_notes(attention), critic_notes(critic)]
     notes = "\n".join(n for n, _ in parts if n)

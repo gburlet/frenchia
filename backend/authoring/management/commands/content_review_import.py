@@ -77,7 +77,13 @@ class Command(BaseCommand):
                 # than the published version, which stays up while it converges.
                 limit = options["max_rounds"] + (2 if job.lesson.published_revision_id else 0)
                 if generation_round(job) >= limit:
-                    line += f" -> left for manual review after {limit} rounds"
+                    # The learner's rule: after the last round, publish rather than wait in
+                    # Admin (each round is usually better than the live version).
+                    try:
+                        path = approve(job, allow_errors=True)
+                        line += f" -> published after {limit} rounds: {path.name}"
+                    except ReviewError as exc:
+                        line += f" -> not published after {limit} rounds: {exc}"
                 else:
                     # Errors only: rewriting for every suggestion introduced new errors.
                     parts = [

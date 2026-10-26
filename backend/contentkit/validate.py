@@ -253,7 +253,8 @@ def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
                 _check_quebec(add, section.id, variant.qc, ref)
 
     for path, text in _strings(lesson.model_dump(mode="json", exclude={"provenance"})):
-        if m := _NO_ELISION.search(text):
+        # Wrong options are deliberately wrong; the right one is checked with the answer keys.
+        if ".options." not in path and (m := _NO_ELISION.search(text)):
             add("error", path, f"missing elision: « {m.group(0)} »")
         parts = path.split(".")
         field = next((p for p in reversed(parts) if not p.isdigit()), "")

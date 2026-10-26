@@ -110,7 +110,7 @@ def test_revisions_stop_after_max_rounds(
             max_rounds=1,
         )
     job.refresh_from_db()
-    assert job.status == GenerationJob.Status.NEEDS_REVIEW  # errors: neither approved nor revised
+    assert job.status == GenerationJob.Status.APPROVED  # out of rounds: published as it is
     assert not GenerationJob.objects.filter(parent=job).exists()
 
 

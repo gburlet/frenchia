@@ -190,16 +190,18 @@ def test_auto_review_revises_a_draft_with_problems_then_hands_it_over(
         auto_review(job)
     child = GenerationJob.objects.get(parent=job)
     assert child.targets == ["ex-02"] and "too long" in child.notes
-    # After MAX_ROUNDS generations it is left for a human.
+    # After MAX_ROUNDS generations it is published as it is (the learner's rule).
     last = child
     for _ in range(MAX_ROUNDS - 2):
         last = GenerationJob.objects.create(
             lesson=job.lesson, kind="revision", parent=last, status="needs_review"
         )
-    last.validation = job.validation
+    last.validation, last.output = job.validation, job.output
     last.status = GenerationJob.Status.NEEDS_REVIEW
     last.save()
     messages: list[str] = []
     auto_review(last, messages.append)
     assert not GenerationJob.objects.filter(parent=last).exists()
-    assert "left for review" in messages[0]
+    assert "published after" in messages[0]
+    last.refresh_from_db()
+    assert last.status == GenerationJob.Status.APPROVED
