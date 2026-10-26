@@ -149,6 +149,10 @@ _LATEX = {
     r"$\times$": "×",
     r"$\cdot$": "·",
     "\\n": "\n",  # a literal backslash-n from JSON escaped twice
+    # « \rightarrow » / « \to » left unescaped in JSON arrive as a carriage return / tab.
+    "$\rightarrow$": "→",
+    "\rightarrow": "→",
+    "\to ": "→ ",
 }
 
 

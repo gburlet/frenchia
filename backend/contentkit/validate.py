@@ -187,6 +187,17 @@ _FORMATTING_REF = re.compile(
 )
 _BOLD = re.compile(r"\*\*")  # rendered only in explanations
 HINT_MAX = 160
+# « parce que il », « si il », « je ai »: elision is never optional in written French.
+_NO_ELISION = re.compile(
+    r"\b(?:(?:parce |lors|puis|jus)?que (?:il|ils|elle|elles|on|un|une)|si (?:il|ils)|"
+    r"je (?:ai|avais|aurai|étais|aime|habite|en|y))\b",
+    re.I,
+)
+# Québec usage (prompts.SYSTEM): « la fin de semaine », not « le week-end », except when the
+# text is comparing with France.
+_WEEK_END = re.compile(r"\b(?:le |ce |du |au |en )?week-?ends?\b", re.I)
+_ABOUT_FRANCE = re.compile(r"\bFrance\b|\beurop", re.I)
+_FRENCH_FIELDS = {"fr", "passage_fr", "example_fr", "sentence", "answers"}
 # « loin du le centre-ville », « grâce au le beau temps » (a filled blank or an answer key).
 _DOUBLE_ARTICLE = re.compile(r"\b(du|au|aux) (?:(le|la|les)\b|l['’])", re.I)
 # Bits of the generation prompt that reach the learner (« no slang that isn't in the verified
@@ -233,6 +244,14 @@ def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
                 _check_quebec(add, section.id, variant.qc, ref)
 
     for path, text in _strings(lesson.model_dump(mode="json", exclude={"provenance"})):
+        if m := _NO_ELISION.search(text):
+            add("error", path, f"missing elision: « {m.group(0)} »")
+        parts = path.split(".")
+        field = next((p for p in reversed(parts) if not p.isdigit()), "")
+        # Regional-note variants hold the France form in "fr" on purpose.
+        french = "variants" not in parts and field in _FRENCH_FIELDS
+        if french and (m := _WEEK_END.search(text)) and not _ABOUT_FRANCE.search(text):
+            add("error", path, f"« {m.group(0)} »: Québec usage is « la fin de semaine »")
         if FOREIGN_SCRIPT.search(text):
             add("error", path, f"text contains another script: {text[:60]!r}")
         if _VULGAR.search(text):
@@ -280,6 +299,8 @@ def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
         if any("(" in a or "[" in a for a in answers):
             add("error", ex.id, "an accepted answer is a full answer, with no notes in brackets")
         for text in _graded_french(ex):
+            if (m := _WEEK_END.search(text)) and not _ABOUT_FRANCE.search(text):
+                add("error", ex.id, f"« {m.group(0)} »: Québec usage is « la fin de semaine »")
             if m := _DOUBLE_ARTICLE.search(text):
                 add("error", ex.id, f"« {m.group(0)} »: du/au/aux already contain the article")
             for word in _unknown_words(text, ref):

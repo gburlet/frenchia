@@ -377,3 +377,19 @@ def test_meal_names_are_checked_in_example_sentences_too() -> None:
     )
     found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
     assert any(m.startswith("error:Québec meals: « dîné »") for m in found)
+
+
+def test_missing_elision_and_week_end_are_errors() -> None:
+    data = lesson_data()
+    data["exercises"][1]["accepted_answers"] = ["Parce que il pleut, on reste.", "On reste."]
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert "error:missing elision: « Parce que il »" in found
+    data["exercises"][1]["accepted_answers"] = ["On a magasiné ce week-end.", "On a magasiné."]
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert "error:« ce week-end »: Québec usage is « la fin de semaine »" in found
+    data["exercises"][1]["hint"] = "En France on dit « le week-end »."
+    assert not [
+        m
+        for m in messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+        if "hint" in m and "week" in m
+    ]
