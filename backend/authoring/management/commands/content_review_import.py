@@ -73,8 +73,11 @@ class Command(BaseCommand):
             elif options["revise"] and (job.external_review or attention or job.error_count):
                 if attention:
                     line += f", {len(attention)} unverified Québec claims"
-                if generation_round(job) >= options["max_rounds"]:
-                    line += f" -> left for manual review after {options['max_rounds']} rounds"
+                # A lesson that is already live gets more rounds: each draft is usually better
+                # than the published version, which stays up while it converges.
+                limit = options["max_rounds"] + (2 if job.lesson.published_revision_id else 0)
+                if generation_round(job) >= limit:
+                    line += f" -> left for manual review after {limit} rounds"
                 else:
                     # Errors only: rewriting for every suggestion introduced new errors.
                     parts = [
