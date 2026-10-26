@@ -395,6 +395,21 @@ def test_missing_elision_and_week_end_are_errors() -> None:
     ]
 
 
+def test_other_france_forms_are_errors_in_french_text() -> None:
+    data = lesson_data()
+    for answer, word in [
+        ("Je prends mon petit-déjeuner.", "petit-déjeuner"),
+        ("Nous faisons du shopping.", "faisons du shopping"),
+        ("Elle a envoyé un e-mail.", "e-mail"),
+    ]:
+        data["exercises"][1]["accepted_answers"] = [answer]
+        found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+        assert any(m.startswith(f"error:« {word} »") for m in found), (answer, found)
+    data["exercises"][1]["accepted_answers"] = ["En France, on dit petit-déjeuner."]
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert not [m for m in found if "petit-déjeuner" in m]
+
+
 def test_elision_is_checked_in_the_filled_sentence() -> None:
     data = lesson_data()
     data["exercises"][0] |= {"sentence": "On reste, ___ il pleut.", "answers": ["parce que"]}

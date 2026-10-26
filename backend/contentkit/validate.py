@@ -201,6 +201,25 @@ _NO_ELISION = re.compile(
 # text is comparing with France.
 _WEEK_END = re.compile(r"\b(?:le |ce |du |au |en )?week-?ends?\b", re.I)
 _ABOUT_FRANCE = re.compile(r"\bFrance\b|\beurop", re.I)
+# Other France forms the model keeps using where Québec has its own default.
+_FRANCE_FORMS = [
+    (_WEEK_END, "Québec usage is « la fin de semaine »"),
+    (re.compile(r"\bpetits?[- ]d[ée]jeuners?\b", re.I), "the Québec morning meal is « le déjeuner »"),
+    (
+        re.compile(r"\b(?:fai[a-z]*|fera[a-z]*|fit|fai[st]) du shopping\b", re.I),
+        "Québec usage is « magasiner »",
+    ),
+    (re.compile(r"\be-?mails?\b", re.I), "Québec usage is « un courriel »"),
+]
+
+
+def _france_form(text: str) -> str | None:
+    if _ABOUT_FRANCE.search(text):
+        return None
+    for pattern, message in _FRANCE_FORMS:
+        if m := pattern.search(text):
+            return f"« {m.group(0)} »: {message}"
+    return None
 _FRENCH_FIELDS = {"fr", "passage_fr", "example_fr", "sentence", "answers"}
 # « loin du le centre-ville », « grâce au le beau temps » (a filled blank or an answer key).
 # « loin de le centre-ville »: after a compound preposition de + le/les must contract. (Before a
@@ -274,8 +293,8 @@ def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
         field = next((p for p in reversed(parts) if not p.isdigit()), "")
         # Regional-note variants hold the France form in "fr" on purpose.
         french = "variants" not in parts and field in _FRENCH_FIELDS
-        if french and (m := _WEEK_END.search(text)) and not _ABOUT_FRANCE.search(text):
-            add("error", path, f"« {m.group(0)} »: Québec usage is « la fin de semaine »")
+        if french and (problem := _france_form(text)):
+            add("error", path, problem)
         if FOREIGN_SCRIPT.search(text):
             add("error", path, f"text contains another script: {text[:60]!r}")
         if _VULGAR.search(text):
@@ -325,8 +344,8 @@ def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
         for text in _graded_french(ex):
             if m := _NO_ELISION.search(text):  # a filled blank: « ___ il » + « parce que »
                 add("error", ex.id, f"missing elision once filled: « {m.group(0)} »")
-            if (m := _WEEK_END.search(text)) and not _ABOUT_FRANCE.search(text):
-                add("error", ex.id, f"« {m.group(0)} »: Québec usage is « la fin de semaine »")
+            if problem := _france_form(text):
+                add("error", ex.id, problem)
             if m := _NO_CONTRACTION.search(text):
                 add("error", ex.id, f"« {m.group(0)} »: de + le/les contract (du/des)")
             if m := _DOUBLE_ARTICLE.search(text):
