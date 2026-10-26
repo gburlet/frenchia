@@ -18,6 +18,7 @@ from contentkit.models import (
     TranslateExercise,
 )
 from contentkit.validate import Issue
+from inference.errors import InvalidOutput
 from inference.llm import ChatModel, Message, complete_structured
 
 from . import prompts
@@ -77,7 +78,10 @@ def critique(
             Message("system", prompts.SYSTEM),
             Message("user", prompts.CRITIC.format(level=lesson.level, sentence=sentence)),
         ]
-        result, completion = complete_structured(chat, messages, Critique, max_tokens=400)
+        try:
+            result, completion = complete_structured(chat, messages, Critique, max_tokens=400)
+        except InvalidOutput:  # one unreadable check must not sink the whole job
+            continue
         if record:
             record(completion.latency_ms / 1000, completion.completion_tokens or 0)
         if result.correct:
@@ -120,7 +124,10 @@ def solve_choices(
                 ),
             ),
         ]
-        result, completion = complete_structured(chat, messages, Solution, max_tokens=200)
+        try:
+            result, completion = complete_structured(chat, messages, Solution, max_tokens=200)
+        except InvalidOutput:
+            continue
         if record:
             record(completion.latency_ms / 1000, completion.completion_tokens or 0)
         chosen = sorted(set(result.correct_options))
@@ -163,7 +170,10 @@ def check_blanks(
                 ),
             ),
         ]
-        result, completion = complete_structured(chat, messages, BlankCheck, max_tokens=300)
+        try:
+            result, completion = complete_structured(chat, messages, BlankCheck, max_tokens=300)
+        except InvalidOutput:
+            continue
         if record:
             record(completion.latency_ms / 1000, completion.completion_tokens or 0)
         keyed = {_key(a) for a in ex.answers}
