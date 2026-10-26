@@ -31,3 +31,7 @@ verbecc.log
 # Generated lesson drafts are reviewed in Admin; only approved lessons are committed
 /content/drafts/*
 !/content/drafts/.gitkeep
+
+# API credentials (never commit)
+aleph_creds.txt
+*_creds.txt

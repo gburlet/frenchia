@@ -27,7 +27,7 @@ def root(settings: Any, tmp_path: Path) -> Path:
 
 @pytest.fixture(autouse=True)
 def scripted_llm() -> Any:
-    with patch("authoring.services.get_chat_model", return_value=ScriptedChat()):
+    with patch("authoring.services.get_authoring_chat_model", return_value=ScriptedChat()):
         yield
 
 
@@ -123,14 +123,27 @@ def test_failures_are_recorded(root: Path) -> None:
 def test_recover_jobs_requeues_interrupted_jobs(
     root: Path, django_capture_on_commit_callbacks: Callable[..., Any]
 ) -> None:
-    from django.core.management import call_command
+    from datetime import timedelta
 
-    job = create_job(Lesson.objects.get(slug="a2-passe-compose-er"), enqueue=False)
-    GenerationJob.objects.filter(pk=job.pk).update(status=GenerationJob.Status.RUNNING)
+    from django.core.management import call_command
+    from django.utils import timezone
+
+    lesson = Lesson.objects.get(slug="a2-passe-compose-er")
+    job = create_job(lesson, enqueue=False)
+    long_ago = timezone.now() - timedelta(minutes=30)
+    GenerationJob.objects.filter(pk=job.pk).update(
+        status=GenerationJob.Status.RUNNING, started_at=long_ago
+    )
+    active = create_job(lesson, enqueue=False)  # another worker is running this one right now
+    GenerationJob.objects.filter(pk=active.pk).update(
+        status=GenerationJob.Status.RUNNING, started_at=timezone.now()
+    )
     with django_capture_on_commit_callbacks(execute=False) as callbacks:
         call_command("recover_jobs")
     job.refresh_from_db()
+    active.refresh_from_db()
     assert job.status == GenerationJob.Status.QUEUED and len(callbacks) == 1
+    assert active.status == GenerationJob.Status.RUNNING
     assert "Interrupted" in job.progress[-1]["message"]
     assert run_job(job.pk).status == GenerationJob.Status.NEEDS_REVIEW  # runs normally again
 
@@ -145,7 +158,7 @@ class DownChat(ScriptedChat):
 def test_an_unavailable_llm_requeues_the_job_instead_of_failing_it(root: Path) -> None:
     job = create_job(Lesson.objects.get(slug="a2-passe-compose-er"), enqueue=False)
     with (
-        patch("authoring.services.get_chat_model", return_value=DownChat()),
+        patch("authoring.services.get_authoring_chat_model", return_value=DownChat()),
         patch("authoring.services._enqueue") as enqueue,
     ):
         for _ in range(7):
@@ -154,3 +167,39 @@ def test_an_unavailable_llm_requeues_the_job_instead_of_failing_it(root: Path) -
     assert "run_after" in enqueue.call_args.kwargs
     assert job.status == GenerationJob.Status.FAILED
     assert sum(p["message"].startswith("LLM unavailable") for p in job.progress) == 6
+
+
+def test_without_external_review_a_clean_draft_is_published(root: Path, settings: Any) -> None:
+    settings.AUTHORING = {**settings.AUTHORING, "EXTERNAL_REVIEW": False}
+    job = generated(root)
+    assert job.status == GenerationJob.Status.APPROVED, job.progress[-1]
+    assert Lesson.objects.get(slug="a2-passe-compose-er").published_revision is not None
+
+
+def test_auto_review_revises_a_draft_with_problems_then_hands_it_over(
+    root: Path, django_capture_on_commit_callbacks: Any
+) -> None:
+    from authoring.services import MAX_ROUNDS, auto_review
+
+    job = generated(root)
+    job.validation = [
+        {"severity": "error", "path": "a2-passe-compose-er:ex-02.hint", "message": "too long"}
+    ]
+    job.save()
+    with django_capture_on_commit_callbacks(execute=False):
+        auto_review(job)
+    child = GenerationJob.objects.get(parent=job)
+    assert child.targets == ["ex-02"] and "too long" in child.notes
+    # After MAX_ROUNDS generations it is left for a human.
+    last = child
+    for _ in range(MAX_ROUNDS - 2):
+        last = GenerationJob.objects.create(
+            lesson=job.lesson, kind="revision", parent=last, status="needs_review"
+        )
+    last.validation = job.validation
+    last.status = GenerationJob.Status.NEEDS_REVIEW
+    last.save()
+    messages: list[str] = []
+    auto_review(last, messages.append)
+    assert not GenerationJob.objects.filter(parent=last).exists()
+    assert "left for review" in messages[0]

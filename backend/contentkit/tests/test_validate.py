@@ -268,6 +268,8 @@ def test_answer_keys_must_be_real_french_words() -> None:
     assert found == ["error:'bonned' is not a French word (not in Lexique)"]
     data["exercises"][0]["answers"] = ["ai mangé"]
     assert check_lesson_quality(Lesson.model_validate(data), ref) == []
+    data["exercises"][1]["accepted_answers"] = ["On a magasiné.", "L'ingénieure a magasiné."]
+    assert check_lesson_quality(Lesson.model_validate(data), ref) == []  # feminine form
 
 
 def test_quebec_meal_names_in_translations() -> None:
@@ -299,3 +301,22 @@ def test_quebec_meal_names_in_translations() -> None:
         "Québec meals"
         in messages(check_lesson_quality(Lesson.model_validate(data), reference()))[0]
     )
+
+
+def test_accepted_answers_carry_no_notes() -> None:
+    data = lesson_data()
+    data["exercises"][1]["accepted_answers"] = [
+        "On a magasiné.",
+        "Nous avons fait du shopping. (France)",
+    ]
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert found == ["error:an accepted answer is a full answer, with no notes in brackets"]
+
+
+def test_an_english_right_option_is_not_checked_as_french() -> None:
+    ref = reference()
+    ref.words = frozenset({"avoir", "chienne", "qu'est-ce", "veut", "dire"})
+    data = lesson_data()
+    data["exercises"][2] |= {"options": ["To be frightened or anxious.", "To own a dog."]}
+    issues = check_lesson_quality(Lesson.model_validate(data), ref)
+    assert not [i for i in issues if i.path.endswith("ex-03") and "French word" in i.message]

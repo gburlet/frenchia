@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand, CommandParser
 from authoring.bank_workflow import import_reviews
 from authoring.bankgen import BankGenerator
 from curriculum import content
-from inference.providers import get_chat_model
+from inference.providers import get_authoring_chat_model
 
 
 class Command(BaseCommand):
@@ -22,7 +22,7 @@ class Command(BaseCommand):
     def handle(self, *args: Any, **options: Any) -> None:
         ref = content.reference()
         generator = (
-            BankGenerator(get_chat_model(), ref, model_name=settings.INFERENCE["LLM_MODEL"])
+            BankGenerator(chat := get_authoring_chat_model(), ref, model_name=chat.model)
             if options["revise"]
             else None
         )

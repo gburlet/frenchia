@@ -50,7 +50,7 @@ def job(settings: Any, tmp_path: Path) -> GenerationJob:
     root = make_repo(tmp_path / "content", lessons=[])
     settings.CONTENT_DIR = root
     import_content(root)
-    with patch("authoring.services.get_chat_model", return_value=ScriptedChat()):
+    with patch("authoring.services.get_authoring_chat_model", return_value=ScriptedChat()):
         job = create_job(Lesson.objects.get(slug="a2-passe-compose-er"), enqueue=False)
         return run_job(job.pk)
 

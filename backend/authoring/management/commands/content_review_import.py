@@ -12,15 +12,7 @@ from authoring.external_review import (
     warning_notes,
 )
 from authoring.models import GenerationJob
-from authoring.services import ReviewError, approve, request_revision
-
-
-def _round(job: GenerationJob) -> int:
-    """How many generations led to this job (1 for a fresh draft)."""
-    depth = 1
-    while job.parent_id is not None:
-        job, depth = job.parent, depth + 1  # type: ignore[assignment]
-    return depth
+from authoring.services import ReviewError, approve, generation_round, request_revision
 
 
 class Command(BaseCommand):
@@ -66,7 +58,7 @@ class Command(BaseCommand):
             elif options["revise"] and (job.external_review or attention or job.error_count):
                 if attention:
                     line += f", {len(attention)} unverified Québec claims"
-                if _round(job) >= options["max_rounds"]:
+                if generation_round(job) >= options["max_rounds"]:
                     line += f" -> left for manual review after {options['max_rounds']} rounds"
                 else:
                     parts = [revision_notes(job), warning_notes(attention), validation_notes(job)]

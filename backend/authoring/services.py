@@ -20,7 +20,7 @@ from curriculum.importer import import_content
 from curriculum.models import GrammarTopic, Lesson
 from inference.errors import InferenceTimeout, InferenceUnavailable
 from inference.llm import ChatModel
-from inference.providers import get_chat_model
+from inference.providers import get_authoring_chat_model
 
 from .generation import GenerationResult, LessonBrief, LessonGenerator, LessonReviser
 from .models import GenerationJob
@@ -28,6 +28,7 @@ from .writer import ContentWriter, WriteConflict
 
 logger = logging.getLogger(__name__)
 
+MAX_ROUNDS = 4  # generations of one draft before auto-review hands it to a human
 RETRY_NOTE = "LLM unavailable"
 RETRY_DELAY = timedelta(minutes=5)
 MAX_RETRIES = 6
@@ -99,7 +100,7 @@ def run_job(job_id: int) -> GenerationJob:
     if job.status != GenerationJob.Status.QUEUED:
         return job
     writer = ContentWriter(_root())
-    chat = get_chat_model()
+    chat = get_authoring_chat_model()
     job.status, job.started_at, job.model = GenerationJob.Status.RUNNING, timezone.now(), chat.model
     job.save(update_fields=["status", "started_at", "model"])
 
@@ -142,7 +143,52 @@ def run_job(job_id: int) -> GenerationJob:
         job.error = f"{exc}\n\n{traceback.format_exc()}"
     job.finished_at = timezone.now()
     job.save()
+    if (
+        job.status == GenerationJob.Status.NEEDS_REVIEW
+        and not settings.AUTHORING["EXTERNAL_REVIEW"]
+    ):
+        auto_review(job, progress)
     return job
+
+
+def generation_round(job: GenerationJob) -> int:
+    """How many generations led to this job (1 for a fresh draft)."""
+    depth = 1
+    while job.parent_id is not None:
+        job, depth = job.parent, depth + 1  # type: ignore[assignment]
+    return depth
+
+
+def auto_review(job: GenerationJob, progress: Callable[[str], None] | None = None) -> None:
+    """Review without an external proof-reader (a large remote author, ADR 0007): publish a
+    draft that passes every deterministic check and that the AI critic did not flag; otherwise
+    queue a revision with the problems as notes, and after MAX_ROUNDS leave it for a human."""
+    from .external_review import critic_flags, needs_attention, validation_notes, warning_notes
+
+    note = progress or (lambda message: None)
+    attention, critic = needs_attention(job), critic_flags(job)
+    if not job.error_count and not attention and not critic:
+        try:
+            note(f"Auto-review: published {approve(job).name}")
+        except ReviewError as exc:
+            note(f"Auto-review: not published: {exc}")
+        return
+    if generation_round(job) >= MAX_ROUNDS:
+        note(f"Auto-review: still has problems after {MAX_ROUNDS} rounds; left for review")
+        return
+    parts = [validation_notes(job), warning_notes(attention), critic_notes(critic)]
+    notes = "\n".join(n for n, _ in parts if n)
+    child = request_revision(job, notes, sorted({t for _, ts in parts for t in ts}))
+    note(f"Auto-review: revision job {child.pk} queued")
+
+
+def critic_notes(flags: list[dict[str, str]]) -> tuple[str, list[str]]:
+    notes = "\n".join(
+        f"- {f['path'].split(':', 1)[-1]}: {f['message']} Fix it if it is a real error."
+        for f in flags
+    )
+    targets = sorted({f["path"].split(":", 1)[1] for f in flags if ":" in f["path"]})
+    return notes, targets
 
 
 def _enqueue(job: GenerationJob, **options: Any) -> None:

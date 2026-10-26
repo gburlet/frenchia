@@ -187,6 +187,9 @@ _FORMATTING_REF = re.compile(
 )
 _BOLD = re.compile(r"\*\*")  # rendered only in explanations
 HINT_MAX = 160
+# Bits of the generation prompt that reach the learner (« no slang that isn't in the verified
+# list »).
+_PROMPT_LEAK = re.compile(r"verified (list|lexicon|usage)|\bthe lexicon\b|\bJSON\b", re.I)
 
 
 def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
@@ -247,6 +250,8 @@ def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
             add("error", ex.id, f"repeats {seen[stem]}")
         seen.setdefault(stem, ex.id)
         for path, text in _strings(ex.model_dump(mode="json")):
+            if _PROMPT_LEAK.search(text):
+                add("error", f"{ex.id}.{path}", "text mentions the generation instructions")
             if _FORMATTING_REF.search(text) or (
                 _BOLD.search(text) and not path.endswith("explanation")
             ):
@@ -267,6 +272,9 @@ def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
                         ex.id,
                         f"explanation quotes text that is not in the reading: {text!r}",
                     )
+        answers = [*getattr(ex, "answers", []), *getattr(ex, "accepted_answers", [])]
+        if any("(" in a or "[" in a for a in answers):
+            add("error", ex.id, "an accepted answer is a full answer, with no notes in brackets")
         for text in _graded_french(ex):
             for word in _unknown_words(text, ref):
                 add("error", ex.id, f"{word!r} is not a French word (not in Lexique)")
@@ -320,16 +328,20 @@ _TOKEN = re.compile(r"[^\W\d_]+(?:['’-][^\W\d_]+)*")
 
 def _unknown_words(text: str, ref: Reference) -> list[str]:
     """Words in French text that no dictionary knows (« bonned »). Capitalised words are
-    skipped as likely names; hyphenated words pass if the whole or every part is known."""
+    skipped as likely names; hyphenated words pass if the whole or every part is known.
+    Text that is mostly unknown words is English (« To be scared or nervous »), not French."""
     unknown = []
-    for token in _TOKEN.findall(text):
-        if len(token) < 3 or token[0].isupper() or ref.is_word(token):
+    tokens = [t for t in _TOKEN.findall(text) if len(t) >= 3 and not t[0].isupper()]
+    for token in tokens:
+        if ref.is_word(token):
             continue
         # « aujourd'hui » is one word; « l'épicerie », « est-ce » are known parts.
         parts = re.split(r"['’-]", token)
         if len(parts) > 1 and all(len(p) < 3 or ref.is_word(p) for p in parts):
             continue
         unknown.append(token)
+    if _looks_english(text) or len(unknown) * 2 > len(tokens):
+        return []
     return unknown
 
 
@@ -378,8 +390,7 @@ def _graded_french(ex: object) -> list[str]:
         return list(ex.accepted_answers) if ex.direction == "en_fr" else [ex.prompt]
     if isinstance(ex, MultipleChoiceExercise | ComprehensionExercise):
         # Only the right answer: wrong options are often deliberately wrong forms (« j'ai finé »).
-        right = ex.options[ex.answer_index]
-        return [] if _looks_english(right) else [right]
+        return [ex.options[ex.answer_index]]
     return []
 
 

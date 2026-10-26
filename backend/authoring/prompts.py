@@ -5,7 +5,7 @@ PROMPT_VERSIONS = {
     "author.system": "2",
     "author.steps": "3",
     "author.revise": "1",
-    "author.critic": "1",
+    "author.critic": "3",
     "author.practice": "1",
     "bank.verb": "4",
     "bank.vocab": "2",
@@ -123,7 +123,9 @@ List every problem. severity 'error' = anything a teacher would mark wrong (gram
 missing or wrong preposition, article, tense, spelling or accent, unnatural word choice); \
 'minor' = acceptable but could be more natural. Québec usage and informal spoken forms are \
 correct. Before concluding there are no errors, check verb constructions (parler à, penser à, \
-téléphoner à), agreement, articles, prepositions and elision. Do not invent errors."""
+téléphoner à), agreement, articles, prepositions and elision. Do not invent errors.
+Set "correct" to true when the sentence has no error; then "errors" lists only minor points \
+(or nothing)."""
 
 PRACTICE = """\
 You are now writing extra practice for one learner who has finished this lesson. Their recent \
@@ -132,6 +134,15 @@ mistakes on its topic:
 Write new items that practise the same points as these mistakes (not the same sentences), in \
 everyday Québec situations. Keep them short and at CEFR {level}.
 """
+
+
+SOLVE = """\
+Answer this question from a CEFR {level} French exercise as a careful teacher would.
+{passage}Question: {question}
+Options (numbered from 0):
+{options}
+List the number of EVERY option that is correct (grammatical, natural and right for the \
+question). Usually that is exactly one."""
 
 
 # --- Verb and vocabulary banks (Phase 6) ---------------------------------------------------

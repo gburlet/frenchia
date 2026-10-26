@@ -11,6 +11,7 @@ from inference.providers import reset_providers
 def fake_inference(settings: Any, tmp_path: Path) -> Iterator[None]:
     """Tests never call the native LLM/TTS: use the deterministic fakes and a temp cache."""
     settings.INFERENCE = {**settings.INFERENCE, "MODE": "fake"}
+    settings.AUTHORING = {**settings.AUTHORING, "LLM": "local", "EXTERNAL_REVIEW": True}
     settings.AUDIO_CACHE_DIR = tmp_path / "audio"
     reset_providers()
     yield

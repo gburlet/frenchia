@@ -7,7 +7,15 @@ from typing import Literal
 
 from pydantic import BaseModel
 
-from contentkit.models import BLANK, FillBlankExercise, Lesson, TranslateExercise
+from contentkit.models import (
+    BLANK,
+    ComprehensionExercise,
+    FillBlankExercise,
+    Lesson,
+    MultipleChoiceExercise,
+    ReadingSection,
+    TranslateExercise,
+)
 from contentkit.validate import Issue
 from inference.llm import ChatModel, Message, complete_structured
 
@@ -20,7 +28,14 @@ class Finding(BaseModel):
     explanation: str
 
 
+class Solution(BaseModel):
+    correct_options: list[int]
+
+
 class Critique(BaseModel):
+    # An explicit verdict first: gpt-oss otherwise files "None, the sentence is correct" as an
+    # error entry.
+    correct: bool
     errors: list[Finding]
 
 
@@ -51,8 +66,10 @@ def critique(
         result, completion = complete_structured(chat, messages, Critique, max_tokens=400)
         if record:
             record(completion.latency_ms / 1000, completion.completion_tokens or 0)
+        if result.correct:
+            continue
         for finding in result.errors:
-            if finding.severity == "error":
+            if finding.severity == "error" and finding.span.strip():
                 issues.append(
                     Issue(
                         "warning",
@@ -60,4 +77,47 @@ def critique(
                         f"AI critic on {sentence!r}: {finding.span!r}: {finding.explanation}",
                     )
                 )
+    return issues
+
+
+def solve_choices(
+    chat: ChatModel, lesson: Lesson, record: Callable[[float, int], None] | None = None
+) -> list[Issue]:
+    """Answer every multiple-choice and comprehension question without its key: a key the
+    model doesn't reach, or a second correct option, is flagged (AI critic warning). Wrong
+    keys were the commonest error in generated lessons, and the sentence critic can't see
+    them."""
+    passages = {s.id: s.passage_fr for s in lesson.sections if isinstance(s, ReadingSection)}
+    issues: list[Issue] = []
+    for ex in lesson.exercises:
+        if not isinstance(ex, MultipleChoiceExercise | ComprehensionExercise):
+            continue
+        passage = passages.get(ex.reading_id, "") if isinstance(ex, ComprehensionExercise) else ""
+        options = "\n".join(f"{i}: {o}" for i, o in enumerate(ex.options))
+        messages = [
+            Message("system", prompts.SYSTEM),
+            Message(
+                "user",
+                prompts.SOLVE.format(
+                    level=lesson.level,
+                    passage=f"Reading passage:\n{passage}\n\n" if passage else "",
+                    question=ex.question,
+                    options=options,
+                ),
+            ),
+        ]
+        result, completion = complete_structured(chat, messages, Solution, max_tokens=200)
+        if record:
+            record(completion.latency_ms / 1000, completion.completion_tokens or 0)
+        chosen = sorted(set(result.correct_options))
+        if chosen != [ex.answer_index]:
+            issues.append(
+                Issue(
+                    "warning",
+                    f"{lesson.id}:{ex.id}",
+                    f"AI critic solved the question: correct option(s) {chosen}, but the key is "
+                    f"{ex.answer_index} (options are numbered from 0). Make exactly one option "
+                    "correct and the key point to it.",
+                )
+            )
     return issues

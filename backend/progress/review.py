@@ -22,7 +22,7 @@ from contentkit.yamlio import content_hash
 from curriculum import content
 from curriculum.models import Exercise, ExerciseRevision, GrammarTopic, Lesson
 from exercises.models import ExerciseAttempt, MistakeOccurrence
-from inference.providers import get_chat_model
+from inference.providers import get_authoring_chat_model
 
 from .models import ReviewItem, ReviewSet, TopicMastery
 
@@ -235,7 +235,7 @@ def generate_extras(review_id: int) -> ReviewSet:
     log: list[dict[str, Any]] = []
     try:
         ref = content.reference()
-        chat = get_chat_model()
+        chat = get_authoring_chat_model()
         for entry in review.topics[:GENERATED_TOPICS]:
             lesson = _lesson_for(entry["id"])
             if lesson is None or lesson.published_revision is None:

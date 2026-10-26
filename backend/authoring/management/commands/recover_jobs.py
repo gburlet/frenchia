@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from functools import partial
 from typing import Any
 
@@ -7,17 +8,33 @@ from django.utils import timezone
 
 from authoring.models import GenerationJob
 
+QUIET_FOR = timedelta(minutes=10)
+
+
+def _last_activity(job: GenerationJob) -> datetime:
+    if job.progress:
+        return datetime.fromisoformat(job.progress[-1]["at"])
+    return job.started_at or job.created_at
+
 
 class Command(BaseCommand):
     help = (
         "Requeue generation jobs left 'running' by a stopped worker. Run at worker start: with a "
-        "single worker, any job still marked running at that moment was interrupted."
+        "single worker, any job still marked running at that moment was interrupted; with "
+        "several, only jobs quiet for 10 minutes are."
     )
 
     def handle(self, *args: Any, **options: Any) -> None:
         from authoring.tasks import run_generation_job
 
-        stale = list(GenerationJob.objects.filter(status=GenerationJob.Status.RUNNING))
+        # With several workers, another worker may be running a job right now: only jobs that
+        # have shown no progress for a while were interrupted.
+        cutoff = timezone.now() - QUIET_FOR
+        stale = [
+            job
+            for job in GenerationJob.objects.filter(status=GenerationJob.Status.RUNNING)
+            if _last_activity(job) < cutoff
+        ]
         for job in stale:
             note = {
                 "at": timezone.now().isoformat(timespec="seconds"),

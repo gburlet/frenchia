@@ -57,6 +57,10 @@ services:
     # No auto-reload: a code reload would kill a running generation. `just restart worker` to pick
     # up code changes; jobs interrupted by a restart are requeued at startup.
     command: ["sh", "-c", "python manage.py recover_jobs && exec python manage.py db_worker --no-reload"]
+    # Several workers only make sense with a remote AUTHORING_LLM (the local one serves one
+    # request at a time); see .env.example.
+    deploy:
+      replicas: ${WORKER_REPLICAS:-1}
     depends_on:
       db:
         condition: service_healthy

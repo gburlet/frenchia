@@ -8,7 +8,7 @@ from authoring.bank_workflow import LIVE, Bank, Kind, drafts, next_version, writ
 from authoring.bankgen import BankGenerator
 from contentkit.models import VerbBank
 from curriculum import content
-from inference.providers import get_chat_model
+from inference.providers import get_authoring_chat_model
 
 
 class Command(BaseCommand):
@@ -25,10 +25,11 @@ class Command(BaseCommand):
     def handle(self, *args: Any, **options: Any) -> None:
         root = Path(settings.CONTENT_DIR)
         ref, banks = content.reference(), content.banks()
+        chat = get_authoring_chat_model()
         generator = BankGenerator(
-            get_chat_model(),
+            chat,
             ref,
-            model_name=f"ollama/{settings.INFERENCE['LLM_MODEL']}",
+            model_name=chat.model,
             progress=lambda m: self.stdout.write(f"  {m}"),
         )
         kind: Kind = "verbs" if options["kind"] == "verbs" else "vocabulary"

@@ -3,7 +3,7 @@ assigns those) so outputs stay small and focused; the generator converts them in
 contentkit models."""
 
 import re
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -84,26 +84,38 @@ class ReadingStep(Step):
     glossary: list[VocabDraft] = Field(min_length=3, max_length=8)
 
 
+# Field limits and descriptions keep larger models from packing a whole exercise (heading,
+# numbered answers, hint) into one field.
+Answer = Annotated[
+    str, Field(max_length=200, description="One complete answer, with no notes or brackets")
+]
+
+
 class FillBlankDraft(Step):
-    sentence: str = Field(description="French sentence containing exactly one ___")
-    answers: list[str] = Field(min_length=1, max_length=3)
+    sentence: str = Field(max_length=200, description="French sentence containing exactly one ___")
+    answers: list[Answer] = Field(min_length=1, max_length=3)
     hint: str = Field(
-        description="Infinitive in parentheses when the blank is a verb, e.g. (aller)"
+        max_length=160,
+        description="Infinitive in parentheses when the blank is a verb, e.g. (aller); "
+        "never the answer",
     )
-    translation_en: str
+    translation_en: str = Field(max_length=250)
 
 
 class TranslateDraft(Step):
-    prompt: str
-    accepted_answers: list[str] = Field(min_length=2, max_length=4)
-    hint: str
+    prompt: str = Field(
+        max_length=200,
+        description="Only the one sentence to translate: no heading, answers or hint",
+    )
+    accepted_answers: list[Answer] = Field(min_length=2, max_length=4)
+    hint: str = Field(max_length=160, description="One short line")
 
 
 class ChoiceDraft(Step):
-    question: str
-    options: list[str] = Field(min_length=3, max_length=4)
+    question: str = Field(max_length=300)
+    options: list[Annotated[str, Field(max_length=200)]] = Field(min_length=3, max_length=4)
     answer_index: int = Field(ge=0, le=3)
-    explanation: str
+    explanation: str = Field(max_length=600)
 
 
 def batch(item: type[Step], count: int) -> type[Step]:

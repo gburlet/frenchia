@@ -131,6 +131,24 @@ INFERENCE = {
     "TTS_VOICE": env("INFERENCE_TTS_VOICE", default="ff_siwis"),
     "TTS_TIMEOUT_S": env.float("INFERENCE_TTS_TIMEOUT_S", default=60.0),
 }
+# Which LLM writes learning content (lessons, verb/vocabulary banks, review extras): "local"
+# uses the LLM above; "remote" an OpenAI-compatible server (e.g. the Alliance's gpt-oss-120b).
+# Grading and the tutor always use the local LLM. With a remote author, drafts that pass the
+# deterministic checks are published without the external (Haiku) proof-read.
+AUTHORING = {
+    "LLM": env("AUTHORING_LLM", default="local"),
+    "BASE_URL": env("AUTHORING_LLM_BASE_URL", default=""),
+    "MODEL": env("AUTHORING_LLM_MODEL", default="gpt-oss-120b"),
+    "API_KEY": env("AUTHORING_LLM_API_KEY", default=""),
+    "REASONING_EFFORT": env("AUTHORING_LLM_REASONING_EFFORT", default="low"),
+    "TIMEOUT_S": env.float("AUTHORING_LLM_TIMEOUT_S", default=300.0),
+    # Reasoning models spend output tokens on hidden reasoning; added to each request's max.
+    "REASONING_TOKENS": env.int("AUTHORING_LLM_REASONING_TOKENS", default=4000),
+    "EXTERNAL_REVIEW": env.bool(
+        "AUTHORING_EXTERNAL_REVIEW", default=env("AUTHORING_LLM", default="local") == "local"
+    ),
+}
+
 # Version-controlled learning content (mounted at /content in Docker)
 CONTENT_DIR = Path(env("CONTENT_DIR", default=str(BASE_DIR.parent / "content")))
 

@@ -150,7 +150,10 @@ class ScriptedChat:
         if title == "Critique":
             sentence = messages[-1].content.split("Sentence: ", 1)[1].split("\n", 1)[0]
             errors = [{"severity": "error", "span": "a parlé son ami", "explanation": "parler à"}]
-            data = {"errors": errors if "parlé son ami" in sentence else []}
+            bad = "parlé son ami" in sentence
+            data = {"correct": not bad, "errors": errors if bad else []}
+        elif title == "Solution":  # scripted choice questions all have answer_index 1
+            data = {"correct_options": [1]}
         elif title in STEP_OUTPUTS:
             data = STEP_OUTPUTS[title]
         elif title.startswith("FillBlankDraftBatch"):

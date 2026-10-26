@@ -1,5 +1,6 @@
 import json
 from collections.abc import Callable
+from typing import Any
 
 import httpx
 import pytest
@@ -128,3 +129,53 @@ def test_complete_structured_gives_up_with_invalid_output() -> None:
 def test_fake_chat_model_produces_schema_shaped_json() -> None:
     result, _ = complete_structured(FakeChatModel(), [Message("user", "x")], Verdict)
     assert result == Verdict(verdict="test", score=0)
+
+
+def test_remote_author_sends_key_reasoning_budget_and_waits_for_a_waking_model(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    sleeps: list[float] = []
+    monkeypatch.setattr("inference.llm.time.sleep", sleeps.append)
+    seen: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request)
+        if len(seen) == 1:
+            return httpx.Response(503, headers={"Retry-After": "20"}, text="model_scaled_to_zero")
+        return ok_response("{}")
+
+    chat = chat_model(
+        handler,
+        api_key="secret",
+        extra_body={"reasoning_effort": "low"},
+        reasoning_tokens=4000,
+        wake_wait_s=240.0,
+    )
+    chat.complete([Message("user", "hi")], max_tokens=800)
+    body = json.loads(seen[-1].content)
+    assert seen[-1].headers["authorization"] == "Bearer secret"
+    assert body["max_tokens"] == 4800 and body["reasoning_effort"] == "low"
+    assert sleeps == [20.0]
+
+
+def test_a_503_without_wake_wait_is_unavailable() -> None:
+    chat = chat_model(lambda r: httpx.Response(503, text="insufficient_capacity"))
+    with pytest.raises(InferenceUnavailable):
+        chat.complete([Message("user", "hi")])
+
+
+def test_authoring_model_is_local_unless_configured_remote(settings: Any) -> None:
+    from inference.providers import get_authoring_chat_model, get_chat_model, reset_providers
+
+    settings.INFERENCE = {**settings.INFERENCE, "MODE": "live"}
+    reset_providers()
+    assert get_authoring_chat_model() is get_chat_model()
+    settings.AUTHORING = {
+        **settings.AUTHORING,
+        "LLM": "remote",
+        "BASE_URL": "https://inference.example/v1",
+        "API_KEY": "k",
+    }
+    reset_providers()
+    remote = get_authoring_chat_model()
+    assert remote is not get_chat_model() and remote.model == "gpt-oss-120b"

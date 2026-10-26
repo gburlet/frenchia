@@ -93,7 +93,7 @@ def test_generated_extras_are_validated_labelled_and_kept_out_of_lessons(
     created = review.build_set(user, generate=False)
     created.extras = ReviewSet.Extras.QUEUED
     created.save()
-    with patch("progress.review.get_chat_model", return_value=FlaggingChat()):
+    with patch("progress.review.get_authoring_chat_model", return_value=FlaggingChat()):
         review.generate_extras(created.pk)
     created.refresh_from_db()
     assert created.extras == ReviewSet.Extras.READY, created.extras_error

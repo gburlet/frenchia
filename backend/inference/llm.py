@@ -1,6 +1,7 @@
 """Chat models behind a small protocol, so runtimes and models can be replaced without
 touching learning-domain code. The live implementation speaks the OpenAI-compatible
-chat completions API (Ollama, llama.cpp server, LM Studio, ...)."""
+chat completions API (Ollama, llama.cpp server, LM Studio, ... and, for content generation
+only, a remote server such as the Alliance's gpt-oss-120b: see providers.py)."""
 
 import json
 import logging
@@ -114,17 +115,26 @@ class OpenAICompatibleChatModel:
         extra_body: dict[str, Any] | None = None,
         breaker: CircuitBreaker | None = None,
         transport: httpx.BaseTransport | None = None,
+        api_key: str = "",
+        reasoning_tokens: int = 0,
+        wake_wait_s: float = 0.0,
     ) -> None:
+        """`api_key`, `reasoning_tokens` (added to every max_tokens, for models that reason
+        before answering) and `wake_wait_s` (how long to wait out "503, model waking up") are
+        for a remote content-generation server; the local runtime needs none of them."""
         if is_cloud_model(model):
             raise ValueError(f"Cloud model {model!r} is not allowed: inference must stay local")
         self.model = model
         # Ollama extension: no hidden "thinking" tokens for interactive requests.
         self.extra_body = {"reasoning_effort": "none"} if extra_body is None else extra_body
         self.breaker = breaker or CircuitBreaker("llm")
+        self.reasoning_tokens = reasoning_tokens
+        self.wake_wait_s = wake_wait_s
         self._http = httpx.Client(
             base_url=base_url.rstrip("/") + "/",
-            timeout=httpx.Timeout(timeout_s, connect=3.0),
+            timeout=httpx.Timeout(timeout_s, connect=10.0 if api_key else 3.0),
             transport=transport,
+            headers={"Authorization": f"Bearer {api_key}"} if api_key else None,
         )
 
     def complete(
@@ -139,7 +149,7 @@ class OpenAICompatibleChatModel:
             "model": self.model,
             "messages": [{"role": m.role, "content": m.content} for m in messages],
             "temperature": temperature,
-            "max_tokens": max_tokens,
+            "max_tokens": max_tokens + self.reasoning_tokens,
             **self.extra_body,
         }
         if json_schema is not None:
@@ -225,14 +235,28 @@ class OpenAICompatibleChatModel:
 
     def _post(self, path: str, body: dict[str, Any]) -> dict[str, Any]:
         self.breaker.before_call()
-        try:
-            response = self._http.post(path, json=body)
-        except (httpx.ConnectError, httpx.ConnectTimeout) as exc:
+        waited = 0.0
+        while True:
+            try:
+                response = self._http.post(path, json=body)
+            except (httpx.ConnectError, httpx.ConnectTimeout) as exc:
+                self.breaker.record_failure()
+                raise InferenceUnavailable(
+                    "llm", "The language model service is not running"
+                ) from exc
+            except httpx.TimeoutException as exc:
+                self.breaker.record_failure()
+                raise InferenceTimeout("llm", "The language model took too long to answer") from exc
+            # A scaled-to-zero model answers 503 with Retry-After while it wakes up (1-3 min).
+            if response.status_code != 503 or waited >= self.wake_wait_s:
+                break
+            delay = min(float(response.headers.get("retry-after") or 15), 60.0)
+            logger.info("LLM %s is waking up; retrying in %.0f s", self.model, delay)
+            time.sleep(delay)
+            waited += delay
+        if response.status_code == 503:
             self.breaker.record_failure()
-            raise InferenceUnavailable("llm", "The language model service is not running") from exc
-        except httpx.TimeoutException as exc:
-            self.breaker.record_failure()
-            raise InferenceTimeout("llm", "The language model took too long to answer") from exc
+            raise InferenceUnavailable("llm", f"LLM unavailable (503): {response.text[:200]}")
         self.breaker.record_success()
         if response.status_code == 404:
             raise InferenceUnavailable("llm", f"Model {self.model!r} is not available")

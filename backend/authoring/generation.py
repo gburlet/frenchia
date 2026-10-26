@@ -38,7 +38,7 @@ from inference.errors import InvalidOutput
 from inference.llm import ChatModel, Message, complete_structured
 
 from . import prompts
-from .critic import critique
+from .critic import critique, solve_choices
 from .schemas import (
     DRAFT_SHAPES,
     ChoiceDraft,
@@ -209,6 +209,7 @@ class LessonGenerator:
         if self.critic:
             self.progress("AI critic: proof-reading graded French sentences")
             issues += critique(self.chat, lesson, self.stats.record)
+            issues += solve_choices(self.chat, lesson, self.stats.record)
         self.progress(
             f"Done: {len(sections)} sections, {len(exercises)} exercises, "
             f"{sum(i.severity == 'error' for i in issues)} errors"
@@ -288,6 +289,9 @@ class LessonGenerator:
                 "id": f"{step.replace('_', '-')}-{i}",
                 "grammar_topics": topics,
             }
+            for key in ("accepted_answers", "answers"):
+                if key in data:  # the same translation twice, when Québec = standard wording
+                    data[key] = _dedupe(data[key])
             if step == "fill_blank":
                 return FillBlankExercise.model_validate({**data, "type": "fill_blank"})
             if step.startswith("translate"):
@@ -467,7 +471,9 @@ class LessonGenerator:
         )
         # Tidy before hashing: the generated hash must match the content as written.
         lesson = Lesson.model_validate(
-            verify_regions(tidy(lesson.model_dump(mode="json", exclude_none=True)), self.ref)
+            plain_exercises(
+                verify_regions(tidy(lesson.model_dump(mode="json", exclude_none=True)), self.ref)
+            )
         )
         provenance = Provenance(
             generator=f"llm/{self.chat.model}",
@@ -541,6 +547,7 @@ class LessonReviser:
         if self.critic:
             self.progress("AI critic: proof-reading graded French sentences")
             issues += critique(self.chat, revised, self.stats.record)
+            issues += solve_choices(self.chat, revised, self.stats.record)
         return GenerationResult(revised, issues, self.stats)
 
     def _build(
@@ -561,7 +568,7 @@ class LessonReviser:
             "sections": [s.model_dump(mode="json", exclude_none=True) for s in sections],
             "exercises": [e.model_dump(mode="json", exclude_none=True) for e in exercises],
         }
-        return Lesson.model_validate(verify_regions(tidy(data), self.ref))
+        return Lesson.model_validate(plain_exercises(verify_regions(tidy(data), self.ref)))
 
     def _item_errors(self, lesson: Lesson) -> dict[str, list[str]]:
         """Deterministic errors by item id ("ex-07.hint" belongs to "ex-07")."""
@@ -657,6 +664,42 @@ class LessonReviser:
 
 
 _ARTICLE = re.compile(r"^(le|la|les|un|une|des)\s+|^l'")
+
+
+def _dedupe(answers: list[str]) -> list[str]:
+    seen: set[str] = set()
+    out = []
+    for answer in answers:
+        key = " ".join(answer.replace("**", "").casefold().split())
+        if key not in seen:
+            seen.add(key)
+            out.append(answer)
+    return out
+
+
+_ENUMERATOR = re.compile(r"^\s*(?:[A-Da-d1-9][.)]|\d\ufe0f?\u20e3|[A-D]\s*[-–:])\s+")
+_ENUMERATED = {"options", "prompt", "question", "sentence"}
+
+
+def plain_exercises(data: Any) -> Any:
+    """Exercises are shown as plain text (only explanations render **bold**): drop the Markdown
+    emphasis larger models put on key words (« Mon frère a vu **un castor** »)."""
+
+    def plain(value: Any, key: str = "") -> Any:
+        if isinstance(value, str):
+            if key == "explanation":
+                return value
+            value = value.replace("**", "")
+            # « A. C'est le fun… », « 1️⃣ Après le souper… »: the UI numbers options itself.
+            return _ENUMERATOR.sub("", value) if key in _ENUMERATED else value
+        if isinstance(value, list):
+            return [plain(v, key) for v in value]
+        if isinstance(value, dict):
+            return {k: plain(v, k) for k, v in value.items()}
+        return value
+
+    data["exercises"] = [plain(e) for e in data["exercises"]]
+    return data
 
 
 def verify_regions(data: Any, ref: Reference) -> Any:

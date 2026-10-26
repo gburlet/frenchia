@@ -447,3 +447,52 @@ def test_only_lexicon_words_keep_a_quebec_tag() -> None:
 
 def test_tidy_turns_literal_backslash_n_into_a_newline() -> None:
     assert tidy({"body": "- les\\n- leur"}) == {"body": "- les\n- leur"}
+
+
+def test_markdown_emphasis_is_dropped_from_exercises_but_not_explanations() -> None:
+    from authoring.generation import plain_exercises
+
+    data = {
+        "exercises": [
+            {"prompt": "Mon frère a vu **un castor**.", "explanation": "**Le castor** est m."}
+        ]
+    }
+    assert plain_exercises(data)["exercises"][0] == {
+        "prompt": "Mon frère a vu un castor.",
+        "explanation": "**Le castor** est m.",
+    }
+
+
+def test_enumerators_are_dropped_from_options_and_prompts() -> None:
+    from authoring.generation import plain_exercises
+
+    data = {
+        "exercises": [
+            {"options": ["A. C'est le fun.", "B) C'est plate."], "prompt": "1️⃣ Après le souper."}
+        ]
+    }
+    assert plain_exercises(data)["exercises"][0] == {
+        "options": ["C'est le fun.", "C'est plate."],
+        "prompt": "Après le souper.",
+    }
+
+
+def test_solver_flags_a_question_whose_key_it_cannot_reach() -> None:
+    from authoring.critic import solve_choices
+
+    class TwoRightAnswers(ScriptedChat):
+        def complete(self, messages: Any, **kwargs: Any) -> Completion:
+            if (kwargs.get("json_schema") or {}).get("title") == "Solution":
+                return Completion('{"correct_options": [0, 1]}', self.model, 1, 5)
+            return super().complete(messages, **kwargs)
+
+    lesson = (
+        LessonGenerator(ScriptedChat(), reference(), critic=False)
+        .generate(brief(), content_version=1, job_id=None)
+        .lesson
+    )
+    assert solve_choices(ScriptedChat(), lesson) == []  # agrees with every key
+    flagged = solve_choices(TwoRightAnswers(), lesson)
+    choices = [e for e in lesson.exercises if e.type in ("multiple_choice", "comprehension")]
+    assert len(flagged) == len(choices) and "correct option(s) [0, 1]" in flagged[0].message
+    assert flagged[0].message.startswith("AI critic")  # so auto-review revises it

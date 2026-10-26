@@ -64,12 +64,17 @@ class Reference:
         key = normalize(word)
         if "œ" in key or "æ" in key:  # Lexique spells « soeur », « coeur »
             return self.is_word(key.replace("œ", "oe").replace("æ", "ae")) or key in self.words
-        return (
+        known = (
             not self.words
             or key in self.words
             or key in self._verb_index
             or key in self._lexicon_words
         )
+        # Feminine forms Lexique lacks, common in Québec (« ingénieure », « auteure »).
+        for ending in ("es", "e"):
+            if not known and key.endswith(ending) and len(key) > 4:
+                known = self.is_word(key.removesuffix(ending))
+        return known
 
     @cached_property
     def _lexicon_words(self) -> frozenset[str]:
