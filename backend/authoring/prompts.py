@@ -2,13 +2,13 @@
 changes: jobs record the versions they used (GenerationJob.prompts, lesson provenance)."""
 
 PROMPT_VERSIONS = {
-    "author.system": "3",
+    "author.system": "4",
     "author.steps": "4",
     "author.revise": "1",
     "author.critic": "4",
     "author.practice": "2",
-    "bank.verb": "4",
-    "bank.vocab": "2",
+    "bank.verb": "5",
+    "bank.vocab": "3",
     "bank.revise": "2",
 }
 
@@ -21,6 +21,8 @@ use it (the evening meal is « le souper », the weekend « la fin de semaine »
 European French equivalent where it differs. Do not go out of your way to bring in \
 Québec-specific words, places or situations: choose vocabulary and settings for the lesson's \
 topic, vary them, and let Québec forms appear only where they come up naturally.
+- Teach a broad, useful vocabulary for the learner's level: vary the nouns, verbs and \
+situations across examples, readings and exercises instead of reusing the same few words.
 - Québec meals: déjeuner = breakfast, dîner = lunch, souper = supper. Say « la fin de semaine », \
 not « le week-end ».
 - Use standard language; mark familiar usage as familiar. Never use swear words or sacres.
@@ -166,8 +168,11 @@ BANK_SYSTEM = """\
 You write short, original practice material for Frenchia, a French course for an English-speaking \
 adult learning Québec French (A1 to B2).
 Rules:
-- Québec usage is the default: everyday Québec life, places and vocabulary (dépanneur, souper, \
-fin de semaine, magasiner, chalet, hiver). Never use swear words or sacres.
+- Québec usage is the default form, not the subject: when a word has a Québec form, use it (the \
+evening meal is « le souper », the weekend « la fin de semaine »), but do not go out of your way \
+to bring in Québec words or places (no dépanneur or souper just for local colour). Use varied, \
+everyday situations (work, school, family, health, travel, hobbies, home) and a broad range of \
+vocabulary suited to the learner's level. Never use swear words or sacres.
 - Every French sentence must be grammatical and natural, with correct accents, agreement and \
 elision. Keep vocabulary at A2 level unless told otherwise.
 - Do not invent Québec expressions: only call something Québec usage when it is in the verified \
@@ -189,8 +194,9 @@ Slots:
 
 Each sentence's "en" is a full English translation of that sentence. Then fill "gloss" \
 with only the verb's English gloss, e.g. "to go" (two or three meanings at most, separated by \
-commas), and "note" with one English sentence about its usage (a Québec usage, a \
-common construction like « aller + infinitive », or a trap), or "" if there is nothing useful."""
+commas), and "note" with one English sentence about this verb's usage (a common construction \
+like « aller + infinitive », or a trap), or "" if there is nothing useful. Never use the note \
+for general Québec facts that are not about this verb."""
 
 VERB_REPAIR = """\
 These sentences were rejected:
@@ -205,8 +211,10 @@ Québec angle: {quebec_focus}
 word without its article, with its gender for nouns ("none" otherwise), a short English gloss, \
 its part of speech, region ("qc" only for verified Québec terms, "common" otherwise) and \
 formality. For a Québec word, the France equivalent goes in the gloss's note later, not here. \
-Prefer words a Québec speaker actually uses. No duplicates; no proper nouns. Leave the examples \
-empty."""
+Every word must belong to the set's theme and suit the level: give the theme's core everyday \
+vocabulary, using the Québec form where a Québec speaker would. Never pad the set with \
+general Québec words (souper, dépanneur, magasiner, chalet…) that are not about the theme. No \
+duplicates; no proper nouns. Leave the examples empty."""
 
 VOCAB_EXAMPLES = """\
 Vocabulary set: {title} ({title_en}), CEFR {level}.

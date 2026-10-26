@@ -138,7 +138,7 @@ units:
     - present-er
     prerequisites:
     - a1-subject-pronouns
-    quebec_focus: Include Québec -er verbs like magasiner and jaser
+    quebec_focus: Common everyday -er verbs; Québec forms (magasiner, jaser) only where they fit naturally
     reference: clemence:day-10
   - id: a1-present-ir
     title: Le présent des verbes en -ir (2e groupe)
@@ -360,7 +360,7 @@ units:
     - articles-definite-indefinite
     vocabulary_theme: food
     prerequisites: []
-    quebec_focus: 'Québec words: le blé d''Inde (corn), la patate, le dépanneur, l''épicerie'
+    quebec_focus: 'Everyday food and shopping words; use the Québec form where one exists (le blé d''Inde for corn, la patate)'
     reference: clemence:day-29
   - id: a1-expressions-1
     title: Expressions québécoises (1)

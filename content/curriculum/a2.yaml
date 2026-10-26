@@ -286,7 +286,7 @@ units:
     - partitive-articles
     vocabulary_theme: hobbies
     prerequisites: []
-    quebec_focus: Hockey, le chalet, le camping, faire du ski de fond
+    quebec_focus: A broad range of sports and hobbies; Québec forms where a word has one
     reference: clemence:day-55
   - id: a2-clothing
     title: Les vêtements
@@ -306,7 +306,7 @@ units:
     grammar_topics: []
     vocabulary_theme: animals
     prerequisites: []
-    quebec_focus: 'Canadian wildlife: l''orignal, le castor, le huard, le maringouin'
+    quebec_focus: 'Common animals first (pets, farm, wild); Québec forms where a word has one (l''orignal, le maringouin)'
     reference: clemence:day-57
   - id: a2-jobs
     title: Les métiers et les professions
