@@ -360,3 +360,17 @@ def test_contraction_followed_by_an_article_is_an_error() -> None:
     data["exercises"][0] |= {"sentence": "Il y a ___ dans le frigo.", "answers": ["du lait"]}
     found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
     assert not [m for m in found if "already contain" in m]  # « du lait »
+
+
+def test_meal_names_are_checked_in_example_sentences_too() -> None:
+    data = lesson_data()
+    data["sections"].append(
+        {
+            "type": "examples",
+            "id": "examples",
+            "heading": "Exemples",
+            "examples": [{"fr": "Nous avons dîné tard.", "en": "We had dinner late."}],
+        }
+    )
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert any(m.startswith("error:Québec meals: « dîné »") for m in found)

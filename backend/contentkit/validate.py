@@ -226,6 +226,8 @@ def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
                     add("warning", section.id, f"French example looks English: {example.fr!r}")
         if isinstance(section, ReadingSection) and _looks_english(section.passage_fr):
             add("error", section.id, "reading passage does not look French")
+        if not isinstance(section, ReadingSection):  # a whole passage names many meals
+            _check_meal_pairs(add, section.id, _section_meal_pairs(section))
         if isinstance(section, RegionalNoteSection):
             for variant in section.variants:
                 _check_quebec(add, section.id, variant.qc, ref)
@@ -379,12 +381,37 @@ def _check_meals(add: AddFn, ex: TranslateExercise) -> None:
         if ex.direction == "en_fr"
         else [(a, ex.prompt) for a in ex.accepted_answers]
     )
+    _check_meal_pairs(add, ex.id, pairs)
+
+
+def _section_meal_pairs(section: object) -> list[tuple[str, str]]:
+    """(English, French) pairs in examples, vocabulary, glossaries and the reading."""
+    pairs: list[tuple[str, str]] = []
+    if isinstance(section, ExamplesSection):
+        pairs += [(e.en, e.fr) for e in section.examples]
+    items = (
+        section.items
+        if isinstance(section, VocabularySection)
+        else section.glossary
+        if isinstance(section, ReadingSection)
+        else []
+    )
+    for item in items:
+        pairs.append((item.en, item.fr))
+        if item.example_fr and item.example_en:
+            pairs.append((item.example_en, item.example_fr))
+    if isinstance(section, ReadingSection):
+        pairs.append((section.translation_en, section.passage_fr))
+    return pairs
+
+
+def _check_meal_pairs(add: AddFn, where: str, pairs: list[tuple[str, str]]) -> None:
     for english, french in pairs:
         for en, fr, really in _MEAL_CLASHES:
             if en.search(english) and fr.search(french) and not really.search(english):
                 add(
                     "error",
-                    ex.id,
+                    where,
                     f"Québec meals: « {fr.search(french).group(0)} » is not "  # type: ignore[union-attr]
                     f"{en.search(english).group(0)!r} (déjeuner = breakfast, dîner = lunch, "  # type: ignore[union-attr]
                     "souper = supper)",
