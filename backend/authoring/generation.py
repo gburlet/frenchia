@@ -626,7 +626,12 @@ class LessonReviser:
             return self._revise_item(model, data, notes)
         except InvalidOutput as exc:
             if not droppable:
-                raise
+                # A section the model can't revise keeps its current text (it is still checked
+                # and reviewed); failing the whole revision would lose every other fix.
+                self.dropped.append(
+                    Issue("warning", data["id"], f"kept unrevised after failed revision: {exc}")
+                )
+                return model.model_validate(data)
             # Like generation: one stubborn exercise should not sink the revision.
             self.dropped.append(
                 Issue("warning", data["id"], f"dropped after failed revision: {exc}")
