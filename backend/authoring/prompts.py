@@ -2,11 +2,11 @@
 changes: jobs record the versions they used (GenerationJob.prompts, lesson provenance)."""
 
 PROMPT_VERSIONS = {
-    "author.system": "2",
-    "author.steps": "3",
+    "author.system": "3",
+    "author.steps": "4",
     "author.revise": "1",
     "author.critic": "4",
-    "author.practice": "1",
+    "author.practice": "2",
     "bank.verb": "4",
     "bank.vocab": "2",
     "bank.revise": "2",
@@ -16,9 +16,11 @@ SYSTEM = """\
 You write original lessons for Frenchia, a French course for an English-speaking adult who is \
 progressing from A1 to B2 and is learning Québec French.
 Rules:
-- Québec usage is the default. Use natural Québec vocabulary and phrasing in examples, dialogues \
-and readings (e.g. souper, fin de semaine, magasiner, dépanneur), and mention the European French \
-equivalent where it differs.
+- Québec usage is the default form, not the subject: when a word or phrase has a Québec form, \
+use it (the evening meal is « le souper », the weekend « la fin de semaine ») and mention the \
+European French equivalent where it differs. Do not go out of your way to bring in \
+Québec-specific words, places or situations: choose vocabulary and settings for the lesson's \
+topic, vary them, and let Québec forms appear only where they come up naturally.
 - Québec meals: déjeuner = breakfast, dîner = lunch, souper = supper. Say « la fin de semaine », \
 not « le week-end ».
 - Use standard language; mark familiar usage as familiar. Never use swear words or sacres.
@@ -62,9 +64,9 @@ If a reference table genuinely helps (conjugation, forms, pronouns, articles...)
 2-5 columns and at most 12 rows; otherwise set include to false. Cells are short (no sentences).""",
     "examples": """\
 Write 6-10 example sentences that illustrate the objectives, each with an English translation. \
-Use everyday Québec situations. Set `region` = qc only when the sentence uses Québec-specific \
-wording, common otherwise. Use `note` only for a remark about that same sentence, and never claim \
-a Québec difference you are not certain of.""",
+Use varied everyday situations that fit the topic. Set `region` = qc only when the sentence \
+uses Québec-specific wording, common otherwise. Use `note` only for a remark about that same \
+sentence, and never claim a Québec difference you are not certain of.""",
     "vocabulary": """\
 List 10-16 vocabulary items for the theme, ordered from most to least useful. Give the bare word \
 without article, its part of speech, the gender for every noun, Québec items with region qc and \
@@ -75,7 +77,8 @@ with France, and up to 6 Québec/France/English variants. Only include differenc
 of; use the verified Québec usage above. If there is no real difference, say so briefly and list \
 no variants.""",
     "reading": """\
-Write an original French reading passage of {words} words set in Québec that naturally uses the \
+Write an original French reading passage of {words} words (Québec French; any everyday setting \
+that suits the topic, not built around Québec-specific words) that naturally uses the \
 lesson's grammar and vocabulary, an English translation, and a glossary of 3-8 harder words. \
 Write at CEFR {level}.""",
     "fill_blank": """\
@@ -132,7 +135,7 @@ You are now writing extra practice for one learner who has finished this lesson.
 mistakes on its topic:
 {mistakes}
 Write new items that practise the same points as these mistakes (not the same sentences), in \
-everyday Québec situations. Keep them short and at CEFR {level}.
+varied everyday situations. Keep them short and at CEFR {level}.
 """
 
 

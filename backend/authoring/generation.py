@@ -435,7 +435,7 @@ class LessonGenerator:
             objectives="\n".join(f"- {x}" for x in o.objectives),
             topics=", ".join(brief.topic_titles) or "none",
             theme=o.vocabulary_theme or "none",
-            quebec_focus=o.quebec_focus or "use Québec usage where natural",
+            quebec_focus=o.quebec_focus or "Québec forms where they come up; no special focus",
             prerequisites=", ".join(brief.prerequisite_titles) or "nothing specific",
             lexicon=lexicon,
         )
