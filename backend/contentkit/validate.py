@@ -217,7 +217,10 @@ _FRANCE_FORMS = [
 
 # « Ce soir, on prépare le dîner »: in Québec the evening meal is « le souper ».
 _EVENING = re.compile(r"\bsoir(?:ée)?\b|\b(?:19|20|21) ?h", re.I)
-_DINNER = re.compile(r"\bd[iî]n(?:er|é|ons|ez|ent)\b", re.I)
+_DINNER = re.compile(
+    r"\bd[iî]n(?:er|é|ée?s?|ons|ez|ent|erai|eras|era|erons|erez|eront|ais|ait|ions|iez|aient)\b",
+    re.I,
+)
 
 
 def _france_form(text: str) -> str | None:
@@ -260,6 +263,9 @@ def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
         issues.append(Issue(severity, f"{lesson.id}:{where}", message))
 
     for section in lesson.sections:
+        for path, text in _strings(section.model_dump(mode="json")):
+            if _PROMPT_LEAK.search(text):
+                add("error", f"{section.id}.{path}", "text mentions the generation instructions")
         if isinstance(section, VocabularySection | ReadingSection):
             items = section.items if isinstance(section, VocabularySection) else section.glossary
             for item in items:

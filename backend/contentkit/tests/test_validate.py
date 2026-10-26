@@ -406,6 +406,7 @@ def test_other_france_forms_are_errors_in_french_text() -> None:
         ("Nous faisons du shopping.", "faisons du shopping"),
         ("Elle a envoyé un e-mail.", "e-mail"),
         ("Ce soir, nous préparons le dîner.", "dîner"),
+        ("Le soir, nous dînerons chez Paul.", "dînerons"),
     ]:
         data["exercises"][1]["accepted_answers"] = [answer]
         found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
@@ -416,6 +417,10 @@ def test_other_france_forms_are_errors_in_french_text() -> None:
 
 
 def test_notes_about_the_brief_are_prompt_leaks() -> None:
+    data = lesson_data()
+    data["sections"][0]["body"] += " Based on the verified usage list."
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert any("sections" in m or "mentions the generation instructions" in m for m in found)
     data = lesson_data()
     data["exercises"][1]["hint"] = "Use « fin ». No regional note is needed here."
     found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
