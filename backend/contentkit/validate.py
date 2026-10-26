@@ -199,6 +199,13 @@ _WEEK_END = re.compile(r"\b(?:le |ce |du |au |en )?week-?ends?\b", re.I)
 _ABOUT_FRANCE = re.compile(r"\bFrance\b|\beurop", re.I)
 _FRENCH_FIELDS = {"fr", "passage_fr", "example_fr", "sentence", "answers"}
 # « loin du le centre-ville », « grâce au le beau temps » (a filled blank or an answer key).
+# « loin de le centre-ville »: after a compound preposition de + le/les must contract. (Before a
+# verb « de le » is a pronoun and correct: « essayer de le faire ».)
+_NO_CONTRACTION = re.compile(
+    r"\b(?:près|loin|à côté|en face|autour|au lieu|à cause|au bord|au milieu|le long) de "
+    r"(?:le|les)\b",
+    re.I,
+)
 _DOUBLE_ARTICLE = re.compile(r"\b(du|au|aux) (?:(le|la|les)\b|l['’])", re.I)
 # Bits of the generation prompt that reach the learner (« no slang that isn't in the verified
 # list »).
@@ -298,13 +305,15 @@ def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
                         f"explanation quotes text that is not in the reading: {text!r}",
                     )
         answers = [*getattr(ex, "answers", []), *getattr(ex, "accepted_answers", [])]
-        if any("(" in a or "[" in a for a in answers):
+        if any("(" in a or "[" in a or "//" in a for a in answers):
             add("error", ex.id, "an accepted answer is a full answer, with no notes in brackets")
         for text in _graded_french(ex):
             if m := _NO_ELISION.search(text):  # a filled blank: « ___ il » + « parce que »
                 add("error", ex.id, f"missing elision once filled: « {m.group(0)} »")
             if (m := _WEEK_END.search(text)) and not _ABOUT_FRANCE.search(text):
                 add("error", ex.id, f"« {m.group(0)} »: Québec usage is « la fin de semaine »")
+            if m := _NO_CONTRACTION.search(text):
+                add("error", ex.id, f"« {m.group(0)} »: de + le/les contract (du/des)")
             if m := _DOUBLE_ARTICLE.search(text):
                 add("error", ex.id, f"« {m.group(0)} »: du/au/aux already contain the article")
             for word in _unknown_words(text, ref):

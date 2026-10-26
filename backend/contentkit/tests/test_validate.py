@@ -401,3 +401,14 @@ def test_elision_is_checked_in_the_filled_sentence() -> None:
     data["exercises"][0]["hint"] = None
     found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
     assert "error:missing elision once filled: « parce que il »" in found
+
+
+def test_missing_contraction_after_a_compound_preposition() -> None:
+    data = lesson_data()
+    data["exercises"][1]["accepted_answers"] = ["On a magasiné loin de le centre-ville.", "Non."]
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert "error:« loin de le »: de + le/les contract (du/des)" in found
+    data["exercises"][1]["accepted_answers"] = ["On a essayé de le faire.", "On // France"]
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert not [m for m in found if "contract" in m]
+    assert "error:an accepted answer is a full answer, with no notes in brackets" in found
