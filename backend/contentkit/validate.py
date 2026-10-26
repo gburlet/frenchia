@@ -14,6 +14,7 @@ from .models import (
     ComprehensionExercise,
     CurriculumLevel,
     ExamplesSection,
+    ExplanationSection,
     FillBlankExercise,
     GrammarTopicRegistry,
     Lesson,
@@ -187,6 +188,9 @@ _FORMATTING_REF = re.compile(
 )
 _BOLD = re.compile(r"\*\*")  # rendered only in explanations
 HINT_MAX = 160
+# A model can degenerate into markup (« {#core-explanation .untyped-1 .untyped-2 … ») instead
+# of an explanation.
+EXPLANATION_MIN_WORDS = 5
 # « parce que il », « si il », « je ai »: elision is never optional in written French.
 _NO_ELISION = re.compile(
     r"\b(?:(?:parce |lors|puis|jus)?que (?:il|ils|elle|elles|on|un|une)|si (?:il|ils)|"
@@ -240,6 +244,10 @@ def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
                         )
                 if item.region == "qc":
                     _check_quebec(add, section.id, item.fr, ref)
+        if isinstance(section, ExplanationSection):
+            prose = _WORD.findall(re.sub(r"\{[^}]*\}?", " ", section.body))
+            if "{#" in section.body or len(prose) < EXPLANATION_MIN_WORDS:
+                add("error", section.id, "the explanation is empty or broken markup")
         if isinstance(section, ExamplesSection):
             for example in section.examples:
                 if _looks_english(example.fr):
@@ -254,7 +262,10 @@ def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
 
     for path, text in _strings(lesson.model_dump(mode="json", exclude={"provenance"})):
         # Wrong options are deliberately wrong; the right one is checked with the answer keys.
-        if ".options." not in path and (m := _NO_ELISION.search(text)):
+        # Text about elision itself may quote the uncontracted form (« qu'un, contraction of
+        # que un »).
+        about_elision = re.search(r"contraction|elision|élision|elid", text, re.I)
+        if ".options." not in path and not about_elision and (m := _NO_ELISION.search(text)):
             add("error", path, f"missing elision: « {m.group(0)} »")
         parts = path.split(".")
         field = next((p for p in reversed(parts) if not p.isdigit()), "")

@@ -412,3 +412,10 @@ def test_missing_contraction_after_a_compound_preposition() -> None:
     found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
     assert not [m for m in found if "contract" in m]
     assert "error:an accepted answer is a full answer, with no notes in brackets" in found
+
+
+def test_an_empty_or_degenerate_explanation_is_an_error() -> None:
+    data = lesson_data()
+    data["sections"][0]["body"] = "### Core {#core .untyped-1 .untyped-2 .untyped-3"
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert "error:the explanation is empty or broken markup" in found
