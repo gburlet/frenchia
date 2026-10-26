@@ -273,6 +273,7 @@ def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
         if isinstance(ex, FillBlankExercise):
             _check_fill_blank(add, ex, ref)
         if isinstance(ex, TranslateExercise):
+            _check_meals(add, ex)
             answers_english = [_looks_english(a) for a in ex.accepted_answers]
             if ex.direction == "en_fr" and any(answers_english):
                 add("error", ex.id, "en_fr answers must be French")
@@ -330,6 +331,43 @@ def _unknown_words(text: str, ref: Reference) -> list[str]:
             continue
         unknown.append(token)
     return unknown
+
+
+# Québec meal names (déjeuner = breakfast, dîner = lunch, souper = supper): the model keeps
+# translating "dinner" as « dîner » and "lunch" as « déjeuner », as in France.
+# Each rule: (English meal, French word that is not that meal, the meal it really is). A
+# sentence naming both meals (« Le souper est meilleur que le dîner ») is fine.
+_MEAL_CLASHES = [
+    (
+        re.compile(r"\b(dinner|supper)s?\b", re.I),
+        re.compile(r"\bd[iî]n(er|é|ons|ez|ent)\b", re.I),
+        re.compile(r"\blunch", re.I),
+    ),
+    (
+        re.compile(r"\blunch", re.I),
+        re.compile(r"(?<!petit-)(?<!petit )\bd[ée]jeun", re.I),
+        re.compile(r"\bbreakfast", re.I),
+    ),
+]
+
+
+def _check_meals(add: AddFn, ex: TranslateExercise) -> None:
+    pairs = (
+        [(ex.prompt, a) for a in ex.accepted_answers]
+        if ex.direction == "en_fr"
+        else [(a, ex.prompt) for a in ex.accepted_answers]
+    )
+    for english, french in pairs:
+        for en, fr, really in _MEAL_CLASHES:
+            if en.search(english) and fr.search(french) and not really.search(english):
+                add(
+                    "error",
+                    ex.id,
+                    f"Québec meals: « {fr.search(french).group(0)} » is not "  # type: ignore[union-attr]
+                    f"{en.search(english).group(0)!r} (déjeuner = breakfast, dîner = lunch, "  # type: ignore[union-attr]
+                    "souper = supper)",
+                )
+                return
 
 
 def _graded_french(ex: object) -> list[str]:

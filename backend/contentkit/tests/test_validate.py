@@ -268,3 +268,34 @@ def test_answer_keys_must_be_real_french_words() -> None:
     assert found == ["error:'bonned' is not a French word (not in Lexique)"]
     data["exercises"][0]["answers"] = ["ai mangé"]
     assert check_lesson_quality(Lesson.model_validate(data), ref) == []
+
+
+def test_quebec_meal_names_in_translations() -> None:
+    data = lesson_data()
+    translate = data["exercises"][1]
+    translate.update(
+        prompt="We had dinner at the restaurant.",
+        accepted_answers=["On a soupé au restaurant.", "Nous avons dîné au restaurant."],
+    )
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert found == [
+        "error:Québec meals: « dîné » is not 'dinner' (déjeuner = breakfast, "
+        "dîner = lunch, souper = supper)"
+    ]
+    translate.update(prompt="I eat lunch at noon.", accepted_answers=["Je dîne à midi."])
+    assert check_lesson_quality(Lesson.model_validate(data), reference()) == []
+    translate.update(
+        direction="fr_en",
+        prompt="Le souper est meilleur que le dîner.",
+        accepted_answers=["Supper is better than lunch."],
+    )
+    assert check_lesson_quality(Lesson.model_validate(data), reference()) == []
+    translate.update(prompt="I eat breakfast.", accepted_answers=["Je prends mon petit-déjeuner."])
+    assert check_lesson_quality(Lesson.model_validate(data), reference()) == []
+    translate.update(
+        direction="fr_en", prompt="Mon déjeuner était bon.", accepted_answers=["My lunch was good."]
+    )
+    assert (
+        "Québec meals"
+        in messages(check_lesson_quality(Lesson.model_validate(data), reference()))[0]
+    )
