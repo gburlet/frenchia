@@ -369,7 +369,10 @@ def test_meal_names_are_checked_in_example_sentences_too() -> None:
             "type": "examples",
             "id": "examples",
             "heading": "Exemples",
-            "examples": [{"fr": "Nous avons dîné tard.", "en": "We had dinner late."}],
+            "examples": [
+                {"fr": "Nous avons dîné tard.", "en": "We had dinner late."},
+                {"fr": "J'ai mangé.", "en": "I ate."},
+            ],
         }
     )
     found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
