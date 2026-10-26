@@ -14,6 +14,7 @@ from .validate import (
     FOREIGN_SCRIPT,
     Issue,
     Severity,
+    _check_meal_pairs,
     _check_quebec,
     _looks_english,
     _parse,
@@ -79,6 +80,32 @@ _SUBJECT = {
 }
 
 
+# Subject pronouns right before the verb form (object pronouns and « ne » may sit between).
+# « nous » and « vous » are left out: before a verb they are often objects (« il nous parle »).
+_PRONOUN_BEFORE = (
+    r"\b(je|j['’]|tu|il|elle|on|ils|elles)\s*(?:ne\s+|n['’])?"
+    r"(?:(?:me|te|se|le|la|les|lui|leur|y|en|nous|vous)\s+|[mtsl]['’])*{form}\b"
+)
+_PERSONS = {
+    "je": {"je", "j'", "j’"},
+    "tu": {"tu"},
+    "il": {"il", "elle", "on"},
+    "ils": {"ils", "elles"},
+}
+
+
+def _subject_clash(person: str, form: str, sentence: str) -> str | None:
+    """The pronoun in front of the form when it belongs to another person: for most -er verbs
+    « je mange » and « il mange » are the same form, so the conjugation check cannot tell."""
+    match = re.search(_PRONOUN_BEFORE.format(form=re.escape(form)), sentence, re.IGNORECASE)
+    if not match:
+        return None
+    pronoun = match.group(1).lower()
+    if person in ("nous", "vous") or pronoun not in _PERSONS.get(person, {pronoun}):
+        return pronoun
+    return None
+
+
 def _is_gloss(en: str, gloss: str) -> bool:
     """« Choose » or « to like, to love » where a sentence translation belongs."""
     words = re.findall(r"[\w']+", en.casefold())
@@ -116,6 +143,8 @@ def check_verb_bank(bank: VerbBank, ref: Reference, where: str) -> list[Issue]:
                 add("error", at, f"no {label} « {s.person} » form of {bank.infinitive} in {s.fr!r}")
             elif normalize(found) != normalize(s.form):
                 add("error", at, f"form should be {found!r} (as written in the sentence)")
+            elif pronoun := _subject_clash(s.person, found, s.fr):
+                add("error", at, f"the subject of {found!r} is « {pronoun} », not « {s.person} »")
         if s.person in _SUBJECT and not s.tense.startswith("imperatif"):
             if not re.search(_SUBJECT[s.person], s.fr, re.IGNORECASE):
                 # Without its pronoun a « vous » sentence reads as an imperative.
@@ -128,6 +157,7 @@ def check_verb_bank(bank: VerbBank, ref: Reference, where: str) -> list[Issue]:
             add("error", at, "the English runs on into other text")
         if s.region == "qc" and not quebec_verb:
             _check_quebec(add, at, s.fr, ref)
+        _check_meal_pairs(add, at, [(s.en, s.fr)])
         for text in (s.fr, s.en):
             if _LATEX.search(text):
                 add("warning", at, "LaTeX markup in text")

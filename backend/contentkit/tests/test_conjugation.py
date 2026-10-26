@@ -128,6 +128,34 @@ def test_verb_bank_checks() -> None:
     assert "Imparfait" in errors[0][1]
 
 
+def test_verb_bank_subject_must_match_the_person_and_meals_their_québec_names() -> None:
+    present, subjunctive = "indicatif.present", "subjonctif.present"
+
+    def sentence(tense: str, person: str, fr: str, form: str, en: str) -> dict[str, str]:
+        return {"tense": tense, "person": person, "fr": fr, "form": form, "en": en}
+
+    bank = VerbBank.model_validate(
+        {
+            "id": "rester",
+            "content_version": 1,
+            "infinitive": "rester",
+            "en": "to stay",
+            "sentences": [
+                sentence(subjunctive, "il", "Il faut que je reste calme.", "reste", "I must stay calm."),
+                sentence(subjunctive, "il", "Il faut qu'elle reste ici.", "reste", "She must stay here."),
+                sentence(present, "il", "Mon frère ne le reste pas.", "reste", "My brother doesn't."),
+                sentence(present, "je", "Je reste au bureau avant le dîner.", "reste", "I stay at the office before supper."),
+                sentence(present, "nous", "Nous restons après le souper.", "restons", "We stay after dinner."),
+            ],
+        }
+    )
+    issues = check_verb_bank(bank, REF, "verbs/bank/rester.yaml")
+    errors = [(i.path.split(":")[-1], i.message) for i in issues if i.severity == "error"]
+    assert [path for path, _ in errors] == ["sentences.0", "sentences.3"]
+    assert "« je », not « il »" in errors[0][1]
+    assert "Québec meals" in errors[1][1]
+
+
 def test_find_form_needs_the_reflexive_pronoun_after_nous_and_vous() -> None:
     present = "indicatif.present"
     assert find_form(REF, "se lever", present, "nous", "Nous levons les rideaux.") is None

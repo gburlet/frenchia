@@ -27,7 +27,7 @@ DRAFTS: dict[Kind, Path] = {"verbs": Path("drafts/verbs"), "vocabulary": Path("d
 LIVE: dict[Kind, Path] = {"verbs": Path("verbs/bank"), "vocabulary": Path("vocabulary/sets")}
 SCHEMA: dict[Kind, str] = {"verbs": "verb-bank", "vocabulary": "vocab-set"}
 REVIEW_DIR = Path("drafts/review")
-PROMPT_VERSION = "1"
+PROMPT_VERSION = "2"
 Bank = VerbBank | VocabSet
 
 
@@ -87,7 +87,11 @@ prepositions, elision, accents, word order, and whether the tense makes sense in
 - the English translation is accurate;
 - the verb's English gloss and the usage note are accurate;
 - Québec usage is the default (déjeuner = breakfast, dîner = lunch, souper = supper). Flag a \
-Québec claim (region "qc") only when you are certain it is wrong.
+Québec claim (region "qc") only when you are certain it is wrong;
+- Québec is the default form, not the subject: a sentence set at a dépanneur, around a souper, \
+a cabane à sucre or poutine for local colour is an error, and so is a note that states a general \
+Québec fact instead of something about this verb. The sentences should cover varied everyday \
+situations with a broad vocabulary.
 Use item_id "gloss", "note", or "s1", "s2"… for the sentences in order. severity "error" = must \
 fix; "suggestion" = could be better. Do not report style preferences as errors.
 
@@ -113,7 +117,8 @@ teach mistakes. Check every entry:
 meaning, and suits the level; its translation is accurate;
 - the note (often the France equivalent of a Québec word) is accurate;
 - region "qc" is only for genuine Québec usage, and formality is right (familiar vs standard);
-- the word belongs in the set « {title} ».
+- the word belongs in the set « {title} » and suits the level; a general Québec word that does \
+not belong to the theme (souper, dépanneur, magasiner, chalet…) is padding: report it as an error.
 Québec usage is the default (déjeuner = breakfast, dîner = lunch, souper = supper; « la fin de \
 semaine »). Flag a Québec claim only when you are certain it is wrong.
 Use item_id = the entry id (or "set" for the set as a whole). severity "error" = must fix; \
