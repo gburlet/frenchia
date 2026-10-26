@@ -150,6 +150,7 @@ _LATEX = {
     r"$\cdot$": "·",
     "\\n": "\n",  # a literal backslash-n from JSON escaped twice
     "\u2011": "-",  # non-breaking hyphen (gpt-oss): learners type « - »
+    "\u00ad": "",  # soft hyphen inside a word (« déco\u00adrations »)
     # « \rightarrow » / « \to » left unescaped in JSON arrive as a carriage return / tab.
     "$\rightarrow$": "→",
     "\rightarrow": "→",
