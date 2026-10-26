@@ -151,6 +151,10 @@ def test_comprehension_explanations_must_quote_the_passage() -> None:
     assert any("quotes text that is not in the reading" in m for m in found)
     data["exercises"][2]["explanation"] = "The text says: « j'ai magasiné avec ma blonde »."
     assert check_lesson_quality(Lesson.model_validate(data), reference()) == []
+    # Quoting an option, not the passage, is fine.
+    data["exercises"][2]["options"][1] = "Ils ont dormi au chalet"
+    data["exercises"][2]["explanation"] = "L'option B (« Ils ont dormi au chalet ») est fausse."
+    assert check_lesson_quality(Lesson.model_validate(data), reference()) == []
 
 
 def test_quebec_word_needs_a_bare_pattern_match() -> None:
@@ -409,6 +413,13 @@ def test_other_france_forms_are_errors_in_french_text() -> None:
     data["exercises"][1]["accepted_answers"] = ["En France, on dit petit-déjeuner."]
     found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
     assert not [m for m in found if "petit-déjeuner" in m]
+
+
+def test_notes_about_the_brief_are_prompt_leaks() -> None:
+    data = lesson_data()
+    data["exercises"][1]["hint"] = "Use « fin ». No regional note is needed here."
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert any("mentions the generation instructions" in m for m in found), found
 
 
 def test_elision_is_checked_in_the_filled_sentence() -> None:

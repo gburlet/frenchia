@@ -246,7 +246,9 @@ _DOUBLE_ARTICLE = re.compile(r"\b(du|au|aux) (?:(le|la|les)\b|l['’])", re.I)
 _PROMPT_LEAK = re.compile(
     r"verified (list|lexicon|usage)|\bthe lexicon\b|\bJSON\b|≤\s*\d+ char"
     # editing notes left by a revision
-    r"|key now points|now points to option|not asked here|\bWait\s*[–-]\s*careful",
+    r"|key now points|now points to option|not asked here|\bWait\s*[–-]\s*careful"
+    # the model talking about its brief (« No regional note is needed here. »)
+    r"|\bNo [^.]{0,40}\b(?:is|are) (?:needed|required) here\b",
     re.I,
 )
 
@@ -340,11 +342,15 @@ def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
                     "exercises are plain text: nothing is underlined or bold",
                 )
         if isinstance(ex, ComprehensionExercise) and ex.reading_id in passages:
+            # Quoting one of the options (« L'option C, « De la soupe… » ») is fine.
+            options = {normalize(o).strip(" .!?…") for o in ex.options}
             for quote in _QUOTE.findall(ex.explanation):
                 text = next(q for q in quote if q)
+                quoted = normalize(text).strip(" .!?…")
                 if (
                     len(text.split()) >= 3
-                    and normalize(text).strip(" .!?…") not in passages[ex.reading_id]
+                    and quoted not in passages[ex.reading_id]
+                    and quoted not in options
                 ):
                     add(
                         "error",
