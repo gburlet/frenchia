@@ -436,6 +436,8 @@ def test_only_lexicon_words_keep_a_quebec_tag() -> None:
             "variants": [
                 {"en": "corner store", "fr": "l'épicerie", "qc": "le dépanneur"},
                 {"en": "hardware store", "fr": "la quincaillerie", "qc": "la quincaillerie"},
+                # Supported by the lexicon but not used anywhere in the lesson: padding.
+                {"en": "supper", "fr": "le dîner", "qc": "le souper"},
             ],
         }
     )

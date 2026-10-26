@@ -763,6 +763,21 @@ def verify_regions(data: Any, ref: Reference) -> Any:
             word = normalize(entry.get("fr", ""))
             if _ARTICLE.sub("", word) in terms:
                 entry["region"] = "qc"
+    # A variant is only worth noting when the lesson uses the word: the model pads regional
+    # notes with dépanneur and souper whatever the topic.
+    rest = json.dumps(
+        [s for s in data["sections"] if s.get("type") != "regional_note"]
+        + data.get("exercises", []),
+        ensure_ascii=False,
+    )
+    used = {normalize(t.term) for t in ref.quebec_terms_in(rest)}
+    for section in data["sections"]:
+        if section.get("type") == "regional_note" and section.get("variants"):
+            section["variants"] = [
+                v
+                for v in section["variants"]
+                if {normalize(t.term) for t in ref.quebec_terms_in(v.get("qc", ""))} & used
+            ]
     return data
 
 
