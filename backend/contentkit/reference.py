@@ -70,8 +70,8 @@ class Reference:
             or key in self._verb_index
             or key in self._lexicon_words
         )
-        # Feminine forms Lexique lacks, common in Québec (« ingénieure », « auteure »).
-        for ending in ("es", "e"):
+        # Feminine and plural forms Lexique or the lexicon lack (« ingénieure », « maringouins »).
+        for ending in ("es", "e", "s", "x"):
             if not known and key.endswith(ending) and len(key) > 4:
                 known = self.is_word(key.removesuffix(ending))
         return known
