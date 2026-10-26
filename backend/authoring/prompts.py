@@ -3,7 +3,7 @@ changes: jobs record the versions they used (GenerationJob.prompts, lesson prove
 
 PROMPT_VERSIONS = {
     "author.system": "4",
-    "author.steps": "4",
+    "author.steps": "5",
     "author.revise": "1",
     "author.critic": "4",
     "author.practice": "2",
@@ -76,8 +76,10 @@ their formality, and a short French example with translation.""",
     "regional_note": """\
 Write a short note (60-150 words, English) on how this lesson's topic is used in Québec compared \
 with France, and up to 6 Québec/France/English variants. Only include differences you are certain \
-of; use the verified Québec usage above. If there is no real difference, say so briefly and list \
-no variants.""",
+of; use the verified Québec usage above. A variant must be a word or form this lesson's topic or \
+examples actually use: never list general Québec words (dépanneur, souper, magasiner…) that the \
+lesson does not need. If there is no real difference for this topic, say so in one or two \
+sentences and list no variants.""",
     "reading": """\
 Write an original French reading passage of {words} words (Québec French; any everyday setting \
 that suits the topic, not built around Québec-specific words) that naturally uses the \

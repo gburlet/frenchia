@@ -213,12 +213,21 @@ _FRANCE_FORMS = [
 ]
 
 
+# « Ce soir, on prépare le dîner »: in Québec the evening meal is « le souper ».
+_EVENING = re.compile(r"\bsoir(?:ée)?\b|\b(?:19|20|21) ?h", re.I)
+_DINNER = re.compile(r"\bd[iî]n(?:er|é|ons|ez|ent)\b", re.I)
+
+
 def _france_form(text: str) -> str | None:
     if _ABOUT_FRANCE.search(text):
         return None
     for pattern, message in _FRANCE_FORMS:
         if m := pattern.search(text):
             return f"« {m.group(0)} »: {message}"
+    for sentence in re.split(r"(?<=[.!?])\s+", text):
+        if (m := _DINNER.search(sentence)) and _EVENING.search(sentence):
+            if not re.search(r"\bmidi\b|\bsoup", sentence, re.I):
+                return f"« {m.group(0)} » in the evening: the Québec evening meal is « le souper »"
     return None
 _FRENCH_FIELDS = {"fr", "passage_fr", "example_fr", "sentence", "answers"}
 # « loin du le centre-ville », « grâce au le beau temps » (a filled blank or an answer key).

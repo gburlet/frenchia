@@ -401,6 +401,7 @@ def test_other_france_forms_are_errors_in_french_text() -> None:
         ("Je prends mon petit-déjeuner.", "petit-déjeuner"),
         ("Nous faisons du shopping.", "faisons du shopping"),
         ("Elle a envoyé un e-mail.", "e-mail"),
+        ("Ce soir, nous préparons le dîner.", "dîner"),
     ]:
         data["exercises"][1]["accepted_answers"] = [answer]
         found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
