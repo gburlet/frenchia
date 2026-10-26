@@ -151,6 +151,25 @@ def run_job(job_id: int) -> GenerationJob:
     return job
 
 
+def revalidate(job: GenerationJob) -> None:
+    """Re-run today's deterministic checks on a draft (checks added after it was generated
+    would otherwise only show up when its import is refused): new problems are added."""
+    from contentkit.validate import check_lesson_quality
+
+    if not job.output:
+        return
+    lesson = LessonContent.model_validate(job.output)
+    known = {(v["path"], v["message"]) for v in job.validation}
+    fresh = [
+        {"severity": i.severity, "path": i.path, "message": i.message}
+        for i in check_lesson_quality(lesson, Reference.load(_root()))
+        if (i.path, i.message) not in known
+    ]
+    if fresh:
+        job.validation = [*job.validation, *fresh]
+        job.save(update_fields=["validation"])
+
+
 def generation_round(job: GenerationJob) -> int:
     """How many generations led to this job (1 for a fresh draft)."""
     depth = 1

@@ -13,7 +13,13 @@ from authoring.external_review import (
     warning_notes,
 )
 from authoring.models import GenerationJob
-from authoring.services import ReviewError, approve, generation_round, request_revision
+from authoring.services import (
+    ReviewError,
+    approve,
+    generation_round,
+    request_revision,
+    revalidate,
+)
 
 
 class Command(BaseCommand):
@@ -48,6 +54,7 @@ class Command(BaseCommand):
         errors += published_errors
         for job_id in imported:
             job = GenerationJob.objects.get(pk=job_id)
+            revalidate(job)
             counts = {
                 s: sum(f["severity"] == s for f in job.external_review)
                 for s in ("error", "suggestion")
