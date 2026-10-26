@@ -18,7 +18,7 @@ from curriculum.models import Lesson
 
 from .models import GenerationJob
 
-PROMPT_VERSION = "5"
+PROMPT_VERSION = "6"
 REVIEW_DIR = Path("drafts") / "review"
 
 
@@ -69,8 +69,11 @@ error;
 « la fin de semaine », not « le week-end »). Flag claims about Québec usage that are wrong or \
 misplaced, but only when you are certain;
 - explanations, tables, examples, regional notes, readings and glossaries are taught as fact: \
-a wrong rule, a wrong form in a table, a wrong translation (Québec dîner = lunch, souper = \
-supper) or a wrong date is an error, like a wrong answer key;
+a wrong rule, a wrong form in a table, a wrong translation (Québec dîner = lunch: « dinner » \
+for dîner is wrong; souper may be translated « supper » or « dinner ») or a wrong date is an \
+error, like a wrong answer key;
+- Québec forms are used where a word naturally comes up; do not ask for more Québec-specific \
+vocabulary;
 - consistency: notes must be about the sentence they're attached to; glossary words are written \
 without articles; explanations must describe mistakes learners really make.
 Use item_id = the id of the section or exercise. severity 'error' = must fix; 'suggestion' = could \
