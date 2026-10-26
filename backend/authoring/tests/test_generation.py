@@ -496,3 +496,29 @@ def test_solver_flags_a_question_whose_key_it_cannot_reach() -> None:
     choices = [e for e in lesson.exercises if e.type in ("multiple_choice", "comprehension")]
     assert len(flagged) == len(choices) and "correct option(s) [0, 1]" in flagged[0].message
     assert flagged[0].message.startswith("AI critic")  # so auto-review revises it
+
+
+def test_blank_checker_flags_other_answers_and_off_topic_blanks() -> None:
+    from authoring.critic import check_blanks
+
+    class Picky(ScriptedChat):
+        def complete(self, messages: Any, **kwargs: Any) -> Completion:
+            if (kwargs.get("json_schema") or {}).get("title") == "BlankCheck":
+                body = {
+                    "other_accepted_answers": ["Est allée", "y est allée"],
+                    "tests_the_lesson_point": False,
+                    "problem": "Tests a place, not y.",
+                }
+                return Completion(json.dumps(body), self.model, 1, 5)
+            return super().complete(messages, **kwargs)
+
+    lesson = (
+        LessonGenerator(ScriptedChat(), reference(), critic=False)
+        .generate(brief(), content_version=1, job_id=None)
+        .lesson
+    )
+    assert check_blanks(ScriptedChat(), lesson, ["Use y"]) == []
+    flagged = check_blanks(Picky(), lesson, ["Use y"])
+    first = flagged[0].message
+    assert "also accept ['y est allée']" in first  # « Est allée » is the key itself
+    assert "does not practise the lesson's point" in first and first.startswith("AI critic")

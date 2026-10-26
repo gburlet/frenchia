@@ -2,6 +2,7 @@
 against (filled-in blanks, French accepted answers, French prompts) using the judge-v2 design
 from ADR 0002. Findings are *warnings* for the human reviewer, never verdicts."""
 
+import re
 from collections.abc import Callable
 from typing import Literal
 
@@ -28,6 +29,12 @@ class Finding(BaseModel):
     explanation: str
 
 
+class BlankCheck(BaseModel):
+    other_accepted_answers: list[str]
+    tests_the_lesson_point: bool
+    problem: str
+
+
 class Solution(BaseModel):
     correct_options: list[int]
 
@@ -39,12 +46,19 @@ class Critique(BaseModel):
     errors: list[Finding]
 
 
+def _fill(sentence: str, answer: str) -> str:
+    """The sentence as a learner reads it once filled: an elided answer (« l' ») joins the next
+    word, so « ___ ai laissé » reads « l'ai laissé », not « l' ai »."""
+    filled = sentence.replace(BLANK, answer)
+    return re.sub(r"(\b\w['’]) (?=\w)", r"\1", filled) if answer.endswith(("'", "’")) else filled
+
+
 def sentences_to_check(lesson: Lesson) -> list[tuple[str, str]]:
     """(exercise id, French sentence) pairs a learner is graded against."""
     out: list[tuple[str, str]] = []
     for ex in lesson.exercises:
         if isinstance(ex, FillBlankExercise):
-            out += [(ex.id, ex.sentence.replace(BLANK, answer)) for answer in ex.answers]
+            out += [(ex.id, _fill(ex.sentence, answer)) for answer in ex.answers]
         elif isinstance(ex, TranslateExercise):
             out += (
                 [(ex.id, a) for a in ex.accepted_answers]
@@ -121,3 +135,55 @@ def solve_choices(
                 )
             )
     return issues
+
+
+def check_blanks(
+    chat: ChatModel,
+    lesson: Lesson,
+    objectives: list[str],
+    record: Callable[[float, int], None] | None = None,
+) -> list[Issue]:
+    """For each fill-in-the-blank: would a teacher accept an answer the key lacks (« Je ___ dis
+    la vérité » fits any pronoun), and does the blank practise the lesson's point? A blank
+    whose answer is « au chalet » in a lesson on « y » does neither."""
+    issues: list[Issue] = []
+    for ex in lesson.exercises:
+        if not isinstance(ex, FillBlankExercise):
+            continue
+        messages = [
+            Message("system", prompts.SYSTEM),
+            Message(
+                "user",
+                prompts.CHECK_BLANK.format(
+                    level=lesson.level,
+                    objectives="; ".join(objectives) or lesson.title,
+                    sentence=ex.sentence,
+                    hint=ex.hint or "(none)",
+                    answers=" / ".join(ex.answers),
+                ),
+            ),
+        ]
+        result, completion = complete_structured(chat, messages, BlankCheck, max_tokens=300)
+        if record:
+            record(completion.latency_ms / 1000, completion.completion_tokens or 0)
+        keyed = {_key(a) for a in ex.answers}
+        others = [a for a in result.other_accepted_answers if _key(a) not in keyed]
+        if others or not result.tests_the_lesson_point:
+            what = []
+            if others:
+                what.append(f"a teacher would also accept {others}")
+            if not result.tests_the_lesson_point:
+                what.append("the blank does not practise the lesson's point")
+            issues.append(
+                Issue(
+                    "warning",
+                    f"{lesson.id}:{ex.id}",
+                    f"AI critic on the blank {ex.sentence!r} (key {ex.answers}): "
+                    f"{'; '.join(what)}. {result.problem}".strip(),
+                )
+            )
+    return issues
+
+
+def _key(answer: str) -> str:
+    return " ".join(answer.casefold().replace("’", "'").split())

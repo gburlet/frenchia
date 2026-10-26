@@ -152,6 +152,8 @@ class ScriptedChat:
             errors = [{"severity": "error", "span": "a parlé son ami", "explanation": "parler à"}]
             bad = "parlé son ami" in sentence
             data = {"correct": not bad, "errors": errors if bad else []}
+        elif title == "BlankCheck":
+            data = {"other_accepted_answers": [], "tests_the_lesson_point": True, "problem": ""}
         elif title == "Solution":  # scripted choice questions all have answer_index 1
             data = {"correct_options": [1]}
         elif title in STEP_OUTPUTS:

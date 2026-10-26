@@ -38,7 +38,7 @@ from inference.errors import InvalidOutput
 from inference.llm import ChatModel, Message, complete_structured
 
 from . import prompts
-from .critic import critique, solve_choices
+from .critic import check_blanks, critique, solve_choices
 from .schemas import (
     DRAFT_SHAPES,
     ChoiceDraft,
@@ -210,6 +210,9 @@ class LessonGenerator:
             self.progress("AI critic: proof-reading graded French sentences")
             issues += critique(self.chat, lesson, self.stats.record)
             issues += solve_choices(self.chat, lesson, self.stats.record)
+            issues += check_blanks(
+                self.chat, lesson, list(brief.outline.objectives), self.stats.record
+            )
         self.progress(
             f"Done: {len(sections)} sections, {len(exercises)} exercises, "
             f"{sum(i.severity == 'error' for i in issues)} errors"
@@ -557,6 +560,7 @@ class LessonReviser:
             self.progress("AI critic: proof-reading graded French sentences")
             issues += critique(self.chat, revised, self.stats.record)
             issues += solve_choices(self.chat, revised, self.stats.record)
+            issues += check_blanks(self.chat, revised, list(revised.objectives), self.stats.record)
         return GenerationResult(revised, issues, self.stats)
 
     def _build(

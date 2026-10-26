@@ -5,7 +5,7 @@ PROMPT_VERSIONS = {
     "author.system": "2",
     "author.steps": "3",
     "author.revise": "1",
-    "author.critic": "3",
+    "author.critic": "4",
     "author.practice": "1",
     "bank.verb": "4",
     "bank.vocab": "2",
@@ -143,6 +143,18 @@ Options (numbered from 0):
 {options}
 List the number of EVERY option that is correct (grammatical, natural and right for the \
 question). Usually that is exactly one."""
+
+
+CHECK_BLANK = """\
+Check this fill-in-the-blank from a CEFR {level} French lesson whose objectives are: {objectives}
+Sentence: {sentence}
+Hint: {hint}
+Answer key: {answers}
+1. List every OTHER answer a teacher would also accept in the blank, given the sentence and \
+hint (another pronoun, tense, agreement or word that fits as well). Leave the list empty if the \
+key is the only right answer. Do not list spelling variants of the key.
+2. Say whether filling this blank practises the lesson's objectives.
+3. In "problem", say briefly what is wrong, or leave it empty."""
 
 
 # --- Verb and vocabulary banks (Phase 6) ---------------------------------------------------
