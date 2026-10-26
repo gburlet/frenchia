@@ -32,8 +32,8 @@ the importer and the LLM's structured output.
    - repeated words after filling a blank
 3. **External proof-reading (ADR 0003).** `just content-review-export` writes one self-contained
    prompt per job awaiting review to `content/drafts/review/job-N.prompt.txt`. A stronger model
-   reads it and writes `job-N.findings.json` next to it. In practice that's a Claude Code Haiku
-   subagent; anything that follows the JSON schema at the end of the prompt works. Then run
+   reads it and writes `job-N.findings.json` next to it. In practice that's a Claude Code
+   subagent (Sonnet since the switch to a remote author, Haiku before); anything that follows the JSON schema at the end of the prompt works. Then run
    `just content-review-import claude-haiku-5-5` (add `--revise` to queue a local-LLM revision
    from the findings straight away). Findings appear in Admin as suggestions and pre-fill the
    revision form. They are never applied automatically.
@@ -43,7 +43,8 @@ the importer and the LLM's structured output.
    Unverified Québec claims are only warnings in Admin, but they are exactly what Haiku misses:
    it passed « avoir le feu au cul » as a Québec expression. The local AI critic's flags are
    often wrong, so they are listed in the review prompt and the reviewer decides each one. After `--max-rounds` generations (default 4) a draft with
-   errors is left for you in Admin.
+   errors is left for you in Admin. `just content-review-export --published` also exports
+   lessons that were published without a proof-read; findings with errors become revision jobs.
 4. **Review.** Open Admin → Generation jobs. Each job shows a rendered preview, the validation report and a diff
    against the published version. Then choose one of:
    - **Approve & publish:** writes `content/lessons/<level>/<id>.yaml` with the next `content_version`, imports

@@ -6,6 +6,7 @@ from django.core.management.base import BaseCommand, CommandError, CommandParser
 
 from authoring.external_review import (
     import_findings,
+    import_published_findings,
     needs_attention,
     revision_notes,
     validation_notes,
@@ -37,7 +38,14 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args: Any, **options: Any) -> None:
+        published, published_errors = import_published_findings(
+            Path(settings.CONTENT_DIR), options["reviewer"]
+        )
+        for slug, count, job in published:
+            outcome = f"revision job {job.pk} queued" if job else "no errors"
+            self.stdout.write(f"published {slug}: {count} errors -> {outcome}")
         imported, errors = import_findings(Path(settings.CONTENT_DIR), options["reviewer"])
+        errors += published_errors
         for job_id in imported:
             job = GenerationJob.objects.get(pk=job_id)
             counts = {

@@ -200,3 +200,24 @@ def test_validation_errors_alone_queue_a_revision(
         )
     child = GenerationJob.objects.get(parent=job)
     assert child.targets == ["ex-02"] and "ex-02.hint: too long" in child.notes
+
+
+def test_published_lessons_can_be_proof_read_and_revised(
+    settings: Any, tmp_path: Path, django_capture_on_commit_callbacks: Any
+) -> None:
+    root = make_repo(tmp_path / "pub")
+    settings.CONTENT_DIR = root
+    import_content(root, publish=True)
+    folder = root / REVIEW_DIR
+    call_command("content_review_export", published=[])
+    prompt = folder / "lesson-a2-passe-compose-er.prompt.txt"
+    assert '"id": "a2-passe-compose-er"' in prompt.read_text()
+    (folder / "lesson-a2-passe-compose-er.findings.json").write_text(json.dumps(FINDINGS))
+    with django_capture_on_commit_callbacks(execute=False):
+        call_command("content_review_import", reviewer="claude-sonnet-5-5")
+    job = GenerationJob.objects.get(lesson="a2-passe-compose-er")
+    assert job.kind == "revision" and "parler à" in job.notes and "claude-sonnet" in job.notes
+    assert not list(folder.glob("lesson-*"))
+    # A lesson with a job in progress is not exported again.
+    call_command("content_review_export", published=[])
+    assert not list(folder.glob("lesson-*"))

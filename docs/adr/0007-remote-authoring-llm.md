@@ -27,8 +27,14 @@ frees the Mac's 16 GB.
   - the client waits out `503 model_scaled_to_zero` responses using `Retry-After`, for up to
     4 minutes;
   - JSON-schema `response_format` works (tested), although the gateway doesn't document it.
-- **No external proof-read with the remote author** (`AUTHORING_EXTERNAL_REVIEW` defaults to
-  false). `authoring.services.auto_review` runs after each job:
+- **External proof-read: off at first, then back on, with Sonnet.** `AUTHORING_EXTERNAL_REVIEW`
+  defaults to false for a remote author. The first batches ran without it. Then Haiku found
+  3–13 real errors in each of the 7 hardest drafts, mostly in explanations, tables, examples and
+  glossaries, which the self-checks below never see. Nine auto-published lessons also translated
+  « dîner » as dinner. So the learner turned the proof-read back on, with Claude Sonnet as the
+  reviewer (`AUTHORING_EXTERNAL_REVIEW=true`). `content_review_export --published` exports
+  lessons that were published without it; their findings become revision jobs.
+- When the proof-read is off, `authoring.services.auto_review` runs after each job:
   - **publish** when there are no deterministic errors, no unverified Québec claims and no
     AI-critic flags;
   - **revise** otherwise, with the problems as notes, up to 4 generations;
@@ -56,4 +62,4 @@ frees the Mac's 16 GB.
 - With no independent reviewer, the author also checks its own answer keys, so errors that come
   from the model's own blind spots can pass. In the first test, a question accepted only
   « Après le souper » although « dîner » and « déjeuner » fit equally well. Set
-  `AUTHORING_EXTERNAL_REVIEW=true` to put the Haiku step back.
+  `AUTHORING_EXTERNAL_REVIEW=true` to put the proof-read back, as the learner did.

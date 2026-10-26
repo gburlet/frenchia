@@ -14,10 +14,11 @@ from pydantic import BaseModel, ConfigDict, ValidationError
 
 from contentkit.reference import Reference
 from contentkit.validate import UNVERIFIED_QUEBEC
+from curriculum.models import Lesson
 
 from .models import GenerationJob
 
-PROMPT_VERSION = "4"
+PROMPT_VERSION = "5"
 REVIEW_DIR = Path("drafts") / "review"
 
 
@@ -47,7 +48,7 @@ class Review(BaseModel):
 
 
 PROMPT = """\
-You are reviewing a lesson that a smaller model generated for an English-speaking adult learning \
+You are reviewing a lesson that a language model generated for an English-speaking adult learning \
 Québec French (CEFR {level}). The learner will study it and be graded against its answer keys, so \
 errors teach mistakes. Review it as an expert teacher and report every real problem:
 - every French sentence: grammar, agreement, prepositions (parler à…), articles, accents, \
@@ -67,6 +68,9 @@ error;
 - Québec usage: Québec usage is the default (déjeuner = breakfast, dîner = lunch, souper = supper; \
 « la fin de semaine », not « le week-end »). Flag claims about Québec usage that are wrong or \
 misplaced, but only when you are certain;
+- explanations, tables, examples, regional notes, readings and glossaries are taught as fact: \
+a wrong rule, a wrong form in a table, a wrong translation (Québec dîner = lunch, souper = \
+supper) or a wrong date is an error, like a wrong answer key;
 - consistency: notes must be about the sentence they're attached to; glossary words are written \
 without articles; explanations must describe mistakes learners really make.
 Use item_id = the id of the section or exercise. severity 'error' = must fix; 'suggestion' = could \
@@ -199,3 +203,60 @@ def validation_notes(job: GenerationJob) -> tuple[str, list[str]]:
         {v["path"].split(":", 1)[1].split(".", 1)[0] for v in errors if ":" in v["path"]}
     )
     return notes, targets
+
+
+# --- Published lessons ----------------------------------------------------------------------
+# Lessons published without an external proof-read (e.g. by a remote author's auto-review) can
+# be reviewed afterwards: lesson-<id>.prompt.txt / .findings.json in the same folder. Findings
+# with errors become a revision job, which then goes through the normal review.
+
+
+def export_published(content_root: Path, lessons: list[Lesson]) -> Path:
+    out = content_root / REVIEW_DIR
+    out.mkdir(parents=True, exist_ok=True)
+    ref = Reference.load(content_root)
+    for lesson in lessons:
+        assert lesson.published_revision is not None
+        (out / f"lesson-{lesson.slug}.prompt.txt").write_text(
+            build_prompt(lesson.published_revision.payload, ref), encoding="utf-8"
+        )
+    return out
+
+
+def import_published_findings(
+    content_root: Path, reviewer: str
+) -> tuple[list[tuple[str, int, GenerationJob | None]], list[str]]:
+    """Returns ([(lesson id, error count, revision job or None)], errors)."""
+    from .services import create_job
+
+    folder = content_root / REVIEW_DIR
+    done: list[tuple[str, int, GenerationJob | None]] = []
+    errors: list[str] = []
+    for path in sorted(folder.glob("lesson-*.findings.json")):
+        slug = path.name.removeprefix("lesson-").removesuffix(".findings.json")
+        lesson = Lesson.objects.filter(slug=slug, published_revision__isnull=False).first()
+        if lesson is None:
+            errors.append(f"{path.name}: {slug} is not a published lesson")
+            continue
+        try:
+            review = Review.model_validate_json(path.read_text(encoding="utf-8"))
+        except ValidationError as exc:
+            errors.append(f"{path.name}: {exc.errors()[0]['msg']}")
+            continue
+        found = [f for f in review.issues if f.severity == "error"]
+        job = None
+        if found:
+            notes = "\n".join(
+                f"- {f.item_id} ({f.severity}): {f.problem} Fix: {f.suggested_fix}"
+                for f in review.issues
+            )
+            job = create_job(
+                lesson,
+                kind=GenerationJob.Kind.REVISION,
+                notes=f"Proof-read by {reviewer}:\n{notes}",
+                targets=sorted({f.item_id for f in review.issues}),
+            )
+        for leftover in (path, folder / f"lesson-{slug}.prompt.txt"):
+            leftover.unlink(missing_ok=True)
+        done.append((slug, len(found), job))
+    return done, errors
