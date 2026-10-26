@@ -349,3 +349,14 @@ def test_a_gerondif_answer_is_a_verb_form() -> None:
     }
     data["exercises"][0]["hint"] = "(jouer)"
     assert check_lesson_quality(Lesson.model_validate(data), ref) == []
+
+
+def test_contraction_followed_by_an_article_is_an_error() -> None:
+    data = lesson_data()
+    data["exercises"][0] |= {"sentence": "Le parc est loin ___ centre-ville.", "answers": ["du le"]}
+    data["exercises"][0]["hint"] = None
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert "error:« du le »: du/au/aux already contain the article" in found
+    data["exercises"][0] |= {"sentence": "Il y a ___ dans le frigo.", "answers": ["du lait"]}
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert not [m for m in found if "already contain" in m]  # « du lait »

@@ -187,6 +187,8 @@ _FORMATTING_REF = re.compile(
 )
 _BOLD = re.compile(r"\*\*")  # rendered only in explanations
 HINT_MAX = 160
+# « loin du le centre-ville », « grâce au le beau temps » (a filled blank or an answer key).
+_DOUBLE_ARTICLE = re.compile(r"\b(du|au|aux) (?:(le|la|les)\b|l['’])", re.I)
 # Bits of the generation prompt that reach the learner (« no slang that isn't in the verified
 # list »).
 _PROMPT_LEAK = re.compile(r"verified (list|lexicon|usage)|\bthe lexicon\b|\bJSON\b", re.I)
@@ -276,6 +278,8 @@ def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
         if any("(" in a or "[" in a for a in answers):
             add("error", ex.id, "an accepted answer is a full answer, with no notes in brackets")
         for text in _graded_french(ex):
+            if m := _DOUBLE_ARTICLE.search(text):
+                add("error", ex.id, f"« {m.group(0)} »: du/au/aux already contain the article")
             for word in _unknown_words(text, ref):
                 add("error", ex.id, f"{word!r} is not a French word (not in Lexique)")
         if isinstance(ex, FillBlankExercise):
