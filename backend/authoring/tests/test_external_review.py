@@ -75,7 +75,7 @@ def test_import_attaches_findings_and_can_queue_a_revision(
     assert [f["unknown_item"] for f in job.external_review] == [False, False, True]
     assert not list(folder.glob(f"job-{job.pk}.*"))  # consumed
     child = GenerationJob.objects.get(parent=job)
-    assert child.targets == ["ex-01", "table"] and "parler à" in child.notes
+    assert child.targets == ["ex-01"] and "parler à" in child.notes  # errors only
     assert job.status == GenerationJob.Status.REJECTED  # superseded by the revision
 
 

@@ -76,7 +76,12 @@ class Command(BaseCommand):
                 if generation_round(job) >= options["max_rounds"]:
                     line += f" -> left for manual review after {options['max_rounds']} rounds"
                 else:
-                    parts = [revision_notes(job), warning_notes(attention), validation_notes(job)]
+                    # Errors only: rewriting for every suggestion introduced new errors.
+                    parts = [
+                        revision_notes(job, include_suggestions=False),
+                        warning_notes(attention),
+                        validation_notes(job),
+                    ]
                     notes = "\n".join(n for n, _ in parts if n)
                     targets = sorted({t for _, ts in parts for t in ts})
                     child = request_revision(job, notes, targets)
