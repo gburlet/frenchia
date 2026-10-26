@@ -191,6 +191,8 @@ HINT_MAX = 160
 # A model can degenerate into markup (« {#core-explanation .untyped-1 .untyped-2 … ») instead
 # of an explanation.
 EXPLANATION_MIN_WORDS = 5
+# ...or into runs of stray asterisks in the middle of prose (« *****### The pronoun »).
+_BROKEN_MARKUP = re.compile(r"\*{5,}")
 # « parce que il », « si il », « je ai »: elision is never optional in written French.
 _NO_ELISION = re.compile(
     r"\b(?:(?:parce |lors|puis|jus)?que (?:il|ils|elle|elles|on|un|une)|si (?:il|ils)|"
@@ -306,6 +308,8 @@ def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
             add("error", path, problem)
         if FOREIGN_SCRIPT.search(text):
             add("error", path, f"text contains another script: {text[:60]!r}")
+        if m := _BROKEN_MARKUP.search(text):
+            add("error", path, f"stray markup « {m.group(0)} » in the text")
         if _VULGAR.search(text):
             add("error", path, f"vulgar or swear word {_VULGAR.search(text).group(0)!r}")  # type: ignore[union-attr]
         if _LATEX.search(text):

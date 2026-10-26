@@ -158,12 +158,18 @@ _LATEX = {
 }
 
 
+# Line breaks written as HTML or as stray symbols (« <br> », « ⟩⟩⟩ », « ⏎ »): the lesson
+# renderer shows raw HTML as text.
+_LINE_BREAK = re.compile(r"<br\s*/?>|⟩{2,}|⏎", re.I)
+_HTML_COMMENT = re.compile(r"<!--.*?-->", re.S)
+
+
 def tidy(value: object) -> object:
     """Recursively replace LaTeX arrows and similar markup that small models emit in prose."""
     if isinstance(value, str):
         for latex, plain in _LATEX.items():
             value = value.replace(latex, plain)
-        return value
+        return _HTML_COMMENT.sub("", _LINE_BREAK.sub("\n", value))
     if isinstance(value, list):
         return [tidy(v) for v in value]
     if isinstance(value, dict):

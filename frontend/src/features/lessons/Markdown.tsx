@@ -1,5 +1,7 @@
 import ReactMarkdown, { type Components } from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { cn } from "@/lib/utils";
+import { cleanMarkdown } from "./cleanMarkdown";
 
 const components: Components = {
   h1: (p) => <h3 className="mt-4 mb-2 text-xl" {...p} />,
@@ -23,11 +25,13 @@ const components: Components = {
   td: (p) => <td className="border-b border-line px-3 py-2" {...p} />,
 };
 
-/** Markdown with raw HTML disabled (react-markdown's default). */
+/** Markdown (with GFM tables) and raw HTML disabled (react-markdown's default). */
 export function Markdown({ children, className }: { children: string; className?: string }) {
   return (
     <div className={cn("max-w-[70ch]", className)}>
-      <ReactMarkdown components={components}>{children}</ReactMarkdown>
+      <ReactMarkdown components={components} remarkPlugins={[remarkGfm]}>
+        {cleanMarkdown(children)}
+      </ReactMarkdown>
     </div>
   );
 }

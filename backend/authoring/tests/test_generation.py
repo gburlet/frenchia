@@ -447,6 +447,12 @@ def test_only_lexicon_words_keep_a_quebec_tag() -> None:
     assert [e["region"] for e in out["sections"][1]["examples"]] == ["qc", "common"]
 
 
+def test_tidy_turns_html_breaks_and_stray_symbols_into_newlines() -> None:
+    assert tidy({"body": "| a |<br>|---|<br/>x⟩⟩⟩y⏎z<!-- note -->"}) == {
+        "body": "| a |\n|---|\nx\ny\nz"
+    }
+
+
 def test_tidy_turns_literal_backslash_n_into_a_newline() -> None:
     assert tidy({"body": "- les\\n- leur"}) == {"body": "- les\n- leur"}
 
