@@ -393,3 +393,11 @@ def test_missing_elision_and_week_end_are_errors() -> None:
         for m in messages(check_lesson_quality(Lesson.model_validate(data), reference()))
         if "hint" in m and "week" in m
     ]
+
+
+def test_elision_is_checked_in_the_filled_sentence() -> None:
+    data = lesson_data()
+    data["exercises"][0] |= {"sentence": "On reste, ___ il pleut.", "answers": ["parce que"]}
+    data["exercises"][0]["hint"] = None
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert "error:missing elision once filled: « parce que il »" in found

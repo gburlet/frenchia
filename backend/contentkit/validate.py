@@ -299,6 +299,8 @@ def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
         if any("(" in a or "[" in a for a in answers):
             add("error", ex.id, "an accepted answer is a full answer, with no notes in brackets")
         for text in _graded_french(ex):
+            if m := _NO_ELISION.search(text):  # a filled blank: « ___ il » + « parce que »
+                add("error", ex.id, f"missing elision once filled: « {m.group(0)} »")
             if (m := _WEEK_END.search(text)) and not _ABOUT_FRANCE.search(text):
                 add("error", ex.id, f"« {m.group(0)} »: Québec usage is « la fin de semaine »")
             if m := _DOUBLE_ARTICLE.search(text):
