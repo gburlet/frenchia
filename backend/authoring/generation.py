@@ -700,6 +700,17 @@ _ENUMERATOR = re.compile(r"^\s*(?:[A-Da-d1-9][.)]|\d\ufe0f?\u20e3|[A-D]\s*[-–:
 _ENUMERATED = {"options", "prompt", "question", "sentence"}
 
 
+_GENDER_MARK = re.compile(r"\((e|s|es)\)")
+
+
+def _gender_forms(answer: Any) -> list[Any]:
+    """« tu serais allé(e) » -> « tu serais allé », « tu serais allée »: learners type one form,
+    and brackets never match an answer exactly."""
+    if not isinstance(answer, str) or not _GENDER_MARK.search(answer):
+        return [answer]
+    return [_GENDER_MARK.sub("", answer), _GENDER_MARK.sub(r"\1", answer)]
+
+
 def plain_item(value: Any, key: str = "") -> Any:
     """Exercises are shown as plain text (only explanations render **bold**): drop the Markdown
     emphasis larger models put on key words (« Mon frère a vu **un castor** ») and the
@@ -710,7 +721,10 @@ def plain_item(value: Any, key: str = "") -> Any:
         value = value.replace("**", "")
         return _ENUMERATOR.sub("", value) if key in _ENUMERATED else value
     if isinstance(value, list):
-        return [plain_item(v, key) for v in value]
+        items = [plain_item(v, key) for v in value]
+        if key in ("accepted_answers", "answers"):
+            items = _dedupe([form for item in items for form in _gender_forms(item)])
+        return items
     if isinstance(value, dict):
         return {k: plain_item(v, k) for k, v in value.items()}
     return value

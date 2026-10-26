@@ -522,3 +522,10 @@ def test_blank_checker_flags_other_answers_and_off_topic_blanks() -> None:
     first = flagged[0].message
     assert "also accept ['y est allée']" in first  # « Est allée » is the key itself
     assert "does not practise the lesson's point" in first and first.startswith("AI critic")
+
+
+def test_gender_notation_in_answers_becomes_two_answers() -> None:
+    from authoring.generation import plain_item
+
+    data = {"accepted_answers": ["Tu serais allé(e) hier.", "Tu serais allé hier."]}
+    assert plain_item(data)["accepted_answers"] == ["Tu serais allé hier.", "Tu serais allée hier."]
