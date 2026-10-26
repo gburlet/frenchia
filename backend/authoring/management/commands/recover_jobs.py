@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from functools import partial
 from typing import Any
 
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandParser
 from django.db import transaction
 from django.utils import timezone
 
@@ -24,12 +24,19 @@ class Command(BaseCommand):
         "several, only jobs quiet for 10 minutes are."
     )
 
+    def add_arguments(self, parser: CommandParser) -> None:
+        parser.add_argument(
+            "--all",
+            action="store_true",
+            help="requeue every running job (only while no worker is running)",
+        )
+
     def handle(self, *args: Any, **options: Any) -> None:
         from authoring.tasks import run_generation_job
 
         # With several workers, another worker may be running a job right now: only jobs that
         # have shown no progress for a while were interrupted.
-        cutoff = timezone.now() - QUIET_FOR
+        cutoff = timezone.now() - (timedelta(0) if options["all"] else QUIET_FOR)
         stale = [
             job
             for job in GenerationJob.objects.filter(status=GenerationJob.Status.RUNNING)

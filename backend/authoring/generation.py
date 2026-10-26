@@ -253,7 +253,15 @@ class LessonGenerator:
             section = convert(obj)
             return [] if section is None else self._problems(brief, [*sections, section], [])
 
-        obj = self._ask(context, sections, instruction, schema, check)
+        try:
+            obj = self._ask(context, sections, instruction, schema, check)
+        except InvalidOutput as exc:
+            if step not in OPTIONAL_SECTIONS:
+                raise
+            self.dropped.append(
+                Issue("warning", f"{brief.outline.id}:{step}", f"dropped {step}: {exc}")
+            )
+            return None, extra
         try:
             return convert(obj), extra
         except ValidationError as exc:
@@ -289,6 +297,7 @@ class LessonGenerator:
                 "id": f"{step.replace('_', '-')}-{i}",
                 "grammar_topics": topics,
             }
+            data = plain_item(data)  # before validation: « A. x » / « C. x » become duplicates
             for key in ("accepted_answers", "answers"):
                 if key in data:  # the same translation twice, when Québec = standard wording
                     data[key] = _dedupe(data[key])
@@ -636,7 +645,13 @@ class LessonReviser:
         keep: dict[str, Any] = {
             k: data[k] for k in ("id", "type", "grammar_topics", "reading_id") if k in data
         }
-        return revised.model_copy(update=keep)
+        if data["type"] not in EXERCISE_TYPES:
+            return revised.model_copy(update=keep)
+        cleaned = {**plain_item(revised.model_dump(mode="json", exclude_none=True)), **keep}
+        try:
+            return model.model_validate(cleaned)
+        except ValidationError as exc:  # e.g. options that were only told apart by « A. »
+            raise InvalidOutput("llm", f"{data['id']}: {exc.errors()[0]['msg']}") from exc
 
     def _revise_vocab_section(
         self, model: type[BaseModel], data: dict[str, Any], notes: str
@@ -681,24 +696,24 @@ _ENUMERATOR = re.compile(r"^\s*(?:[A-Da-d1-9][.)]|\d\ufe0f?\u20e3|[A-D]\s*[-–:
 _ENUMERATED = {"options", "prompt", "question", "sentence"}
 
 
-def plain_exercises(data: Any) -> Any:
+def plain_item(value: Any, key: str = "") -> Any:
     """Exercises are shown as plain text (only explanations render **bold**): drop the Markdown
-    emphasis larger models put on key words (« Mon frère a vu **un castor** »)."""
+    emphasis larger models put on key words (« Mon frère a vu **un castor** ») and the
+    numbering they put on options (« A. C'est le fun… », « 1️⃣ … »: the UI numbers options)."""
+    if isinstance(value, str):
+        if key == "explanation":
+            return value
+        value = value.replace("**", "")
+        return _ENUMERATOR.sub("", value) if key in _ENUMERATED else value
+    if isinstance(value, list):
+        return [plain_item(v, key) for v in value]
+    if isinstance(value, dict):
+        return {k: plain_item(v, k) for k, v in value.items()}
+    return value
 
-    def plain(value: Any, key: str = "") -> Any:
-        if isinstance(value, str):
-            if key == "explanation":
-                return value
-            value = value.replace("**", "")
-            # « A. C'est le fun… », « 1️⃣ Après le souper… »: the UI numbers options itself.
-            return _ENUMERATOR.sub("", value) if key in _ENUMERATED else value
-        if isinstance(value, list):
-            return [plain(v, key) for v in value]
-        if isinstance(value, dict):
-            return {k: plain(v, k) for k, v in value.items()}
-        return value
 
-    data["exercises"] = [plain(e) for e in data["exercises"]]
+def plain_exercises(data: Any) -> Any:
+    data["exercises"] = [plain_item(e) for e in data["exercises"]]
     return data
 
 

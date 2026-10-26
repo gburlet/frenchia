@@ -297,8 +297,14 @@ def _check_quebec(add: AddFn, where: str, term: str, ref: Reference) -> None:
 
 def _check_fill_blank(add: AddFn, ex: FillBlankExercise, ref: Reference) -> None:
     for answer in ex.answers:
-        filled = normalize(ex.sentence.replace(BLANK, answer)).split()
-        if any(a == b and len(a) > 2 for a, b in zip(filled, filled[1:], strict=False)):
+        # Split at apostrophes too: « parce qu'il il était » repeats « il ».
+        # Inline hints (« décidé ___ (partir) ») are not part of the sentence.
+        sentence = re.sub(r"\([^)]*\)", " ", ex.sentence.replace(BLANK, answer))
+        filled = re.findall(r"[^\W\d_]+", normalize(sentence))
+        if any(
+            a == b and (len(a) > 2 or a in _SUBJECTS) and a not in _REFLEXIVE_DOUBLES
+            for a, b in zip(filled, filled[1:], strict=False)
+        ):
             add("error", ex.id, f"word repeated after filling the blank with {answer!r}")
     hint_words = f" {_words(ex.hint or '')} "
     for answer in ex.answers:
@@ -407,10 +413,16 @@ def _hint_infinitive(hint: str | None) -> str | None:
 _PRONOUNS = re.compile(r"^(je |j'|tu |il |elle |on |nous |vous |ils |elles |qu'|que )+")
 
 
+_SUBJECTS = {"je", "tu", "il", "on", "elle", "ils", "elles"}
+_REFLEXIVE_DOUBLES = {"nous", "vous"}  # « nous nous levons »
+
+
 def _is_verb_form(answer: str, forms: set[str]) -> bool:
     """True if the answer, with or without a leading subject pronoun, is a reference form
-    (the reference includes agreed participles: est allée, sont allées)."""
-    return answer in forms or _PRONOUNS.sub("", answer) in forms
+    (the reference includes agreed participles: est allée, sont allées). A gérondif
+    (« en jouant ») is « en » + the present participle."""
+    bare = _PRONOUNS.sub("", answer)
+    return answer in forms or bare in forms or bare.removeprefix("en ") in forms
 
 
 def validate_repository(root: Path, *, quality: bool = True) -> Repository:

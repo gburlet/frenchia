@@ -320,3 +320,32 @@ def test_an_english_right_option_is_not_checked_as_french() -> None:
     data["exercises"][2] |= {"options": ["To be frightened or anxious.", "To own a dog."]}
     issues = check_lesson_quality(Lesson.model_validate(data), ref)
     assert not [i for i in issues if i.path.endswith("ex-03") and "French word" in i.message]
+
+
+def test_doubled_subject_after_filling_is_an_error_but_reflexive_nous_is_not() -> None:
+    data = lesson_data()
+    blank = data["exercises"][0]
+    blank |= {"sentence": "Je n'ai rien acheté parce qu'il ___ trop cher.", "answers": ["il était"]}
+    blank["hint"] = None
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert found == ["error:word repeated after filling the blank with 'il était'"]
+    blank |= {"sentence": "Ce matin, nous ___ tôt.", "answers": ["nous sommes levés"]}
+    assert check_lesson_quality(Lesson.model_validate(data), reference()) == []
+
+
+def test_a_gerondif_answer_is_a_verb_form() -> None:
+    ref = reference()
+    ref.verbs = {
+        "jouer": {
+            "participle_past": "joué",
+            "participle_present": "jouant",
+            "forms": {"indicatif.present": {"je": "joue"}},
+        }
+    }
+    data = lesson_data()
+    data["exercises"][0] |= {
+        "sentence": "Il chante ___ au hockey.",
+        "answers": ["en jouant"],
+    }
+    data["exercises"][0]["hint"] = "(jouer)"
+    assert check_lesson_quality(Lesson.model_validate(data), ref) == []
