@@ -214,7 +214,10 @@ _DOUBLE_ARTICLE = re.compile(r"\b(du|au|aux) (?:(le|la|les)\b|l['’])", re.I)
 # Bits of the generation prompt that reach the learner (« no slang that isn't in the verified
 # list »).
 _PROMPT_LEAK = re.compile(
-    r"verified (list|lexicon|usage)|\bthe lexicon\b|\bJSON\b|≤\s*\d+ char", re.I
+    r"verified (list|lexicon|usage)|\bthe lexicon\b|\bJSON\b|≤\s*\d+ char"
+    # editing notes left by a revision
+    r"|key now points|now points to option|not asked here|\bWait\s*[–-]\s*careful",
+    re.I,
 )
 
 
