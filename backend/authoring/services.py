@@ -3,8 +3,9 @@
 import logging
 import traceback
 from collections.abc import Callable
+from datetime import timedelta
 from pathlib import Path
-from typing import cast
+from typing import Any, cast
 
 from django.conf import settings
 from django.db import transaction
@@ -17,6 +18,7 @@ from contentkit.reference import Reference
 from contentkit.yamlio import load_yaml
 from curriculum.importer import import_content
 from curriculum.models import GrammarTopic, Lesson
+from inference.errors import InferenceTimeout, InferenceUnavailable
 from inference.llm import ChatModel
 from inference.providers import get_chat_model
 
@@ -25,6 +27,10 @@ from .models import GenerationJob
 from .writer import ContentWriter, WriteConflict
 
 logger = logging.getLogger(__name__)
+
+RETRY_NOTE = "LLM unavailable"
+RETRY_DELAY = timedelta(minutes=5)
+MAX_RETRIES = 6
 
 
 class ReviewError(Exception):
@@ -70,13 +76,7 @@ def create_job(
             parent.reviewed_at = timezone.now()
             parent.save(update_fields=["status", "reviewer_notes", "reviewed_at"])
         if enqueue:
-            from .tasks import run_generation_job
-
-            # A revision is short and finishes a lesson that is nearly done: run it before new
-            # drafts queued in bulk.
-            revision = kind == GenerationJob.Kind.REVISION
-            task = run_generation_job.using(priority=100) if revision else run_generation_job
-            transaction.on_commit(lambda: task.enqueue(job.pk))
+            transaction.on_commit(lambda: _enqueue(job))
     return job
 
 
@@ -123,6 +123,19 @@ def run_job(job_id: int) -> GenerationJob:
         job.llm_calls, job.llm_seconds = result.stats.calls, round(result.stats.seconds, 1)
         job.completion_tokens = result.stats.tokens
         job.status = GenerationJob.Status.NEEDS_REVIEW
+    except (InferenceUnavailable, InferenceTimeout) as exc:
+        # The LLM is down or overloaded (e.g. the Mac ran out of memory): wait and start again
+        # instead of failing a whole queue of jobs in seconds.
+        retries = sum(p["message"].startswith(RETRY_NOTE) for p in job.progress)
+        if retries < MAX_RETRIES:
+            progress(f"{RETRY_NOTE} ({exc}); retrying in {RETRY_DELAY.seconds // 60} min")
+            job.status, job.started_at = GenerationJob.Status.QUEUED, None
+            job.save(update_fields=["status", "started_at"])
+            _enqueue(job, run_after=timezone.now() + RETRY_DELAY)
+            return job
+        logger.exception("Generation job %s failed", job.pk)
+        job.status = GenerationJob.Status.FAILED
+        job.error = f"{exc}\n\n{traceback.format_exc()}"
     except Exception as exc:
         logger.exception("Generation job %s failed", job.pk)
         job.status = GenerationJob.Status.FAILED
@@ -130,6 +143,16 @@ def run_job(job_id: int) -> GenerationJob:
     job.finished_at = timezone.now()
     job.save()
     return job
+
+
+def _enqueue(job: GenerationJob, **options: Any) -> None:
+    """A revision is short and finishes a lesson that is nearly done: run it before new drafts
+    queued in bulk."""
+    from .tasks import run_generation_job
+
+    if job.kind == GenerationJob.Kind.REVISION:
+        options.setdefault("priority", 100)
+    run_generation_job.using(**options).enqueue(job.pk)
 
 
 def _generate(

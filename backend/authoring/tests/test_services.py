@@ -133,3 +133,24 @@ def test_recover_jobs_requeues_interrupted_jobs(
     assert job.status == GenerationJob.Status.QUEUED and len(callbacks) == 1
     assert "Interrupted" in job.progress[-1]["message"]
     assert run_job(job.pk).status == GenerationJob.Status.NEEDS_REVIEW  # runs normally again
+
+
+class DownChat(ScriptedChat):
+    def complete(self, messages: Any, **kwargs: Any) -> Any:
+        from inference.errors import InferenceUnavailable
+
+        raise InferenceUnavailable("llm", "llm is unavailable (retrying shortly)")
+
+
+def test_an_unavailable_llm_requeues_the_job_instead_of_failing_it(root: Path) -> None:
+    job = create_job(Lesson.objects.get(slug="a2-passe-compose-er"), enqueue=False)
+    with (
+        patch("authoring.services.get_chat_model", return_value=DownChat()),
+        patch("authoring.services._enqueue") as enqueue,
+    ):
+        for _ in range(7):
+            job = run_job(job.pk)
+    assert enqueue.call_count == 6  # six retries, then it fails
+    assert "run_after" in enqueue.call_args.kwargs
+    assert job.status == GenerationJob.Status.FAILED
+    assert sum(p["message"].startswith("LLM unavailable") for p in job.progress) == 6
