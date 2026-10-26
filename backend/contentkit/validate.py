@@ -333,7 +333,7 @@ def _check_fill_blank(add: AddFn, ex: FillBlankExercise, ref: Reference) -> None
         sentence = re.sub(r"\([^)]*\)", " ", ex.sentence.replace(BLANK, answer))
         filled = re.findall(r"[^\W\d_]+", normalize(sentence))
         if any(
-            a == b and (len(a) > 2 or a in _SUBJECTS) and a not in _REFLEXIVE_DOUBLES
+            a == b and a not in _REFLEXIVE_DOUBLES and len(a) > 1  # « où où », « il il »
             for a, b in zip(filled, filled[1:], strict=False)
         ):
             add("error", ex.id, f"word repeated after filling the blank with {answer!r}")
@@ -469,7 +469,6 @@ def _hint_infinitive(hint: str | None) -> str | None:
 _PRONOUNS = re.compile(r"^(je |j'|tu |il |elle |on |nous |vous |ils |elles |qu'|que )+")
 
 
-_SUBJECTS = {"je", "tu", "il", "on", "elle", "ils", "elles"}
 _REFLEXIVE_DOUBLES = {"nous", "vous"}  # « nous nous levons »
 
 
