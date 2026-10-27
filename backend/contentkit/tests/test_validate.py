@@ -315,6 +315,9 @@ def test_accepted_answers_carry_no_notes() -> None:
     ]
     found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
     assert found == ["error:an accepted answer is a full answer, with no notes in brackets"]
+    data["exercises"][1]["accepted_answers"] = ["On a magasiné.", "Québec : On a magasiné."]
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert found == ["error:an accepted answer is a full answer, with no « Québec : » label"]
 
 
 def test_an_english_right_option_is_not_checked_as_french() -> None:

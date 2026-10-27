@@ -251,6 +251,8 @@ _NO_CONTRACTION = re.compile(
 _DOUBLE_ARTICLE = re.compile(r"\b(du|au|aux) (?:(le|la|les)\b|l['’])", re.I)
 # Bits of the generation prompt that reach the learner (« no slang that isn't in the verified
 # list »).
+# "Québec : J'ai fini." — a variant label in an answer key can never match what a learner types.
+_ANSWER_LABEL = re.compile(r"\s*(?:Québec|Quebec|France|QC|FR|Standard|Formal|Informal)\s*:", re.I)
 _PROMPT_LEAK = re.compile(
     r"verified (list|lexicon|usage)|\bthe lexicon\b|\bJSON\b|≤\s*\d+ char"
     # editing notes left by a revision
@@ -373,6 +375,8 @@ def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
         answers = [*getattr(ex, "answers", []), *getattr(ex, "accepted_answers", [])]
         if any("(" in a or "[" in a or "//" in a for a in answers):
             add("error", ex.id, "an accepted answer is a full answer, with no notes in brackets")
+        if any(_ANSWER_LABEL.match(a) for a in answers):
+            add("error", ex.id, "an accepted answer is a full answer, with no « Québec : » label")
         for text in _graded_french(ex):
             if m := _NO_ELISION.search(text):  # a filled blank: « ___ il » + « parce que »
                 add("error", ex.id, f"missing elision once filled: « {m.group(0)} »")
