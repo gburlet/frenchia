@@ -142,7 +142,6 @@ units:
     - present-er
     prerequisites:
     - a1-subject-pronouns
-    quebec_focus: Common everyday -er verbs; Québec forms (magasiner, jaser) only where they fit naturally
     reference: clemence:day-10
   - id: a1-present-ir
     title: Le présent des verbes en -ir (2e groupe)
