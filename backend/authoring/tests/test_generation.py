@@ -7,11 +7,19 @@ from authoring.generation import (
     LessonBrief,
     LessonGenerator,
     LessonReviser,
+    _emptied,
     gratuitous_quebec,
     verify_regions,
 )
 from authoring.schemas import tidy
-from contentkit.models import Example, ExamplesSection, FillBlankExercise, Lesson, LessonOutline
+from contentkit.models import (
+    Example,
+    ExamplesSection,
+    FillBlankExercise,
+    Lesson,
+    LessonOutline,
+    RegionalNoteSection,
+)
 from contentkit.reference import QuebecTerm, Reference
 from contentkit.yamlio import content_hash
 from inference.llm import Completion
@@ -617,3 +625,15 @@ def test_plain_french_tagged_as_france_usage_becomes_common() -> None:
     }
     verify_regions(data, reference())
     assert [e["region"] for e in data["sections"][0]["examples"]] == ["common", "fr"]
+
+
+def test_a_regional_note_the_reviser_emptied_is_dropped() -> None:
+    def note(body: str) -> RegionalNoteSection:
+        return RegionalNoteSection(
+            type="regional_note", id="regional-note", heading="Québec", body=body
+        )
+
+    assert _emptied(note("This regional note has been removed because it was not needed."))
+    assert not _emptied(
+        note("Québec speakers often say « fait que » where France says « du coup ».")
+    )

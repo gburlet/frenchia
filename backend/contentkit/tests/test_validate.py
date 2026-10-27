@@ -391,6 +391,9 @@ def test_missing_elision_and_week_end_are_errors() -> None:
     data["exercises"][1]["accepted_answers"] = ["Parce que il pleut, on reste.", "On reste."]
     found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
     assert "error:missing elision: « Parce que il »" in found
+    data["exercises"][1]["accepted_answers"] = ["Si j'avais su, je aurais agi.", "Non."]
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert "error:missing elision: « je aurais »" in found
     data["exercises"][1]["accepted_answers"] = ["On a magasiné ce week-end.", "On a magasiné."]
     found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
     assert "error:« ce week-end »: Québec usage is « la fin de semaine »" in found

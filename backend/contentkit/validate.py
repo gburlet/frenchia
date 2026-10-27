@@ -196,7 +196,8 @@ _BROKEN_MARKUP = re.compile(r"\*{5,}")
 # « parce que il », « si il », « je ai »: elision is never optional in written French.
 _NO_ELISION = re.compile(
     r"\b(?:(?:parce |lors|puis|jus)?que (?:il|ils|elle|elles|on|un|une)|si (?:il|ils)|"
-    r"je (?:ai|avais|aurai|étais|aime|habite|en|y))\b",
+    r"je (?:ai|avais|aurai|aurais|aurait|étais|eus|eusse|aime|adore|habite|arrive|attends|"
+    r"irai|irais|en|y))\b",
     re.I,
 )
 # Québec usage (prompts.SYSTEM): « la fin de semaine », not « le week-end », except when the

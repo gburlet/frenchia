@@ -545,8 +545,11 @@ class LessonReviser:
         wanted = set(targets) or set(ids)
         self.dropped: list[Issue] = []
         sections = [
-            _clean_vocab(self._item(d, SECTION_TYPES, notes, d["id"] in wanted))
+            section
             for d in base["sections"]
+            if not _emptied(
+                section := _clean_vocab(self._item(d, SECTION_TYPES, notes, d["id"] in wanted))
+            )
         ]
         exercises = [
             item
@@ -859,6 +862,21 @@ def verify_regions(data: Any, ref: Reference) -> Any:
                 if {normalize(t.term) for t in ref.quebec_terms_in(v.get("qc", ""))} & used
             ]
     return data
+
+
+_REMOVED = re.compile(
+    r"\b(?:has|have|was|were) been (?:removed|deleted)\b|\bwas (?:removed|deleted)\b", re.I
+)
+
+
+def _emptied(section: Any) -> bool:
+    """A reviser can only rewrite a section, so when a reviewer asks for a regional note to go,
+    the model writes « This regional note has been removed… » instead: drop the section."""
+    return (
+        isinstance(section, RegionalNoteSection)
+        and not section.variants
+        and bool(_REMOVED.search(section.body))
+    )
 
 
 def _clean_vocab(section: Any) -> Any:
