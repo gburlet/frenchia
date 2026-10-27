@@ -422,6 +422,9 @@ def test_notes_about_the_brief_are_prompt_leaks() -> None:
     found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
     assert any("sections" in m or "mentions the generation instructions" in m for m in found)
     data = lesson_data()
+    data["exercises"][1]["hint"] = "The word québécoise has been removed from the option."
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert any("mentions the generation instructions" in m for m in found), found
     data["exercises"][1]["hint"] = "Use « fin ». No regional note is needed here."
     found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
     assert any("mentions the generation instructions" in m for m in found), found

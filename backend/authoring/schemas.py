@@ -164,16 +164,48 @@ _LINE_BREAK = re.compile(r"<br\s*/?>|⟩{2,}|⏎", re.I)
 _HTML_COMMENT = re.compile(r"<!--.*?-->", re.S)
 
 
-def tidy(value: object) -> object:
+_TABLE_RULE = re.compile(r"\|\s*:?-{3,}:?\s*(?:\|\s*:?-{3,}:?\s*)*\|")
+
+
+def _split_table(line: str) -> str:
+    """« text | A | B | |---|---| | a | b | » (a table flattened into one line) -> one row per
+    line, with blank lines around the table."""
+    rule = _TABLE_RULE.search(line)
+    if not rule:
+        return line
+    columns = rule.group(0).count("|") - 1
+    start, end = line.index("|"), line.rindex("|")
+    cells = line[start + 1 : end].split("|")
+    rows, i = [], 0
+    while i < len(cells):
+        rows.append("| " + " | ".join(c.strip() for c in cells[i : i + columns]) + " |")
+        i += columns
+        if i < len(cells) and not cells[i].strip():  # the « | | » between two rows
+            i += 1
+    parts = (line[:start].strip(), "\n".join(rows), line[end + 1 :].strip())
+    return "\n\n".join(p for p in parts if p)
+
+
+def unflatten_markdown(body: str) -> str:
+    """gpt-oss sometimes writes a Markdown body on one line, with two spaces where the line
+    breaks were and table rows run together; put the breaks back."""
+    if "\n" not in body:
+        body = re.sub(r" {2,}", "\n\n", body)
+    body = re.sub(r"\*{5,}", "**", body)  # « *****Heading** »: a rule run into a bold heading
+    return "\n".join(_split_table(line) for line in body.split("\n"))
+
+
+def tidy(value: object, key: str = "") -> object:
     """Recursively replace LaTeX arrows and similar markup that small models emit in prose."""
     if isinstance(value, str):
         for latex, plain in _LATEX.items():
             value = value.replace(latex, plain)
-        return _HTML_COMMENT.sub("", _LINE_BREAK.sub("\n", value))
+        value = _HTML_COMMENT.sub("", _LINE_BREAK.sub("\n", value))
+        return unflatten_markdown(value) if key == "body" else value
     if isinstance(value, list):
         return [tidy(v) for v in value]
     if isinstance(value, dict):
-        return {k: tidy(v) for k, v in value.items()}
+        return {k: tidy(v, k) for k, v in value.items()}
     return value
 
 

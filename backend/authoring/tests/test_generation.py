@@ -448,9 +448,21 @@ def test_only_lexicon_words_keep_a_quebec_tag() -> None:
 
 
 def test_tidy_turns_html_breaks_and_stray_symbols_into_newlines() -> None:
-    assert tidy({"body": "| a |<br>|---|<br/>x⟩⟩⟩y⏎z<!-- note -->"}) == {
-        "body": "| a |\n|---|\nx\ny\nz"
+    assert tidy({"note": "| a |<br>|---|<br/>x⟩⟩⟩y⏎z<!-- note -->"}) == {
+        "note": "| a |\n|---|\nx\ny\nz"
     }
+
+
+def test_tidy_restores_line_breaks_in_a_flattened_body_only() -> None:
+    flat = "### Forms  Intro text.  | Verb | Form | |---|---| | parler | parlé | | finir | fini |  - a"
+    assert tidy({"body": flat, "fr": "Il  pleut."}) == {
+        "body": "### Forms\n\nIntro text.\n\n| Verb | Form |\n| --- | --- |\n"
+        "| parler | parlé |\n| finir | fini |\n\n- a",
+        "fr": "Il  pleut.",
+    }
+    assert tidy({"body": "*****What they are**\nText"}) == {"body": "**What they are**\nText"}
+    # A body that already has line breaks keeps its spacing.
+    assert tidy({"body": "a  b\nc"}) == {"body": "a  b\nc"}
 
 
 def test_tidy_turns_literal_backslash_n_into_a_newline() -> None:
