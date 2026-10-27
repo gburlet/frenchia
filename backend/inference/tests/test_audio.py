@@ -95,3 +95,9 @@ def test_warm_is_throttled(auth_client: Client) -> None:
         assert auth_client.post("/api/llm/warm").json() == {"warming": True}
         assert auth_client.post("/api/llm/warm").json() == {"warming": False}
     assert thread.call_count == 1
+
+
+def test_bold_markers_are_not_spoken() -> None:
+    from inference.audio import normalize_text
+
+    assert normalize_text("Je **mange**  une pomme.") == "Je mange une pomme."

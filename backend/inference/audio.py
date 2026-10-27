@@ -15,6 +15,8 @@ KEY_RE = re.compile(r"^[0-9a-f]{64}$")
 
 
 def normalize_text(text: str) -> str:
+    # Lesson text marks the form being taught in **bold**; the voice should not see it.
+    text = re.sub(r"\*+", "", text)
     return " ".join(unicodedata.normalize("NFC", text).split())
 
 
