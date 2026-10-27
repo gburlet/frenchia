@@ -244,6 +244,7 @@ def _generate(
         if not path.exists():
             raise ReviewError("nothing to revise: the lesson has no content yet")
         base, version = load_yaml(path), _next_version(lesson, writer)
+    base["objectives"] = list(brief_for(lesson).outline.objectives)  # the outline may have changed
     return LessonReviser(chat, ref, progress).revise(
         base, job.notes, list(job.targets), content_version=version, job_id=job.pk
     )

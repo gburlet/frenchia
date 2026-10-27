@@ -100,11 +100,15 @@ def test_request_revision_creates_child_job_on_the_draft(
     assert len(callbacks) == 1  # enqueued for the worker
     job.refresh_from_db()
     assert job.status == GenerationJob.Status.REJECTED and f"job {child.pk}" in job.reviewer_notes
+    lesson = Lesson.objects.get(slug="a2-passe-compose-er")
+    lesson.outline = {**lesson.outline, "objectives": ["Tell what you did yesterday"]}
+    lesson.save()
     child = run_job(child.pk)
     assert child.status == GenerationJob.Status.NEEDS_REVIEW, child.error
     assert (
         child.output and child.output["content_version"] == 1
     )  # still the unpublished draft version
+    assert child.output["objectives"] == ["Tell what you did yesterday"]  # from today's outline
     table = next(s for s in child.output["sections"] if s["id"] == "table")
     assert table["heading"].endswith("(révisé)")
     approve(child)

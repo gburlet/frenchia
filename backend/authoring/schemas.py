@@ -160,7 +160,7 @@ _LATEX = {
 
 # Line breaks written as HTML or as stray symbols (« <br> », « ⟩⟩⟩ », « ⏎ »): the lesson
 # renderer shows raw HTML as text.
-_LINE_BREAK = re.compile(r"<br\s*/?>|⟩{2,}|⏎", re.I)
+_LINE_BREAK = re.compile(r"<br\s*/?>|<br-\s?|⟩{2,}|⏎", re.I)
 _HTML_COMMENT = re.compile(r"<!--.*?-->", re.S)
 
 
