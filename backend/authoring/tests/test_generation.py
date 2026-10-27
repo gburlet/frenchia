@@ -713,3 +713,7 @@ def test_tidy_restores_line_breaks_that_lost_their_backslash() -> None:
 def test_tidy_drops_level_labels_inside_a_body() -> None:
     body = "### Les mots interrogatifs (A1 – Grammar)\nQui, que, où."
     assert tidy({"body": body}) == {"body": "### Les mots interrogatifs\nQui, que, où."}
+
+
+def test_tidy_drops_a_lesson_prefix_from_headings() -> None:
+    assert tidy({"heading": "Lesson : Les prépositions"}) == {"heading": "Les prépositions"}

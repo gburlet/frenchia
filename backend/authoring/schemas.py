@@ -166,7 +166,7 @@ _HTML_COMMENT = re.compile(r"<!--.*?-->", re.S)
 _ZERO_WIDTH = re.compile("[\u200b-\u200d\u2060\ufeff]")
 # « \\n\\n » that lost its backslashes and gained a zero-width space: « n\u200bn ».
 _MANGLED_BREAK = re.compile("[ \u202f\u00a0]*n[\u200b-\u200d\u2060\ufeff]n")
-_HEADING_MARK = re.compile(r"^\s*#{1,6}\s*")
+_HEADING_MARK = re.compile(r"^\s*(?:#{1,6}\s*|Lesson\s*:\s*)")  # « ## », « Lesson : »
 _LEVEL_LABEL_IN_TEXT = re.compile(r"[ \t]*\((?:A1|A2|B1|B2)\s*[–-][^)\n]{0,30}\)")
 _BARE_N_BREAK = re.compile(r"(?<=[.:!?*)])n(?=[-#|]|[A-Z])")
 # « Accents (A1 – Pronunciation) », « Exemples (B2 – Grammar) »: the brief, not the title.

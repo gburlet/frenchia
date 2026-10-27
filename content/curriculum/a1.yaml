@@ -210,7 +210,6 @@ units:
     - il-y-a
     prerequisites:
     - a1-negation
-    quebec_focus: Spoken Québec French often says « y'a » for il y a
     reference: clemence:day-16
   - id: a1-prepositions-location
     title: Les prépositions de lieu
