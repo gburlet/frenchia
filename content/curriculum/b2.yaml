@@ -100,7 +100,7 @@ units:
     title: Le causatif avec faire
     kind: grammar
     objectives:
-    - Use faire + infinitive (je fais réparer mon char)
+    - Use faire + infinitive (je fais réparer ma voiture)
     grammar_topics:
     - causative-faire
     prerequisites: []
