@@ -483,3 +483,13 @@ def test_a_reading_that_translates_quebec_dîner_as_dinner_is_an_error() -> None
     reading["translation_en"] = "After work, we had lunch at the corner restaurant."
     found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
     assert not any("Québec meals" in m for m in found), found
+
+
+def test_en_after_the_auxiliary_is_an_error() -> None:
+    data = lesson_data()
+    data["exercises"][1]["accepted_answers"] = ["Je me suis en allé.", "Je suis parti."]
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert any("en goes before the auxiliary" in m for m in found), found
+    data["exercises"][1]["accepted_answers"] = ["Elle s'est en fait trompée.", "Je m'en suis allé."]
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert not any("en goes before the auxiliary" in m for m in found), found

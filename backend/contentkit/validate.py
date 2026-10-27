@@ -200,6 +200,15 @@ _NO_ELISION = re.compile(
     r"irai|irais|en|y))\b",
     re.I,
 )
+# Pronominal verbs with en (s'en aller, s'en vouloir, s'en sortir…): en goes before the auxiliary
+# in compound tenses (« je m'en suis allé », not « je me suis en allé »). Only participles of
+# s'en verbs, so « elle s'est en fait trompée » is fine.
+_EN_AFTER_AUX = re.compile(
+    r"\b(?:(?:me|te|se|nous|vous) |[mts]['’])(?:suis|es|est|sommes|êtes|sont|étais|était|étions|"
+    r"étiez|étaient|serai|serais|serait) en (?:allé|sorti|voulu|occupé|pris|tiré|souvenu|moqué|"
+    r"aperçu|servi|remis|douté|mêlé|retourné|enfui|envolé)(?:e|s|es)?\b",
+    re.I,
+)
 # Québec usage (prompts.SYSTEM): « la fin de semaine », not « le week-end », except when the
 # text is comparing with France.
 _WEEK_END = re.compile(r"\b(?:le |ce |du |au |en )?week-?ends?\b", re.I)
@@ -338,6 +347,10 @@ def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
         french = "variants" not in parts and field in _FRENCH_FIELDS
         if french and (problem := _france_form(text)):
             add("error", path, problem)
+        if french and (m := _EN_AFTER_AUX.search(text)):
+            add(
+                "error", path, f"« {m.group(0)} »: en goes before the auxiliary (je m'en suis allé)"
+            )
         if FOREIGN_SCRIPT.search(text):
             add("error", path, f"text contains another script: {text[:60]!r}")
         if m := _BROKEN_MARKUP.search(text):
@@ -397,6 +410,12 @@ def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
                 add("error", ex.id, f"missing elision once filled: « {m.group(0)} »")
             if problem := _france_form(text):
                 add("error", ex.id, problem)
+            if m := _EN_AFTER_AUX.search(text):
+                add(
+                    "error",
+                    ex.id,
+                    f"« {m.group(0)} »: en goes before the auxiliary (je m'en suis allé)",
+                )
             if m := _NO_CONTRACTION.search(text):
                 add("error", ex.id, f"« {m.group(0)} »: de + le/les contract (du/des)")
             if m := _DOUBLE_ARTICLE.search(text):
