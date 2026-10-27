@@ -634,7 +634,14 @@ def _is_verb_form(answer: str, forms: set[str]) -> bool:
     (the reference includes agreed participles: est allée, sont allées). A gérondif
     (« en jouant ») is « en » + the present participle."""
     bare = _PRONOUNS.sub("", answer)
-    return answer in forms or bare in forms or bare.removeprefix("en ") in forms
+    # A negated form (« ne mange », « n'a », « ne vas pas ») is still a form of the verb.
+    unnegated = _NEGATION.sub("", bare).strip()
+    return (
+        answer in forms or bare in forms or bare.removeprefix("en ") in forms or unnegated in forms
+    )
+
+
+_NEGATION = re.compile(r"^n(?:e |['’])|\s+(?:pas|plus|jamais|rien|personne)$")
 
 
 def validate_repository(root: Path, *, quality: bool = True) -> Repository:

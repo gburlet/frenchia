@@ -537,3 +537,12 @@ def test_an_explanation_that_loops_is_an_error() -> None:
     )
     found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
     assert any("repeats itself" in m for m in found), found
+
+
+def test_a_negated_verb_form_is_a_form_of_the_verb() -> None:
+    from contentkit.validate import _is_verb_form
+
+    forms = {"mange", "va", "vas", "a", "achetons"}
+    for answer in ("ne mange", "n'a", "ne vas pas", "n'achetons"):
+        assert _is_verb_form(answer, forms), answer
+    assert not _is_verb_form("ne", forms)

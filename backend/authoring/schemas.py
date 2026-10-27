@@ -249,6 +249,10 @@ def tidy(value: object, key: str = "", *, quebec_spacing: bool = True) -> object
         keep = quebec_spacing and value.get("region") != "fr"
         out = {k: tidy(v, k, quebec_spacing=keep and k != "variants") for k, v in value.items()}
         answers, sentence = out.get("answers"), out.get("sentence")
+        hint = out.get("hint")
+        if isinstance(sentence, str) and isinstance(hint, str) and hint.startswith("("):
+            # « Je ___ (manger) une pomme » with hint « (manger) »: the hint has its own field.
+            sentence = out["sentence"] = re.sub(r"\s*" + re.escape(hint.strip()), "", sentence)
         if keep and isinstance(sentence, str) and isinstance(answers, list) and answers:
             # A blank whose answer is ; ! ? , or . sits right after the word (« clés___ »).
             if all(isinstance(a, str) and re.fullmatch(r"[;!?,.]", a) for a in answers):

@@ -717,3 +717,8 @@ def test_tidy_drops_level_labels_inside_a_body() -> None:
 
 def test_tidy_drops_a_lesson_prefix_from_headings() -> None:
     assert tidy({"heading": "Lesson : Les prépositions"}) == {"heading": "Les prépositions"}
+
+
+def test_tidy_takes_the_hint_out_of_the_sentence() -> None:
+    item = {"sentence": "Je ___ (manger) une pomme.", "answers": ["mange"], "hint": "(manger)"}
+    assert tidy(item)["sentence"] == "Je ___ une pomme."  # type: ignore[index]
