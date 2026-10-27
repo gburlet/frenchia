@@ -57,7 +57,7 @@ class TableStep(Step):
     include: bool = Field(description="false if no table would genuinely help")
     heading: str
     columns: list[str] = Field(min_length=2, max_length=5)
-    rows: list[list[str]] = Field(min_length=1, max_length=12)
+    rows: list[list[str]] = Field(min_length=1, max_length=26)  # a whole alphabet
     caption: str
 
 

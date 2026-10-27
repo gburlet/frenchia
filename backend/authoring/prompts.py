@@ -3,7 +3,7 @@ changes: jobs record the versions they used (GenerationJob.prompts, lesson prove
 
 PROMPT_VERSIONS = {
     "author.system": "6",
-    "author.steps": "6",
+    "author.steps": "7",
     "author.revise": "1",
     "author.critic": "4",
     "author.practice": "2",
@@ -62,7 +62,8 @@ Explain how to form and use the point, with short French examples in **bold**, a
 pitfalls English speakers commonly hit. Also give the English translation of the lesson title.""",
     "table": """\
 If a reference table genuinely helps (conjugation, forms, pronouns, articles...), produce it with \
-2-5 columns and at most 12 rows; otherwise set include to false. Cells are short (no sentences).""",
+2-5 columns and at most 12 rows (a complete set such as the alphabet may take up to 26); \
+otherwise set include to false. Cells are short (no sentences).""",
     "examples": """\
 Write 6-10 example sentences that illustrate the objectives, each with an English translation. \
 Use varied everyday situations that fit the topic. Set `region` = qc only when the sentence \

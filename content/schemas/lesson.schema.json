@@ -531,7 +531,7 @@
             },
             "type": "array"
           },
-          "maxItems": 20,
+          "maxItems": 26,
           "minItems": 1,
           "title": "Rows",
           "type": "array"

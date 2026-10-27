@@ -154,7 +154,7 @@ class TableSection(Model):
     id: Slug
     heading: NonEmpty
     columns: list[NonEmpty] = Field(min_length=2, max_length=6)
-    rows: list[list[str]] = Field(min_length=1, max_length=20)
+    rows: list[list[str]] = Field(min_length=1, max_length=26)  # a whole alphabet
     caption: str | None = None
 
     @model_validator(mode="after")
