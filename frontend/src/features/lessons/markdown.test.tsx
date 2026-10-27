@@ -6,6 +6,9 @@ import { Markdown } from "./Markdown";
 describe("Markdown", () => {
   it("turns HTML breaks and stray symbols into line breaks and drops comments", () => {
     expect(cleanMarkdown("a<br>b<br/>c⟩⟩⟩d⏎e<!-- x -->")).toBe("a\nb\nc\nd\ne");
+    expect(cleanMarkdown("x\n\n| A | B |\n\n|---|---|\n\n| 1 | 2 |")).toBe(
+      "x\n\n| A | B |\n| --- | --- |\n| 1 | 2 |",
+    );
   });
 
   it("restores the line breaks of a body written on one line", () => {

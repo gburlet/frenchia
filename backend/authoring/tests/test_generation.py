@@ -687,3 +687,10 @@ def test_tidy_drops_region_tags_copied_into_prose() -> None:
     assert tidy({"body": body}) == {
         "body": "- **Fais-toi-en pas**, tout va bien aller. – Don't worry."
     }
+
+
+def test_tidy_joins_table_rows_split_by_blank_lines() -> None:
+    body = "Lettres:\n\n| Lettre | Nom |\n\n|---|---|\n\n| A | a |\n\nFin&nbsp;!"
+    assert tidy({"body": body}) == {
+        "body": "Lettres:\n\n| Lettre | Nom |\n| --- | --- |\n| A | a |\n\nFin !"
+    }

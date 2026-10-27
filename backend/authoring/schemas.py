@@ -167,6 +167,7 @@ _ZERO_WIDTH = re.compile("[\u200b-\u200d\u2060\ufeff]")
 # « \\n\\n » that lost its backslashes and gained a zero-width space: « n\u200bn ».
 _MANGLED_BREAK = re.compile("[ \u202f\u00a0]*n[\u200b-\u200d\u2060\ufeff]n")
 _HEADING_MARK = re.compile(r"^\s*#{1,6}\s*")
+_TABLE_GAP = re.compile(r"(?<=\|)[ \t]*\n(?:[ \t]*\n)+(?=[ \t]*\|)")
 # A schema value copied into prose: « tout va bien aller. *(region qc)* – Don't worry ».
 _REGION_TAG = re.compile(r"[ \u00a0]*\*?\(region:? ?(?:qc|fr|common)\)\*?", re.I)
 # A narrow no-break space belongs before : ; ! ? » %, after « and between digit groups
@@ -216,6 +217,7 @@ def unflatten_markdown(body: str) -> str:
     if "\n" not in body:
         body = re.sub(r" {2,}", "\n\n", body)
     body = re.sub(r"\*{5,}", "**", body)  # « *****Heading** »: a rule run into a bold heading
+    body = _TABLE_GAP.sub("\n", body)  # blank lines between table rows end the table
     return "\n".join(_split_table(line) for line in body.split("\n"))
 
 
@@ -225,6 +227,7 @@ def tidy(value: object, key: str = "", *, quebec_spacing: bool = True) -> object
     if isinstance(value, str):
         if quebec_spacing and key in _FRENCH_KEYS:
             value = _SPACE_BEFORE_MARK.sub(r"\1", value)
+        value = value.replace("&nbsp;", " ")
         for latex, plain in _LATEX.items():
             value = value.replace(latex, plain)
         value = _HTML_COMMENT.sub("", _LINE_BREAK.sub("\n", value))

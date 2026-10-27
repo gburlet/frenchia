@@ -30,5 +30,7 @@ export function cleanMarkdown(text: string): string {
   let out = text.replace(HTML_COMMENT, "").replace(LINE_BREAK, "\n");
   if (!out.includes("\n")) out = out.replace(/ {2,}/g, "\n\n");
   out = out.replace(/\*{5,}/g, "**"); // « *****Heading** »: a rule run into a bold heading
+  out = out.replace(/(?<=\|)[ \t]*\n(?:[ \t]*\n)+(?=[ \t]*\|)/g, "\n"); // gaps end a table
+  out = out.replace(/&nbsp;/g, " ");
   return out.split("\n").map(splitTable).join("\n");
 }

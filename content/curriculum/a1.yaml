@@ -15,8 +15,9 @@ units:
     title: L'alphabet
     kind: pronunciation
     objectives:
-    - Spell words and names aloud
-    - Recognize letter names when heard
+    - Say the 26 letter names (E sounds like the e of le, U like the u of tu, G « gé », J « ji »,
+      R is a throaty French r, W « double vé », Y « i grec »)
+    - Spell words and names aloud letter by letter, and recognize letter names when heard
     grammar_topics:
     - alphabet
     prerequisites: []
