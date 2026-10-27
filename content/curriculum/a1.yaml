@@ -257,7 +257,6 @@ units:
     - numbers
     vocabulary_theme: numbers
     prerequisites: []
-    quebec_focus: Prices in dollars and cents (« ça fait douze piasses » is familiar for dollars)
     reference: clemence:day-20
   - id: a1-days-months
     title: Les jours et les mois
@@ -268,7 +267,6 @@ units:
     grammar_topics: []
     vocabulary_theme: calendar
     prerequisites: []
-    quebec_focus: « La fin de semaine » for the weekend
     reference: clemence:day-21
   - id: a1-telling-time
     title: Dire l'heure
@@ -289,7 +287,6 @@ units:
     - dates
     prerequisites:
     - a1-days-months
-    quebec_focus: 'Québec holidays: la Saint-Jean-Baptiste / fête nationale (24 juin), le 1er juillet'
     reference: clemence:day-23
 - id: a1-u07-plans
   title: Projets et liens
@@ -305,7 +302,6 @@ units:
     - futur-proche
     prerequisites:
     - a1-present-irregular
-    quebec_focus: Very common in Québec speech for all future plans
     reference: clemence:day-24
   - id: a1-connectors
     title: Les connecteurs de base
@@ -315,7 +311,6 @@ units:
     grammar_topics:
     - basic-connectors
     prerequisites: []
-    quebec_focus: Spoken Québec « pis » (from puis) for 'and then'
     reference: clemence:day-25
 - id: a1-u08-everyday-words
   title: Le vocabulaire du quotidien
@@ -340,7 +335,6 @@ units:
     grammar_topics: []
     vocabulary_theme: family
     prerequisites: []
-    quebec_focus: 'Familiar Québec terms: ma blonde, mon chum, matante, mononcle'
     reference: clemence:day-27
   - id: a1-weather-seasons
     title: La météo et les saisons
@@ -350,8 +344,6 @@ units:
     grammar_topics: []
     vocabulary_theme: weather
     prerequisites: []
-    quebec_focus: 'Winter vocabulary: il fait frette (familiar), la poudrerie, la tempête de neige, la
-      sloche'
     reference: clemence:day-28
   - id: a1-food
     title: Les fruits et les légumes
@@ -362,7 +354,6 @@ units:
     - articles-definite-indefinite
     vocabulary_theme: food
     prerequisites: []
-    quebec_focus: 'Everyday food and shopping words; use the Québec form where one exists (le blé d''Inde for corn, la patate)'
     reference: clemence:day-29
   - id: a1-expressions-1
     title: Expressions québécoises (1)
