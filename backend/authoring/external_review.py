@@ -18,7 +18,7 @@ from curriculum.models import Lesson
 
 from .models import GenerationJob
 
-PROMPT_VERSION = "8"
+PROMPT_VERSION = "9"
 REVIEW_DIR = Path("drafts") / "review"
 
 
@@ -68,8 +68,11 @@ a translation hint may give vocabulary;
 - expressions must be real and in standard register: an invented idiom or a vulgar one is an \
 error;
 - Québec usage: Québec usage is the default (déjeuner = breakfast, dîner = lunch, souper = supper; \
-« la fin de semaine », not « le week-end »). Flag claims about Québec usage that are wrong or \
-misplaced, but only when you are certain;
+« la fin de semaine », not « le week-end »; courriel; in Québec « bon matin » and \
+« bon après-midi » greet as well as take leave, and « allô » is an informal hello). France \
+forms where Québec has a default (petit-déjeuner, le week-end, mail, portable for a phone) \
+should be adapted. Flag claims about Québec usage that are wrong or misplaced, but only \
+when you are certain;
 - explanations, tables, examples, regional notes, readings and glossaries are taught as fact: \
 a wrong rule, a wrong form in a table, a wrong translation (Québec dîner = lunch: « dinner » \
 for dîner is wrong; souper may be translated « supper » or « dinner ») or a wrong date is an \
