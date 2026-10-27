@@ -67,8 +67,10 @@ def create_job(
             notes=notes,
             targets=targets or [],
             parent=parent,
+            # A revision of a draft builds on what was published when that draft began; once the
+            # parent itself is published, the file holds its output, so start from that.
             base_hash=parent.base_hash
-            if parent
+            if parent and parent.status != GenerationJob.Status.APPROVED
             else writer.current_hash(lesson.slug, lesson.level),
         )
         if parent is not None and parent.status == GenerationJob.Status.NEEDS_REVIEW:
@@ -238,7 +240,11 @@ def _generate(
         )
     if job.parent is not None and job.parent.output:
         base = dict(job.parent.output)
-        version = int(base["content_version"])  # still an unpublished draft: same version
+        version = (
+            _next_version(lesson, writer)  # the parent went live: this is a new version
+            if job.parent.status == GenerationJob.Status.APPROVED
+            else int(base["content_version"])  # still an unpublished draft: same version
+        )
     else:
         path = writer.root / "lessons" / lesson.level.lower() / f"{lesson.slug}.yaml"
         if not path.exists():
@@ -261,6 +267,9 @@ def approve(
         )
     writer = ContentWriter(_root())
     draft = LessonContent.model_validate(job.output)
+    if job.lesson.revisions.filter(content_version__gte=draft.content_version).exists():
+        # Its version went live meanwhile (a revision of a draft that was then published).
+        draft = draft.model_copy(update={"content_version": _next_version(job.lesson, writer)})
     target = writer.lesson_path(draft)
     previous = target.read_text(encoding="utf-8") if target.exists() else None
     # A revision of the current file already contains its manual edits.

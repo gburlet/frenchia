@@ -440,6 +440,9 @@ def test_notes_about_the_brief_are_prompt_leaks() -> None:
     )
     found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
     assert any("mentions the generation instructions" in m for m in found), found
+    data["sections"][0]["body"] = "Use auquel after à. (removed meta text) Then practise."
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert any("mentions the generation instructions" in m for m in found), found
 
 
 def test_elision_is_checked_in_the_filled_sentence() -> None:

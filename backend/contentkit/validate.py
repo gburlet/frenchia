@@ -271,7 +271,9 @@ _PROMPT_LEAK = re.compile(
     r" (?:from|to|with|in|so|because)\b"
     # « This regional note has been removed because… »: a section emptied by a revision
     r"|\bThis (?:regional )?(?:note|section|example|exercise)"
-    r" (?:has been|was) (?:removed|deleted)\b",
+    r" (?:has been|was) (?:removed|deleted)\b"
+    # ...or a placeholder where it took something out: « (removed meta text) »
+    r"|\((?:removed|deleted|omitted)\b[^)]{0,40}\)",
     re.I,
 )
 

@@ -209,3 +209,15 @@ def test_auto_review_revises_a_draft_with_problems_then_hands_it_over(
     assert "published after" in messages[0]
     last.refresh_from_db()
     assert last.status == GenerationJob.Status.APPROVED
+
+
+def test_a_revision_of_a_published_draft_can_be_published_too(root: Path) -> None:
+    job = generated(root)
+    approve(job)
+    job.refresh_from_db()
+    child = create_job(
+        job.lesson, kind=GenerationJob.Kind.REVISION, notes="Polish", parent=job, enqueue=False
+    )
+    child = run_job(child.pk)
+    assert child.status == GenerationJob.Status.NEEDS_REVIEW, child.error
+    approve(child)  # the published file is the parent's output, not a conflicting edit
