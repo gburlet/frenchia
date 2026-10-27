@@ -308,7 +308,9 @@ units:
     grammar_topics:
     - punctuation
     prerequisites: []
-    quebec_focus: OQLF (Québec) spacing conventions before ; ! ? differ from France's
+    quebec_focus: 'Québec (OQLF) puts no space before ; ! ? (France puts a thin non-breaking
+      space there); both put a non-breaking space before : and inside « », and one space after
+      a period.'
     reference: clemence:day-118
   - id: b2-on-vs-lon
     title: On et l'on
