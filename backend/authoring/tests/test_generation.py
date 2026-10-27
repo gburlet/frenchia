@@ -601,3 +601,19 @@ def test_one_quebec_term_repeated_across_the_lesson_is_a_problem() -> None:
     assert "magasiner" in problem and "4 French sentences" in problem
     three = examples(*(e.fr for e in section.examples[:3]))
     assert gratuitous_quebec(plain_brief(), [three], [], reference()) == []
+
+
+def test_plain_french_tagged_as_france_usage_becomes_common() -> None:
+    data: dict[str, Any] = {
+        "sections": [
+            {
+                "type": "examples",
+                "examples": [
+                    {"fr": "Il a fini son rapport.", "en": "x", "region": "fr"},
+                    {"fr": "On part en week-end.", "en": "x", "region": "fr"},
+                ],
+            }
+        ]
+    }
+    verify_regions(data, reference())
+    assert [e["region"] for e in data["sections"][0]["examples"]] == ["common", "fr"]

@@ -226,6 +226,11 @@ _DINNER = re.compile(
 )
 
 
+def uses_france_form(text: str) -> bool:
+    """The text uses a France-only form where Québec says it differently (« le week-end »)."""
+    return _france_form(text) is not None
+
+
 def _france_form(text: str) -> str | None:
     if _ABOUT_FRANCE.search(text):
         return None

@@ -32,7 +32,7 @@ from contentkit.models import (
     VocabularySection,
 )
 from contentkit.reference import Reference, normalize
-from contentkit.validate import Issue, check_lesson_quality
+from contentkit.validate import Issue, check_lesson_quality, uses_france_form
 from contentkit.yamlio import content_hash
 from inference.errors import InvalidOutput
 from inference.llm import ChatModel, Message, complete_structured
@@ -828,6 +828,9 @@ def verify_regions(data: Any, ref: Reference) -> Any:
         words = [*section.get("items", []), *section.get("glossary", [])]
         for entry in [*words, *section.get("examples", [])]:
             if entry.get("region") == "qc" and not ref.quebec_terms_in(entry.get("fr", "")):
+                entry["region"] = "common"
+            # Without « Québec French » in the prompt the model tags plain French as "fr".
+            if entry.get("region") == "fr" and not uses_france_form(entry.get("fr", "")):
                 entry["region"] = "common"
         # A regional-note variant is a Québec claim too: keep only those the lexicon supports.
         if "variants" in section:
