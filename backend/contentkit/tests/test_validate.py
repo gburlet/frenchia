@@ -431,6 +431,12 @@ def test_notes_about_the_brief_are_prompt_leaks() -> None:
     data["exercises"][1]["hint"] = "Use « fin ». No regional note is needed here."
     found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
     assert any("mentions the generation instructions" in m for m in found), found
+    data = lesson_data()
+    data["sections"][0]["body"] = (
+        "This regional note has been removed because it contained unnecessary information."
+    )
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert any("mentions the generation instructions" in m for m in found), found
 
 
 def test_elision_is_checked_in_the_filled_sentence() -> None:

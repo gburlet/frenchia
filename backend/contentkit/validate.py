@@ -265,7 +265,11 @@ _PROMPT_LEAK = re.compile(
     # the model talking about its brief (« No regional note is needed here. »)
     r"|\bNo [^.]{0,40}\b(?:is|are) (?:needed|required) here\b"
     # ...or about its own edits (« The word québécoise has been removed »)
-    r"|\bha(?:s|ve) been (?:removed|replaced|deleted|corrected|changed) (?:from|to|with|in|so)\b",
+    r"|\bha(?:s|ve) been (?:removed|replaced|deleted|corrected|changed)"
+    r" (?:from|to|with|in|so|because)\b"
+    # « This regional note has been removed because… »: a section emptied by a revision
+    r"|\bThis (?:regional )?(?:note|section|example|exercise)"
+    r" (?:has been|was) (?:removed|deleted)\b",
     re.I,
 )
 
