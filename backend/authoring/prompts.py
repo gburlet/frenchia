@@ -3,8 +3,8 @@ changes: jobs record the versions they used (GenerationJob.prompts, lesson prove
 
 PROMPT_VERSIONS = {
     "author.system": "6",
-    "author.steps": "7",
-    "author.revise": "1",
+    "author.steps": "8",
+    "author.revise": "2",
     "author.critic": "4",
     "author.practice": "2",
     "bank.verb": "5",
@@ -35,6 +35,7 @@ standard French.
 
 CONTEXT = """\
 Lesson: {title} [{id}], CEFR {level}, kind: {kind}
+French at this level: {level_guide}
 Unit: {unit_title}
 Learning objectives:
 {objectives}
@@ -52,6 +53,18 @@ SO_FAR = """\
 The lesson so far (stay consistent with it; do not repeat it):
 {summary}
 """
+
+# What "CEFR X" means for the French the learner reads; the model treats a bare level loosely
+# (an A1 reading in the imparfait).
+LEVEL_GUIDE = {
+    "A1": "short sentences in the present tense (and aller + infinitive), everyday words only; "
+    "no other tenses",
+    "A2": "simple sentences; present, passé composé, imparfait, futur proche and futur simple; "
+    "everyday topics",
+    "B1": "connected sentences; all common tenses, including the conditionnel and the present "
+    "subjunctive",
+    "B2": "natural, varied sentences; any tense or structure the lesson needs",
+}
 
 READING_WORDS = {"A1": "70-100", "A2": "110-150", "B1": "160-220", "B2": "220-300"}
 
@@ -115,8 +128,11 @@ Your previous answer had these problems:
 Produce a corrected answer that fixes every problem."""
 
 REVISE = """\
-Revise this part of the lesson according to the reviewer's notes. Keep everything that the \
-notes do not ask to change. If the notes do not apply to this part, return it unchanged.
+Revise this part of a CEFR {level} lesson according to the reviewer's notes. Keep everything \
+that the notes do not ask to change. If the notes do not apply to this part, return it unchanged.
+French at this level: {level_guide}
+Lesson objectives (authoritative):
+{objectives}
 Reviewer notes:
 {notes}
 Current content (JSON):

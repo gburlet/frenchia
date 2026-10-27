@@ -36,7 +36,9 @@ units:
     title: Les combinaisons de lettres
     kind: pronunciation
     objectives:
-    - Pronounce ai, ei, au, eau, ou, oi and the nasal vowels an, en, in, on, un
+    - Pronounce ai/ei as in mais, seize (è), au/eau as in chaud, beau (o), ou as in vous, oi as in
+      moi (wa)
+    - Pronounce the nasal vowels an/en (blanc, vent), in/ain (vin, pain), on (bon) and un (brun)
     grammar_topics:
     - letter-combinations
     prerequisites:
@@ -48,8 +50,10 @@ units:
     title: Les lettres muettes
     kind: pronunciation
     objectives:
-    - Predict silent final consonants and silent e
-    - Recognize basic liaison
+    - Predict silent final letters - most final consonants are silent (grand, trop, gros, petit,
+      deux, nez), but final c, r, f, l are usually heard (sac, bonjour, neuf, avril), and a final e
+      is silent (table)
+    - Recognize basic liaison after determiners and pronouns (les amis, vous avez, un enfant)
     grammar_topics:
     - silent-letters
     prerequisites:

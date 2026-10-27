@@ -447,6 +447,7 @@ class LessonGenerator:
             title=o.title,
             id=o.id,
             level=brief.level,
+            level_guide=prompts.LEVEL_GUIDE.get(brief.level, ""),
             kind=o.kind,
             unit_title=brief.unit_title,
             objectives="\n".join(f"- {x}" for x in o.objectives),
@@ -544,6 +545,8 @@ class LessonReviser:
         ids = [item["id"] for item in [*base["sections"], *base["exercises"]]]
         wanted = set(targets) or set(ids)
         self.dropped: list[Issue] = []
+        self.level = str(base.get("level", ""))
+        self.objectives = [str(o) for o in base.get("objectives", [])]
         sections = [
             section
             for d in base["sections"]
@@ -658,6 +661,16 @@ class LessonReviser:
             )
             return None
 
+    def _revise_prompt(self, notes: str, current: str) -> str:
+        level = getattr(self, "level", "")
+        return prompts.REVISE.format(
+            level=level,
+            level_guide=prompts.LEVEL_GUIDE.get(level, "as the level allows"),
+            objectives="\n".join(f"- {o}" for o in getattr(self, "objectives", [])) or "-",
+            notes=notes,
+            current=current,
+        )
+
     def _revise_item(self, model: type[BaseModel], data: dict[str, Any], notes: str) -> BaseModel:
         self.progress(f"Revising {data['id']}")
         if data["type"] in DRAFT_SHAPES:
@@ -665,7 +678,7 @@ class LessonReviser:
         current = json.dumps(data, ensure_ascii=False, indent=1)
         messages = [
             Message("system", prompts.SYSTEM),
-            Message("user", prompts.REVISE.format(notes=notes, current=current)),
+            Message("user", self._revise_prompt(notes, current)),
         ]
         started = time.perf_counter()
         revised, completion = complete_structured(self.chat, messages, model, max_tokens=MAX_TOKENS)
@@ -694,7 +707,7 @@ class LessonReviser:
         )
         messages = [
             Message("system", prompts.SYSTEM),
-            Message("user", prompts.REVISE.format(notes=notes, current=current)),
+            Message("user", self._revise_prompt(notes, current)),
         ]
         started = time.perf_counter()
         revised, completion = complete_structured(
