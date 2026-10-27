@@ -74,7 +74,7 @@ export function LessonPage() {
       <header className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="teal">{l.level}</Badge>
-          <Link to="/curriculum" className="text-sm text-teal underline">
+          <Link to={`/curriculum?level=${l.level}`} className="text-sm text-teal underline">
             {l.unit.title}
           </Link>
           <button type="button" onClick={() => openTutor()} className="ml-auto cursor-pointer text-sm text-teal underline hover:text-teal-hover">

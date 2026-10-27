@@ -49,6 +49,20 @@ describe("Curriculum browser", () => {
     expect(screen.getByRole("heading", { name: "B1 · Intermédiaire" })).toBeInTheDocument();
   });
 
+  it("opens the level named in the URL and keeps it there", async () => {
+    setup();
+    renderApp("/curriculum?level=b1");
+    expect(await screen.findByRole("tab", { name: "B1" })).toHaveAttribute("aria-selected", "true");
+    await userEvent.setup().click(screen.getByRole("tab", { name: "A1" }));
+    expect(screen.getByRole("tab", { name: "A1" })).toHaveAttribute("aria-selected", "true");
+  });
+
+  it("ignores an unknown level in the URL", async () => {
+    setup();
+    renderApp("/curriculum?level=C2");
+    expect(await screen.findByRole("tab", { name: "A2" })).toHaveAttribute("aria-selected", "true");
+  });
+
   it("defaults to A2 when nothing is in progress", async () => {
     const copy = structuredClone(curriculumFixture);
     copy.levels[1]!.units[0]!.lessons[0]!.progress.status = "not_started";

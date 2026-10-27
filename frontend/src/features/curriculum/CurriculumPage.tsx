@@ -1,5 +1,5 @@
-import { useRef, useState, type KeyboardEvent } from "react";
-import { Link } from "react-router";
+import { useRef, type KeyboardEvent } from "react";
+import { Link, useSearchParams } from "react-router";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -53,7 +53,7 @@ function LessonRow({ lesson }: { lesson: CurriculumLesson }) {
 
 export function CurriculumPage() {
   const query = useCurriculum();
-  const [selected, setSelected] = useState<string | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
   const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   if (query.isPending) {
@@ -73,8 +73,14 @@ export function CurriculumPage() {
   }
 
   const curriculum = query.data;
-  const levelId = selected ?? defaultLevel(curriculum);
+  const requested = searchParams.get("level")?.toUpperCase();
+  const levelId = curriculum.levels.some((l) => l.level === requested) ? requested! : defaultLevel(curriculum);
   const level = curriculum.levels.find((l) => l.level === levelId) ?? curriculum.levels[0];
+
+  // Replace rather than push, so Back from a lesson returns to the same tab instead of stepping through tabs.
+  function setSelected(next: string) {
+    setSearchParams({ level: next }, { replace: true });
+  }
 
   function onKeyDown(event: KeyboardEvent, index: number) {
     const count = curriculum.levels.length;
