@@ -466,3 +466,17 @@ def test_an_empty_or_degenerate_explanation_is_an_error() -> None:
     data["sections"][0]["body"] = "### Core {#core .untyped-1 .untyped-2 .untyped-3"
     found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
     assert "error:the explanation is empty or broken markup" in found
+
+
+def test_a_reading_that_translates_quebec_dîner_as_dinner_is_an_error() -> None:
+    data = lesson_data()
+    reading = next(s for s in data["sections"] if s["type"] == "reading")
+    reading |= {
+        "passage_fr": "Après le travail, nous avons dîné au restaurant du coin.",
+        "translation_en": "After work, we had dinner at the corner restaurant.",
+    }
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert any("« dîner » is lunch" in m for m in found), found
+    reading["translation_en"] = "After work, we had lunch at the corner restaurant."
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert not any("Québec meals" in m for m in found), found

@@ -85,37 +85,38 @@ class ReadingStep(Step):
 
 
 # Field limits and descriptions keep larger models from packing a whole exercise (heading,
-# numbered answers, hint) into one field.
+# numbered answers, hint) into one field. Constrained decoding enforces maxLength by cutting
+# the string off mid-word, so each limit sits well above the length its description asks for.
 Answer = Annotated[
-    str, Field(max_length=200, description="One complete answer, with no notes or brackets")
+    str, Field(max_length=300, description="One complete answer, with no notes or brackets")
 ]
 
 
 class FillBlankDraft(Step):
-    sentence: str = Field(max_length=200, description="French sentence containing exactly one ___")
+    sentence: str = Field(max_length=300, description="French sentence containing exactly one ___")
     answers: list[Answer] = Field(min_length=1, max_length=3)
     hint: str = Field(
-        max_length=160,
+        max_length=400,
         description="Infinitive in parentheses when the blank is a verb, e.g. (aller); "
-        "never the answer",
+        "otherwise one short line (under 120 characters); never the answer",
     )
-    translation_en: str = Field(max_length=250)
+    translation_en: str = Field(max_length=400)
 
 
 class TranslateDraft(Step):
     prompt: str = Field(
-        max_length=200,
+        max_length=300,
         description="Only the one sentence to translate: no heading, answers or hint",
     )
     accepted_answers: list[Answer] = Field(min_length=2, max_length=4)
-    hint: str = Field(max_length=160, description="One short line")
+    hint: str = Field(max_length=400, description="One short line (under 120 characters)")
 
 
 class ChoiceDraft(Step):
-    question: str = Field(max_length=300)
-    options: list[Annotated[str, Field(max_length=200)]] = Field(min_length=3, max_length=4)
+    question: str = Field(max_length=500)
+    options: list[Annotated[str, Field(max_length=300)]] = Field(min_length=3, max_length=4)
     answer_index: int = Field(ge=0, le=3)
-    explanation: str = Field(max_length=600)
+    explanation: str = Field(max_length=1000)
 
 
 def batch(item: type[Step], count: int) -> type[Step]:

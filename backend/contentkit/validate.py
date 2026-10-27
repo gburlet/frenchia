@@ -317,6 +317,8 @@ def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
             add("error", section.id, "reading passage does not look French")
         if not isinstance(section, ReadingSection):  # a whole passage names many meals
             _check_meal_pairs(add, section.id, _section_meal_pairs(section))
+        elif problem := _reading_meal_clash(section):
+            add("error", section.id, problem)
         if isinstance(section, RegionalNoteSection):
             for variant in section.variants:
                 _check_quebec(add, section.id, variant.qc, ref)
@@ -532,6 +534,20 @@ def _check_meal_pairs(add: AddFn, where: str, pairs: list[tuple[str, str]]) -> N
                     "souper = supper)",
                 )
                 return
+
+
+def _reading_meal_clash(reading: ReadingSection) -> str | None:
+    """A passage with only one meal word can be checked as a whole: « dîner » with no « souper »
+    translated "dinner" (or « déjeuner » with no « dîner » translated "lunch") is the France
+    reading of a Québec meal."""
+    fr, en = reading.passage_fr, reading.translation_en
+    if re.search(r"\bd[îi]n(?:er|é)", fr, re.I) and not re.search(r"\bsoup", fr, re.I):
+        if re.search(r"\bdinner\b", en, re.I) and not re.search(r"\blunch", en, re.I):
+            return "Québec meals: « dîner » is lunch, not 'dinner' (souper = supper)"
+    if re.search(r"\bdéjeun", fr, re.I) and not re.search(r"\bd[îi]n(?:er|é)", fr, re.I):
+        if re.search(r"\blunch", en, re.I) and not re.search(r"\bbreakfast\b", en, re.I):
+            return "Québec meals: « déjeuner » is breakfast, not 'lunch' (dîner = lunch)"
+    return None
 
 
 def _graded_french(ex: object) -> list[str]:
