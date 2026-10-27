@@ -726,3 +726,8 @@ def test_tidy_takes_the_hint_out_of_the_sentence() -> None:
 
 def test_tidy_drops_a_language_label_from_prompts() -> None:
     assert tidy({"prompt": "French : Il est huit heures."}) == {"prompt": "Il est huit heures."}
+
+
+def test_tidy_cuts_a_sentence_about_the_brief_from_a_hint() -> None:
+    hint = "Use très for “very”. No regional intensifiers are needed at this level."
+    assert tidy({"hint": hint}) == {"hint": "Use très for “very”."}

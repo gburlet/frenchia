@@ -216,6 +216,16 @@ def _split_table(line: str) -> str:
     return "\n\n".join(p for p in parts if p)
 
 
+def _drop_leaked_sentences(text: str) -> str:
+    """« Use très for very. No regional intensifiers are needed at this level. »: the model
+    talking about its instructions; revisions keep it, so it is cut here."""
+    from contentkit.validate import _PROMPT_LEAK
+
+    sentences = re.split(r"(?<=[.!?])\s+", text)
+    kept = [t for t in sentences if not _PROMPT_LEAK.search(t)]
+    return " ".join(kept) if len(kept) < len(sentences) and kept else text
+
+
 def unflatten_markdown(body: str) -> str:
     """gpt-oss sometimes writes a Markdown body on one line, with two spaces where the line
     breaks were and table rows run together; put the breaks back."""
@@ -240,6 +250,8 @@ def tidy(value: object, key: str = "", *, quebec_spacing: bool = True) -> object
         value = _HTML_COMMENT.sub("", _LINE_BREAK.sub("\n", value))
         value = _ZERO_WIDTH.sub("", _MANGLED_BREAK.sub("\n\n", value))
         value = _STRAY_THIN_SPACE.sub(" ", _REGION_TAG.sub("", value))
+        if key in ("hint", "note", "explanation"):  # a sentence about the brief, not the lesson
+            value = _drop_leaked_sentences(value)
         if key in ("prompt", "question"):  # « French : Il est huit heures. »
             value = _LANGUAGE_LABEL.sub("", value)
         if key in ("heading", "title", "title_en"):  # plain text, rendered as a heading already
