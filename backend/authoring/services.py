@@ -159,22 +159,34 @@ def run_job(job_id: int) -> GenerationJob:
     return job
 
 
+# Issues that come from the LLM (critic) or from generation itself, not from today's
+# deterministic checks: revalidating keeps them.
+_NOT_DETERMINISTIC = ("AI critic", "dropped", "kept unrevised")
+
+
 def revalidate(job: GenerationJob) -> None:
-    """Re-run today's deterministic checks on a draft (checks added after it was generated
-    would otherwise only show up when its import is refused): new problems are added."""
+    """Re-run today's deterministic checks on a draft: checks added since it was generated
+    report their problems, and errors a fixed check no longer reports are dropped."""
     from contentkit.validate import check_lesson_quality
 
     if not job.output:
         return
     lesson = LessonContent.model_validate(job.output)
-    known = {(v["path"], v["message"]) for v in job.validation}
+    # Errors block approval, so they are recomputed; warnings (and LLM findings) are kept.
+    kept = [
+        v
+        for v in job.validation
+        if v["severity"] != "error" or v["message"].startswith(_NOT_DETERMINISTIC)
+    ]
+    known = {(v["path"], v["message"]) for v in kept}
     fresh = [
         {"severity": i.severity, "path": i.path, "message": i.message}
         for i in check_lesson_quality(lesson, Reference.load(_root()))
         if (i.path, i.message) not in known
     ]
-    if fresh:
-        job.validation = [*job.validation, *fresh]
+    validation = [*kept, *fresh]
+    if validation != job.validation:
+        job.validation = validation
         job.save(update_fields=["validation"])
 
 

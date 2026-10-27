@@ -242,3 +242,17 @@ def test_a_job_rejected_while_running_stays_rejected(root: Path) -> None:
         job = run_job(job.pk)
     job.refresh_from_db()
     assert job.status == GenerationJob.Status.REJECTED and not job.draft_path
+
+
+def test_revalidate_drops_problems_a_fixed_check_no_longer_reports(root: Path) -> None:
+    from authoring.services import revalidate
+
+    job = generated(root)
+    critic = {"severity": "warning", "path": "x:ex-01", "message": "AI critic on 'x': ..."}
+    note = {"severity": "warning", "path": "x:vocabulary", "message": "check this Québec claim"}
+    stale = {"severity": "error", "path": "x:ex-02", "message": "an old check's false alarm"}
+    job.validation = [critic, note, stale]
+    job.save()
+    revalidate(job)
+    job.refresh_from_db()
+    assert critic in job.validation and note in job.validation and stale not in job.validation

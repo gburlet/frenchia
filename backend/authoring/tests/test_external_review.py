@@ -187,9 +187,10 @@ def test_critic_flags_are_listed_for_the_reviewer_not_blocking(
 def test_validation_errors_alone_queue_a_revision(
     job: GenerationJob, settings: Any, django_capture_on_commit_callbacks: Any
 ) -> None:
-    job.validation = [
-        {"severity": "error", "path": "a2-passe-compose-er:ex-02.hint", "message": "too long"}
-    ]
+    assert job.output is not None
+    for exercise in job.output["exercises"]:
+        if exercise["id"] == "ex-02":
+            exercise["hint"] = "Think about it carefully. " * 12  # too long: a real check fails
     job.save()
     folder = Path(settings.CONTENT_DIR) / REVIEW_DIR
     call_command("content_review_export")
@@ -199,7 +200,7 @@ def test_validation_errors_alone_queue_a_revision(
             "content_review_import", reviewer="claude-haiku-5-5", revise=True, approve_clean=True
         )
     child = GenerationJob.objects.get(parent=job)
-    assert child.targets == ["ex-02"] and "ex-02.hint: too long" in child.notes
+    assert child.targets == ["ex-02"] and "the hint must be one short line" in child.notes
 
 
 def test_published_lessons_can_be_proof_read_and_revised(
