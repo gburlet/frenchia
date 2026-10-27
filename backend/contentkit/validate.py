@@ -2,6 +2,7 @@
 quality checks. Errors block import/publication; warnings are shown during review."""
 
 import re
+from collections import Counter
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -280,7 +281,10 @@ _PROMPT_LEAK = re.compile(
     r"|key now points|now points to option|not asked here|\bWait\s*[–-]\s*careful"
     # the model talking about its brief (« No regional note is needed here. »)
     r"|\bNo (?:[^.]{0,30}\b)?(?:regional|Québec|variant|note|table|section|change)s?\b"
-    r"[^.]{0,20}\b(?:is|are) (?:needed|required) here\b"
+    r"[^.]{0,20}\b(?:is|are) (?:needed|required) (?:here|at this level)\b"
+    # the reviser answering its reviewer: « as requested », « Below is the corrected table »
+    r"|\bas requested\b|\bthe reviewer\b|\bBelow is the (?:corrected|revised|updated)\b"
+    r"|\brenders correctly\b|\bmeta[- ]text\b|\blevel labels?\b"
     r"|\bno regional (?:variant|variation|difference)s? (?:here|needed|required)\b"
     # ...or about its own edits (« The word québécoise has been removed »)
     r"|\bha(?:s|ve) been (?:removed|replaced|deleted|corrected|changed)"
@@ -331,6 +335,13 @@ def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
             prose = _WORD.findall(re.sub(r"\{[^}]*\}?", " ", section.body))
             if "{#" in section.body or len(prose) < EXPLANATION_MIN_WORDS:
                 add("error", section.id, "the explanation is empty or broken markup")
+            # A generation that looped: the same sentence over and over instead of the rules.
+            sentences = [
+                t.strip(" *-#").lower() for t in re.split(r"(?<=[.!?:])\s+|\n", section.body)
+            ]
+            looped = Counter(t for t in sentences if len(t) > 25).most_common(1)
+            if looped and looped[0][1] >= 3:
+                add("error", section.id, f"the explanation repeats itself: {looped[0][0][:60]!r}")
         if isinstance(section, ExamplesSection):
             for example in section.examples:
                 if _looks_english(example.fr):

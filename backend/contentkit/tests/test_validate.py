@@ -443,6 +443,10 @@ def test_notes_about_the_brief_are_prompt_leaks() -> None:
     )
     found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
     assert any("mentions the generation instructions" in m for m in found), found
+    data["sections"][0]["body"] = "Below is the corrected table, as requested."
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert any("mentions the generation instructions" in m for m in found), found
+    data = lesson_data()
     data["sections"][0]["heading"] = "Vocabulaire (10-16 items)"
     found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
     assert any("mentions the generation instructions" in m for m in found), found
@@ -524,3 +528,12 @@ def test_elision_before_a_consonant_is_an_error() -> None:
     data["exercises"][1]["accepted_answers"] = ["J'habite ici, l'hiver aussi.", "Non."]
     found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
     assert not any("elision only before a vowel" in m for m in found), found
+
+
+def test_an_explanation_that_loops_is_an_error() -> None:
+    data = lesson_data()
+    data["sections"][0]["body"] = (
+        "Les noms ont un genre. " + "Le déterminant indique le genre du nom. " * 4
+    )
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert any("repeats itself" in m for m in found), found
