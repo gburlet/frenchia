@@ -217,11 +217,11 @@ def test_vulgar_words_are_errors() -> None:
 def test_hints_must_be_short_and_not_give_the_answer_away() -> None:
     data = lesson_data()
     data["exercises"][0]["hint"] = "Use « ai mangé »: avoir + participle."
-    data["exercises"][1]["hint"] = "Remember:\n\nNote: on is common in Québec. " + "x" * 160
+    data["exercises"][1]["hint"] = "Remember:\n\nNote: on is common in Québec. " + "x" * 240
     found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
     assert found == [
         "error:the hint gives away the answer 'ai mangé'",
-        "error:the hint must be one short line (≤160 characters)",
+        "error:the hint must be one short line (≤240 characters)",
     ]
 
 
@@ -441,6 +441,9 @@ def test_notes_about_the_brief_are_prompt_leaks() -> None:
     found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
     assert any("mentions the generation instructions" in m for m in found), found
     data["sections"][0]["body"] = "Use auquel after à. (removed meta text) Then practise."
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert any("mentions the generation instructions" in m for m in found), found
+    data["sections"][0]["body"] = "Québec speakers say « fais-toi-en pas » (region qc)."
     found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
     assert any("mentions the generation instructions" in m for m in found), found
 

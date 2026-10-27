@@ -187,7 +187,7 @@ _FORMATTING_REF = re.compile(
     r"\b(underlined|in bold|bolded|in italics|soulign[ée]e?s?|en gras|en italique)\b|~~", re.I
 )
 _BOLD = re.compile(r"\*\*")  # rendered only in explanations
-HINT_MAX = 160
+HINT_MAX = 240
 # A model can degenerate into markup (« {#core-explanation .untyped-1 .untyped-2 … ») instead
 # of an explanation.
 EXPLANATION_MIN_WORDS = 5
@@ -282,7 +282,9 @@ _PROMPT_LEAK = re.compile(
     r"|\bThis (?:regional )?(?:note|section|example|exercise)"
     r" (?:has been|was) (?:removed|deleted)\b"
     # ...or a placeholder where it took something out: « (removed meta text) »
-    r"|\((?:removed|deleted|omitted)\b[^)]{0,40}\)",
+    r"|\((?:removed|deleted|omitted)\b[^)]{0,40}\)"
+    # ...or a schema field value: « (region qc) »
+    r"|\(region:? (?:qc|fr|common)\)",
     re.I,
 )
 

@@ -177,6 +177,8 @@ _FRENCH_KEYS = {
     "answers",
     "accepted_answers",
     "question",
+    "prompt",  # French in fr→en translation; English never puts a space before ; ! ?
+    "options",
 }
 _SPACE_BEFORE_MARK = re.compile(r"[ \u00a0\u202f]+([;!?])")
 

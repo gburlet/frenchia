@@ -657,6 +657,7 @@ def test_tidy_gives_french_text_quebec_spacing_except_france_usage() -> None:
         ],
         "variants": [{"qc": "Tu viens?", "fr": "Tu viens\u202f?", "en": "Coming?"}],
         "passage_fr": "Il pleut ; on reste : c'est mieux.",
+        "prompt": "Vous avez lu le rapport ?",
     }
     assert tidy(data) == {
         "examples": [
@@ -665,4 +666,5 @@ def test_tidy_gives_french_text_quebec_spacing_except_france_usage() -> None:
         ],
         "variants": [{"qc": "Tu viens?", "fr": "Tu viens\u202f?", "en": "Coming?"}],
         "passage_fr": "Il pleut; on reste : c'est mieux.",
+        "prompt": "Vous avez lu le rapport?",
     }

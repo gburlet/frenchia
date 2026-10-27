@@ -74,6 +74,10 @@ class Reference:
         for ending in ("es", "e", "s", "x"):
             if not known and key.endswith(ending) and len(key) > 4:
                 known = self.is_word(key.removesuffix(ending))
+        # Regular -er verb forms Lexique never saw (« endommagent »): the infinitive is known.
+        for ending in _ER_ENDINGS:
+            if not known and key.endswith(ending) and len(key) - len(ending) >= 3:
+                known = key.removesuffix(ending) + "er" in self.words
         return known
 
     @cached_property
@@ -192,6 +196,32 @@ class Reference:
         """The word is Québec usage in any context: a lexicon pattern matches it bare
         (« magasiner » does; « chauffer » only counts in « chauffer son char »)."""
         return any(re.search(p, word, re.IGNORECASE) for t in self.quebec for p in t.match)
+
+
+# Longest first, so « endommageraient » strips « eraient », not « ent ».
+_ER_ENDINGS = (
+    "eraient",
+    "erions",
+    "eriez",
+    "erons",
+    "eront",
+    "erais",
+    "erait",
+    "aient",
+    "ions",
+    "iez",
+    "erai",
+    "eras",
+    "erez",
+    "ent",
+    "ons",
+    "ais",
+    "ait",
+    "era",
+    "ez",
+    "es",
+    "e",
+)
 
 
 def participle_agreements(participle: str) -> set[str]:
