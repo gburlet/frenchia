@@ -443,6 +443,10 @@ def test_notes_about_the_brief_are_prompt_leaks() -> None:
     )
     found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
     assert any("mentions the generation instructions" in m for m in found), found
+    data["sections"][0]["heading"] = "Vocabulaire (10-16 items)"
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert any("mentions the generation instructions" in m for m in found), found
+    data = lesson_data()
     data["sections"][0]["body"] = "Finir: je finis… (truncated for brevity)"
     found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
     assert any("mentions the generation instructions" in m for m in found), found
@@ -510,3 +514,13 @@ def test_a_pitfall_may_quote_the_mistake_and_hints_may_say_what_is_not_needed() 
     data["exercises"][1]["hint"] = "Use s'en aller. No « de + event » is needed here."
     found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
     assert not any("elision" in m or "generation instructions" in m for m in found), found
+
+
+def test_elision_before_a_consonant_is_an_error() -> None:
+    data = lesson_data()
+    data["exercises"][1]["accepted_answers"] = ["Tu n' vas pas au parc.", "Non."]
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert any("elision only before a vowel" in m for m in found), found
+    data["exercises"][1]["accepted_answers"] = ["J'habite ici, l'hiver aussi.", "Non."]
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert not any("elision only before a vowel" in m for m in found), found

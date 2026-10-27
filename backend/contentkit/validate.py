@@ -203,6 +203,9 @@ _NO_ELISION = re.compile(
 # Pronominal verbs with en (s'en aller, s'en vouloir, s'en sortir…): en goes before the auxiliary
 # in compound tenses (« je m'en suis allé », not « je me suis en allé »). Only participles of
 # s'en verbs, so « elle s'est en fait trompée » is fine.
+# « n' vas pas », « j' mange »: an elided word before a consonant (French text only — English
+# has « don't »).
+_ELISION_BEFORE_CONSONANT = re.compile(r"\b[jlmntsdc]['’] ?[bcdfgjklmnpqrstvwxzç]\w*", re.I)
 _EN_AFTER_AUX = re.compile(
     r"\b(?:(?:me|te|se|nous|vous) |[mts]['’])(?:suis|es|est|sommes|êtes|sont|étais|était|étions|"
     r"étiez|étaient|serai|serais|serait) en (?:allé|sorti|voulu|occupé|pris|tiré|souvenu|moqué|"
@@ -287,6 +290,8 @@ _PROMPT_LEAK = re.compile(
     r" (?:has been|was) (?:removed|deleted)\b"
     # ...or a placeholder where it took something out: « (removed meta text) »
     r"|\((?:removed|deleted|omitted)\b[^)]{0,40}\)|\btruncated for brevity\b|\bfor brevity\)"
+    # a step's size instruction copied into a heading: « Vocabulaire (10-16 items) »
+    r"|\(\d+\s*[-–]\s*\d+ (?:items|words|sentences|mots)\)"
     # ...or a schema field value: « (region qc) »
     r"|\(region:? (?:qc|fr|common)\)",
     re.I,
@@ -357,6 +362,8 @@ def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
         french = "variants" not in parts and field in _FRENCH_FIELDS
         if french and (problem := _france_form(text)):
             add("error", path, problem)
+        if french and (m := _ELISION_BEFORE_CONSONANT.search(text)):
+            add("error", path, f"« {m.group(0)} »: elision only before a vowel or mute h")
         if french and (m := _EN_AFTER_AUX.search(text)):
             add(
                 "error", path, f"« {m.group(0)} »: en goes before the auxiliary (je m'en suis allé)"
@@ -420,6 +427,8 @@ def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
                 add("error", ex.id, f"missing elision once filled: « {m.group(0)} »")
             if problem := _france_form(text):
                 add("error", ex.id, problem)
+            if m := _ELISION_BEFORE_CONSONANT.search(text):
+                add("error", ex.id, f"« {m.group(0)} »: elision only before a vowel or mute h")
             if m := _EN_AFTER_AUX.search(text):
                 add(
                     "error",
