@@ -167,6 +167,18 @@ _ZERO_WIDTH = re.compile("[\u200b-\u200d\u2060\ufeff]")
 # « \\n\\n » that lost its backslashes and gained a zero-width space: « n\u200bn ».
 _MANGLED_BREAK = re.compile("[ \u202f\u00a0]*n[\u200b-\u200d\u2060\ufeff]n")
 _HEADING_MARK = re.compile(r"^\s*#{1,6}\s*")
+# French fields: Québec typography (OQLF) puts no space before ; ! ? where France puts a thin
+# non-breaking one, which is what the model writes.
+_FRENCH_KEYS = {
+    "fr",
+    "passage_fr",
+    "example_fr",
+    "sentence",
+    "answers",
+    "accepted_answers",
+    "question",
+}
+_SPACE_BEFORE_MARK = re.compile(r"[ \u00a0\u202f]+([;!?])")
 
 
 _TABLE_RULE = re.compile(r"\|\s*:?-{3,}:?\s*(?:\|\s*:?-{3,}:?\s*)*\|")
@@ -200,9 +212,12 @@ def unflatten_markdown(body: str) -> str:
     return "\n".join(_split_table(line) for line in body.split("\n"))
 
 
-def tidy(value: object, key: str = "") -> object:
-    """Recursively replace LaTeX arrows and similar markup that small models emit in prose."""
+def tidy(value: object, key: str = "", *, quebec_spacing: bool = True) -> object:
+    """Recursively replace LaTeX arrows and similar markup that small models emit in prose, and
+    give French text Québec spacing (none before ; ! ?), except where it shows France usage."""
     if isinstance(value, str):
+        if quebec_spacing and key in _FRENCH_KEYS:
+            value = _SPACE_BEFORE_MARK.sub(r"\1", value)
         for latex, plain in _LATEX.items():
             value = value.replace(latex, plain)
         value = _HTML_COMMENT.sub("", _LINE_BREAK.sub("\n", value))
@@ -211,9 +226,11 @@ def tidy(value: object, key: str = "") -> object:
             value = _HEADING_MARK.sub("", value)
         return unflatten_markdown(value) if key == "body" else value
     if isinstance(value, list):
-        return [tidy(v) for v in value]
+        return [tidy(v, key, quebec_spacing=quebec_spacing) for v in value]
     if isinstance(value, dict):
-        return {k: tidy(v, k) for k, v in value.items()}
+        # France usage (a region "fr" example, a regional note's variants) keeps its spacing.
+        keep = quebec_spacing and value.get("region") != "fr"
+        return {k: tidy(v, k, quebec_spacing=keep and k != "variants") for k, v in value.items()}
     return value
 
 

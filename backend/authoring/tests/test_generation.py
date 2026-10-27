@@ -647,3 +647,22 @@ def test_tidy_drops_markdown_marks_from_headings_and_zero_width_characters() -> 
     assert tidy({"note": "Forming words \u202fn\u200bn1. re-"}) == {
         "note": "Forming words\n\n1. re-"
     }
+
+
+def test_tidy_gives_french_text_quebec_spacing_except_france_usage() -> None:
+    data = {
+        "examples": [
+            {"fr": "Tu viens\u202f? Oui\u00a0!", "en": "Coming? Yes!", "region": "common"},
+            {"fr": "Tu viens\u202f?", "en": "Coming?", "region": "fr"},
+        ],
+        "variants": [{"qc": "Tu viens?", "fr": "Tu viens\u202f?", "en": "Coming?"}],
+        "passage_fr": "Il pleut ; on reste : c'est mieux.",
+    }
+    assert tidy(data) == {
+        "examples": [
+            {"fr": "Tu viens? Oui!", "en": "Coming? Yes!", "region": "common"},
+            {"fr": "Tu viens\u202f?", "en": "Coming?", "region": "fr"},
+        ],
+        "variants": [{"qc": "Tu viens?", "fr": "Tu viens\u202f?", "en": "Coming?"}],
+        "passage_fr": "Il pleut; on reste : c'est mieux.",
+    }
