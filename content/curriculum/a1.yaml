@@ -74,8 +74,8 @@ units:
     grammar_topics:
     - greetings
     prerequisites: []
-    quebec_focus: Bonjour/Allô/Salut, « Bonne journée », « Bienvenue » after merci; tu is used more widely
-      in Québec than in France
+    quebec_focus: In Québec, « allô » is also an informal hello (not just on the phone), « bienvenue » is
+      the usual reply to « merci », and tu is used more widely than in France
     reference: clemence:day-5
   - id: a1-introducing-yourself
     title: Se présenter
@@ -87,7 +87,6 @@ units:
     - introductions
     prerequisites:
     - a1-greetings
-    quebec_focus: « Je m'appelle… », « Je viens de… », asking « Tu viens d'où ? »
     reference: clemence:day-6
 - id: a1-u03-nouns
   title: Les noms et les pronoms
