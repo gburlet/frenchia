@@ -668,3 +668,8 @@ def test_tidy_gives_french_text_quebec_spacing_except_france_usage() -> None:
         "passage_fr": "Il pleut; on reste : c'est mieux.",
         "prompt": "Vous avez lu le rapport?",
     }
+
+
+def test_tidy_keeps_narrow_spaces_only_where_french_typography_puts_them() -> None:
+    text = "Fin.\u202fPuis «\u202foui\u202f» : 1\u202f000 $ et 5\u202fh."
+    assert tidy({"note": text}) == {"note": "Fin. Puis «\u202foui\u202f» : 1\u202f000 $ et 5 h."}

@@ -496,3 +496,11 @@ def test_en_after_the_auxiliary_is_an_error() -> None:
     data["exercises"][1]["accepted_answers"] = ["Elle s'est en fait trompée.", "Je m'en suis allé."]
     found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
     assert not any("en goes before the auxiliary" in m for m in found), found
+
+
+def test_a_pitfall_may_quote_the_mistake_and_hints_may_say_what_is_not_needed() -> None:
+    data = lesson_data()
+    data["sections"][0]["body"] += "\n\n- « Je en sors » is ungrammatical: say « J'en sors »."
+    data["exercises"][1]["hint"] = "Use s'en aller. No « de + event » is needed here."
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert not any("elision" in m or "generation instructions" in m for m in found), found

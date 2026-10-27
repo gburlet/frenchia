@@ -167,6 +167,9 @@ _ZERO_WIDTH = re.compile("[\u200b-\u200d\u2060\ufeff]")
 # « \\n\\n » that lost its backslashes and gained a zero-width space: « n\u200bn ».
 _MANGLED_BREAK = re.compile("[ \u202f\u00a0]*n[\u200b-\u200d\u2060\ufeff]n")
 _HEADING_MARK = re.compile(r"^\s*#{1,6}\s*")
+# A narrow no-break space belongs before : ; ! ? » %, after « and between digit groups
+# (1\u202f000); anywhere else (« fin.\u202fPuis ») the model meant an ordinary space.
+_STRAY_THIN_SPACE = re.compile(r"(?<![«\d])\u202f(?![:;!?»%])|(?<=\d)\u202f(?!\d|[:;!?»%])")
 # French fields: Québec typography (OQLF) puts no space before ; ! ? where France puts a thin
 # non-breaking one, which is what the model writes.
 _FRENCH_KEYS = {
@@ -224,6 +227,7 @@ def tidy(value: object, key: str = "", *, quebec_spacing: bool = True) -> object
             value = value.replace(latex, plain)
         value = _HTML_COMMENT.sub("", _LINE_BREAK.sub("\n", value))
         value = _ZERO_WIDTH.sub("", _MANGLED_BREAK.sub("\n\n", value))
+        value = _STRAY_THIN_SPACE.sub(" ", value)
         if key in ("heading", "title"):  # a plain-text field, rendered as a heading already
             value = _HEADING_MARK.sub("", value)
         return unflatten_markdown(value) if key == "body" else value

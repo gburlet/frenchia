@@ -268,12 +268,16 @@ _DOUBLE_ARTICLE = re.compile(r"\b(du|au|aux) (?:(le|la|les)\b|l['’])", re.I)
 # list »).
 # "Québec : J'ai fini." — a variant label in an answer key can never match what a learner types.
 _ANSWER_LABEL = re.compile(r"\s*(?:Québec|Quebec|France|QC|FR|Standard|Formal|Informal)\s*:", re.I)
+_QUOTES_A_MISTAKE = re.compile(
+    r"\b(?:wrong|incorrect|ungrammatical|mistake|not correct|avoid)\b|✗|❌|\*\*Not\b", re.I
+)
 _PROMPT_LEAK = re.compile(
     r"verified (list|lexicon|usage)|\bthe lexicon\b|\bJSON\b|≤\s*\d+ char"
     # editing notes left by a revision
     r"|key now points|now points to option|not asked here|\bWait\s*[–-]\s*careful"
     # the model talking about its brief (« No regional note is needed here. »)
-    r"|\bNo [^.]{0,40}\b(?:is|are) (?:needed|required) here\b"
+    r"|\bNo (?:[^.]{0,30}\b)?(?:regional|Québec|variant|note|table|section|change)s?\b"
+    r"[^.]{0,20}\b(?:is|are) (?:needed|required) here\b"
     r"|\bno regional (?:variant|variation|difference)s? (?:here|needed|required)\b"
     # ...or about its own edits (« The word québécoise has been removed »)
     r"|\bha(?:s|ve) been (?:removed|replaced|deleted|corrected|changed)"
@@ -341,8 +345,12 @@ def check_lesson_quality(lesson: Lesson, ref: Reference) -> list[Issue]:
         # Text about elision itself may quote the uncontracted form (« qu'un, contraction of
         # que un »).
         about_elision = re.search(r"contraction|elision|élision|elid", text, re.I)
-        if ".options." not in path and not about_elision and (m := _NO_ELISION.search(text)):
-            add("error", path, f"missing elision: « {m.group(0)} »")
+        if ".options." not in path and not about_elision:
+            # A pitfall may quote the wrong form on purpose (« Je en sors » is ungrammatical).
+            for line in text.split("\n"):
+                if not _QUOTES_A_MISTAKE.search(line) and (m := _NO_ELISION.search(line)):
+                    add("error", path, f"missing elision: « {m.group(0)} »")
+                    break
         parts = path.split(".")
         field = next((p for p in reversed(parts) if not p.isdigit()), "")
         # Regional-note variants hold the France form in "fr" on purpose.
