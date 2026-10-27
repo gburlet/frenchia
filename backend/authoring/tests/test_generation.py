@@ -637,3 +637,13 @@ def test_a_regional_note_the_reviser_emptied_is_dropped() -> None:
     assert not _emptied(
         note("Québec speakers often say « fait que » where France says « du coup ».")
     )
+
+
+def test_tidy_drops_markdown_marks_from_headings_and_zero_width_characters() -> None:
+    assert tidy({"heading": "## Le ne explétif", "body": "Après\u200b avant que"}) == {
+        "heading": "Le ne explétif",
+        "body": "Après avant que",
+    }
+    assert tidy({"note": "Forming words \u202fn\u200bn1. re-"}) == {
+        "note": "Forming words\n\n1. re-"
+    }

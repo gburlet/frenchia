@@ -163,6 +163,10 @@ _LATEX = {
 # renderer shows raw HTML as text.
 _LINE_BREAK = re.compile(r"<br\s*/?>|<br-\s?|⟩{2,}|⏎", re.I)
 _HTML_COMMENT = re.compile(r"<!--.*?-->", re.S)
+_ZERO_WIDTH = re.compile("[\u200b-\u200d\u2060\ufeff]")
+# « \\n\\n » that lost its backslashes and gained a zero-width space: « n\u200bn ».
+_MANGLED_BREAK = re.compile("[ \u202f\u00a0]*n[\u200b-\u200d\u2060\ufeff]n")
+_HEADING_MARK = re.compile(r"^\s*#{1,6}\s*")
 
 
 _TABLE_RULE = re.compile(r"\|\s*:?-{3,}:?\s*(?:\|\s*:?-{3,}:?\s*)*\|")
@@ -202,6 +206,9 @@ def tidy(value: object, key: str = "") -> object:
         for latex, plain in _LATEX.items():
             value = value.replace(latex, plain)
         value = _HTML_COMMENT.sub("", _LINE_BREAK.sub("\n", value))
+        value = _ZERO_WIDTH.sub("", _MANGLED_BREAK.sub("\n\n", value))
+        if key in ("heading", "title"):  # a plain-text field, rendered as a heading already
+            value = _HEADING_MARK.sub("", value)
         return unflatten_markdown(value) if key == "body" else value
     if isinstance(value, list):
         return [tidy(v) for v in value]
