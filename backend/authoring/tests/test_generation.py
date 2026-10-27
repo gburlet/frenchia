@@ -673,3 +673,17 @@ def test_tidy_gives_french_text_quebec_spacing_except_france_usage() -> None:
 def test_tidy_keeps_narrow_spaces_only_where_french_typography_puts_them() -> None:
     text = "Fin.\u202fPuis «\u202foui\u202f» : 1\u202f000 $ et 5\u202fh."
     assert tidy({"note": text}) == {"note": "Fin. Puis «\u202foui\u202f» : 1\u202f000 $ et 5 h."}
+
+
+def test_tidy_closes_the_gap_before_a_punctuation_blank() -> None:
+    item = {"sentence": "Où sont mes clés ___ Je les cherche.", "answers": ["?"]}
+    assert tidy(item)["sentence"] == "Où sont mes clés___ Je les cherche."  # type: ignore[index]
+    word = {"sentence": "Il est ___ heureux.", "answers": ["très"]}
+    assert tidy(word) == word
+
+
+def test_tidy_drops_region_tags_copied_into_prose() -> None:
+    body = "- **Fais-toi-en pas**, tout va bien aller. *(region qc)* – Don't worry."
+    assert tidy({"body": body}) == {
+        "body": "- **Fais-toi-en pas**, tout va bien aller. – Don't worry."
+    }

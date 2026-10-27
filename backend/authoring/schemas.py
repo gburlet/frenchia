@@ -167,6 +167,8 @@ _ZERO_WIDTH = re.compile("[\u200b-\u200d\u2060\ufeff]")
 # « \\n\\n » that lost its backslashes and gained a zero-width space: « n\u200bn ».
 _MANGLED_BREAK = re.compile("[ \u202f\u00a0]*n[\u200b-\u200d\u2060\ufeff]n")
 _HEADING_MARK = re.compile(r"^\s*#{1,6}\s*")
+# A schema value copied into prose: « tout va bien aller. *(region qc)* – Don't worry ».
+_REGION_TAG = re.compile(r"[ \u00a0]*\*?\(region:? ?(?:qc|fr|common)\)\*?", re.I)
 # A narrow no-break space belongs before : ; ! ? » %, after « and between digit groups
 # (1\u202f000); anywhere else (« fin.\u202fPuis ») the model meant an ordinary space.
 _STRAY_THIN_SPACE = re.compile(r"(?<![«\d])\u202f(?![:;!?»%])|(?<=\d)\u202f(?!\d|[:;!?»%])")
@@ -227,7 +229,7 @@ def tidy(value: object, key: str = "", *, quebec_spacing: bool = True) -> object
             value = value.replace(latex, plain)
         value = _HTML_COMMENT.sub("", _LINE_BREAK.sub("\n", value))
         value = _ZERO_WIDTH.sub("", _MANGLED_BREAK.sub("\n\n", value))
-        value = _STRAY_THIN_SPACE.sub(" ", value)
+        value = _STRAY_THIN_SPACE.sub(" ", _REGION_TAG.sub("", value))
         if key in ("heading", "title"):  # a plain-text field, rendered as a heading already
             value = _HEADING_MARK.sub("", value)
         return unflatten_markdown(value) if key == "body" else value
@@ -236,7 +238,13 @@ def tidy(value: object, key: str = "", *, quebec_spacing: bool = True) -> object
     if isinstance(value, dict):
         # France usage (a region "fr" example, a regional note's variants) keeps its spacing.
         keep = quebec_spacing and value.get("region") != "fr"
-        return {k: tidy(v, k, quebec_spacing=keep and k != "variants") for k, v in value.items()}
+        out = {k: tidy(v, k, quebec_spacing=keep and k != "variants") for k, v in value.items()}
+        answers, sentence = out.get("answers"), out.get("sentence")
+        if keep and isinstance(sentence, str) and isinstance(answers, list) and answers:
+            # A blank whose answer is ; ! ? , or . sits right after the word (« clés___ »).
+            if all(isinstance(a, str) and re.fullmatch(r"[;!?,.]", a) for a in answers):
+                out["sentence"] = re.sub(r"[ \u00a0\u202f]+___", "___", sentence)
+        return out
     return value
 
 
