@@ -144,6 +144,12 @@ def run_job(job_id: int) -> GenerationJob:
         job.status = GenerationJob.Status.FAILED
         job.error = f"{exc}\n\n{traceback.format_exc()}"
     job.finished_at = timezone.now()
+    # Rejected while it ran (e.g. superseded from Admin): keep the rejection, drop the draft.
+    if GenerationJob.objects.filter(pk=job.pk, status=GenerationJob.Status.REJECTED).exists():
+        _discard_draft(job, writer)
+        GenerationJob.objects.filter(pk=job.pk).update(finished_at=job.finished_at)
+        job.status = GenerationJob.Status.REJECTED
+        return job
     job.save()
     if (
         job.status == GenerationJob.Status.NEEDS_REVIEW

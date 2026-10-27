@@ -221,3 +221,19 @@ def test_a_revision_of_a_published_draft_can_be_published_too(root: Path) -> Non
     child = run_job(child.pk)
     assert child.status == GenerationJob.Status.NEEDS_REVIEW, child.error
     approve(child)  # the published file is the parent's output, not a conflicting edit
+
+
+def test_a_job_rejected_while_running_stays_rejected(root: Path) -> None:
+    job = create_job(Lesson.objects.get(slug="a2-passe-compose-er"), enqueue=False)
+
+    def reject_midway(*args: Any, **kwargs: Any) -> Any:
+        GenerationJob.objects.filter(pk=job.pk).update(status=GenerationJob.Status.REJECTED)
+        return original(*args, **kwargs)
+
+    from authoring import services
+
+    original = services._generate
+    with patch("authoring.services._generate", side_effect=reject_midway):
+        job = run_job(job.pk)
+    job.refresh_from_db()
+    assert job.status == GenerationJob.Status.REJECTED and not job.draft_path
