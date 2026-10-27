@@ -197,7 +197,7 @@ _BROKEN_MARKUP = re.compile(r"\*{5,}")
 _NO_ELISION = re.compile(
     r"\b(?:(?:parce |lors|puis|jus)?que (?:il|ils|elle|elles|on|un|une)|si (?:il|ils)|"
     r"je (?:ai|avais|aurai|aurais|aurait|étais|eus|eusse|aime|adore|habite|arrive|attends|"
-    r"irai|irais|en|y))\b",
+    r"irai|irais|en|y)|(?:je|tu|il|elle|on|nous|vous|ils|elles|ça) ne [aeiouéèêâîôû]\w+)\b",
     re.I,
 )
 # Pronominal verbs with en (s'en aller, s'en vouloir, s'en sortir…): en goes before the auxiliary
@@ -286,7 +286,7 @@ _PROMPT_LEAK = re.compile(
     r"|\bThis (?:regional )?(?:note|section|example|exercise)"
     r" (?:has been|was) (?:removed|deleted)\b"
     # ...or a placeholder where it took something out: « (removed meta text) »
-    r"|\((?:removed|deleted|omitted)\b[^)]{0,40}\)"
+    r"|\((?:removed|deleted|omitted)\b[^)]{0,40}\)|\btruncated for brevity\b|\bfor brevity\)"
     # ...or a schema field value: « (region qc) »
     r"|\(region:? (?:qc|fr|common)\)",
     re.I,

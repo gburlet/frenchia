@@ -391,6 +391,9 @@ def test_missing_elision_and_week_end_are_errors() -> None:
     data["exercises"][1]["accepted_answers"] = ["Parce que il pleut, on reste.", "On reste."]
     found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
     assert "error:missing elision: « Parce que il »" in found
+    data["exercises"][1]["accepted_answers"] = ["Elle ne écrit pas.", "Non."]
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert "error:missing elision: « Elle ne écrit »" in found
     data["exercises"][1]["accepted_answers"] = ["Si j'avais su, je aurais agi.", "Non."]
     found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
     assert "error:missing elision: « je aurais »" in found
@@ -438,6 +441,9 @@ def test_notes_about_the_brief_are_prompt_leaks() -> None:
     data["sections"][0]["body"] = (
         "This regional note has been removed because it contained unnecessary information."
     )
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert any("mentions the generation instructions" in m for m in found), found
+    data["sections"][0]["body"] = "Finir: je finis… (truncated for brevity)"
     found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
     assert any("mentions the generation instructions" in m for m in found), found
     data["sections"][0]["body"] = "Use auquel after à. (removed meta text) Then practise."

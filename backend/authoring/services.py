@@ -256,7 +256,10 @@ def _generate(
         if not path.exists():
             raise ReviewError("nothing to revise: the lesson has no content yet")
         base, version = load_yaml(path), _next_version(lesson, writer)
-    base["objectives"] = list(brief_for(lesson).outline.objectives)  # the outline may have changed
+    outline = brief_for(lesson).outline  # the outline may have changed since the draft
+    base["objectives"] = list(outline.objectives)
+    if not outline.quebec_focus:  # a Québec/France note the outline no longer calls for
+        base["sections"] = [s for s in base["sections"] if s.get("type") != "regional_note"]
     return LessonReviser(chat, ref, progress).revise(
         base, job.notes, list(job.targets), content_version=version, job_id=job.pk
     )

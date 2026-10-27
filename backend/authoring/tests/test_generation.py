@@ -708,3 +708,8 @@ def test_tidy_restores_line_breaks_that_lost_their_backslash() -> None:
     }
     letter = "La lettre **n** se prononce « enne »."
     assert tidy({"body": letter}) == {"body": letter}
+
+
+def test_tidy_drops_level_labels_inside_a_body() -> None:
+    body = "### Les mots interrogatifs (A1 – Grammar)\nQui, que, où."
+    assert tidy({"body": body}) == {"body": "### Les mots interrogatifs\nQui, que, où."}
