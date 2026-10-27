@@ -167,6 +167,7 @@ _ZERO_WIDTH = re.compile("[\u200b-\u200d\u2060\ufeff]")
 # « \\n\\n » that lost its backslashes and gained a zero-width space: « n\u200bn ».
 _MANGLED_BREAK = re.compile("[ \u202f\u00a0]*n[\u200b-\u200d\u2060\ufeff]n")
 _HEADING_MARK = re.compile(r"^\s*#{1,6}\s*")
+_BARE_N_BREAK = re.compile(r"(?<=[.:!?*)])n(?=[-#|]|[A-Z])")
 # « Accents (A1 – Pronunciation) », « Exemples (B2 – Grammar) »: the brief, not the title.
 _LEVEL_LABEL = re.compile(r"\s*\((?:A1|A2|B1|B2)\b[^)]{0,30}\)")
 _TABLE_GAP = re.compile(r"(?<=\|)[ \t]*\n(?:[ \t]*\n)+(?=[ \t]*\|)")
@@ -220,6 +221,7 @@ def unflatten_markdown(body: str) -> str:
         body = re.sub(r" {2,}", "\n\n", body)
     body = re.sub(r"\*{5,}", "**", body)  # « *****Heading** »: a rule run into a bold heading
     body = _TABLE_GAP.sub("\n", body)  # blank lines between table rows end the table
+    body = _BARE_N_BREAK.sub("\n", body)  # « gender:n- **un** »: a « \\n » that lost its backslash
     return "\n".join(_split_table(line) for line in body.split("\n"))
 
 

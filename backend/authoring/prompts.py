@@ -2,7 +2,7 @@
 changes: jobs record the versions they used (GenerationJob.prompts, lesson provenance)."""
 
 PROMPT_VERSIONS = {
-    "author.system": "6",
+    "author.system": "7",
     "author.steps": "8",
     "author.revise": "2",
     "author.critic": "4",
@@ -20,9 +20,7 @@ Rules:
 studies, health, travel, housing, family, nature, culture, technology, news, money, \
 relationships… Never pick a word, place, food or custom because it is Québécois, and do not \
 mention Québec unless the lesson is about it.
-- Where a word you need has a distinct Québec form, use that form: if a sentence names a meal, \
-déjeuner = breakfast, dîner = lunch, souper = supper; the weekend is « la fin de semaine », \
-not « le week-end ».
+- Where a word you need has a distinct Québec form, use that form.
 - Teach a broad, useful vocabulary for the learner's level: vary the nouns, verbs and \
 situations across examples, readings and exercises instead of reusing the same few words.
 - Use standard language; mark familiar usage as familiar. Never use swear words or sacres.

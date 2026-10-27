@@ -699,3 +699,12 @@ def test_tidy_joins_table_rows_split_by_blank_lines() -> None:
 def test_tidy_drops_level_labels_from_titles() -> None:
     data = {"title_en": "French Accents (A1 – Pronunciation)", "heading": "Exemples (B2 – Grammar)"}
     assert tidy(data) == {"title_en": "French Accents", "heading": "Exemples"}
+
+
+def test_tidy_restores_line_breaks_that_lost_their_backslash() -> None:
+    body = "***n### Le genre***nChaque nom a un genre:n- **un** livre.*n- **une** table"
+    assert tidy({"body": body}) == {
+        "body": "***\n### Le genre***\nChaque nom a un genre:\n- **un** livre.*\n- **une** table"
+    }
+    letter = "La lettre **n** se prononce « enne »."
+    assert tidy({"body": letter}) == {"body": letter}
