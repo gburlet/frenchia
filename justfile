@@ -161,6 +161,10 @@ api-types:
 backup:
     ./scripts/backup.sh
 
+# Clear one user's learning progress, after a backup (e.g. `just clear-progress legomygrego`; add --dry-run to preview)
+clear-progress username *args: backup
+    {{compose}} exec backend python manage.py clear_progress {{username}} {{args}}
+
 # Restore learner data (defaults to the newest backup)
 restore file="":
     ./scripts/restore.sh {{file}}
