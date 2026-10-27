@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import type { AttemptResult, PublicExercise } from "@/lib/api/types";
 import { useSubmitAttempt } from "./hooks";
 import { ResultPanel } from "./ResultPanel";
+import { InlineText } from "@/features/lessons/InlineText";
 
 interface ExerciseCardProps {
   exercise: PublicExercise;
@@ -141,7 +142,7 @@ export function ExerciseCard({ exercise, number, onResult, className, lessonId, 
             {exercise.direction === "en_fr" ? "Translate into French" : "Translate into English"}
           </p>
           <p className="flex items-center gap-1 text-lg text-heading">
-            <span lang={exercise.direction === "fr_en" ? "fr" : "en"}>{exercise.prompt}</span>
+            <span lang={exercise.direction === "fr_en" ? "fr" : "en"}><InlineText text={exercise.prompt} /></span>
             {exercise.direction === "fr_en" && <SpeakButton text={exercise.prompt} />}
           </p>
           <label htmlFor={`${uid}-answer`} className="sr-only">
@@ -171,7 +172,7 @@ export function ExerciseCard({ exercise, number, onResult, className, lessonId, 
                 About the reading
               </a>
             )}
-            {exercise.question}
+            <InlineText text={exercise.question} />
           </legend>
           <div role="radiogroup" aria-labelledby={headingId} className="flex flex-col gap-2">
             {exercise.options.map((option, i) => (
@@ -191,7 +192,7 @@ export function ExerciseCard({ exercise, number, onResult, className, lessonId, 
                   className="accent-purple"
                 />
                 {i < 4 && <kbd className="text-xs text-muted">{i + 1}</kbd>}
-                <span>{option}</span>
+                <span><InlineText text={option} /></span>
               </label>
             ))}
           </div>
@@ -201,7 +202,7 @@ export function ExerciseCard({ exercise, number, onResult, className, lessonId, 
       {hint && !result && (
         <div className="mt-3">
           {exercise.type === "fill_blank" ? (
-            <p className="text-sm text-detail">Hint: {hint}</p>
+            <p className="text-sm text-detail">Hint: <InlineText text={hint} /></p>
           ) : (
             <>
               <button
@@ -212,7 +213,7 @@ export function ExerciseCard({ exercise, number, onResult, className, lessonId, 
               >
                 {showHint ? "Hide hint" : "Show hint"}
               </button>
-              {showHint && <p className="mt-1 text-sm text-detail">{hint}</p>}
+              {showHint && <p className="mt-1 text-sm text-detail"><InlineText text={hint} /></p>}
             </>
           )}
         </div>
@@ -275,7 +276,7 @@ function FillBlank({
   return (
     <div className="flex flex-col gap-2">
       <p lang="fr" className="flex flex-wrap items-center gap-x-2 gap-y-2 text-lg text-heading">
-        <span>{before}</span>
+        <span><InlineText text={before ?? ""} /></span>
         <input
           type="text"
           aria-label="Missing word"
@@ -289,10 +290,10 @@ function FillBlank({
           id={`${uid}-answer`}
           className="h-9 w-40 rounded-control border border-line bg-chrome px-2 text-base text-heading focus-visible:border-purple disabled:opacity-60"
         />
-        <span>{after}</span>
+        <span><InlineText text={after} /></span>
         <SpeakButton text={exercise.sentence.replace("___", "…")} label="Écouter la phrase" />
       </p>
-      {exercise.translation_en && <p className="text-sm text-muted">{exercise.translation_en}</p>}
+      {exercise.translation_en && <p className="text-sm text-muted"><InlineText text={exercise.translation_en} /></p>}
     </div>
   );
 }

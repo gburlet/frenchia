@@ -731,3 +731,14 @@ def test_tidy_drops_a_language_label_from_prompts() -> None:
 def test_tidy_cuts_a_sentence_about_the_brief_from_a_hint() -> None:
     hint = "Use très for “very”. No regional intensifiers are needed at this level."
     assert tidy({"hint": hint}) == {"hint": "Use très for “very”."}
+
+
+def test_tidy_repairs_flattened_and_wrapped_markdown_in_a_body() -> None:
+    body = (
+        "Intro.\nIt means *will have*.  ## Formation  - avoir: aurai  - être: serai\n"
+        "**### Quick tip**\n\n```text\nJe **parler****ai**.\n```"
+    )
+    assert tidy({"body": body}) == {
+        "body": "Intro.\nIt means *will have*.\n\n## Formation\n\n- avoir: aurai\n\n- être: serai\n"
+        "### Quick tip\n\n\nJe **parlerai**.\n"
+    }

@@ -2,6 +2,7 @@ import { useId } from "react";
 import { Loader2, Square, Volume2, VolumeX } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAudioPlayer } from "./AudioPlayerContext";
+import { stripBold } from "@/lib/sentences";
 
 interface SpeakButtonProps {
   text: string;
@@ -23,7 +24,7 @@ export function SpeakButton({ text, speed = 1, label, className }: SpeakButtonPr
     <button
       type="button"
       onClick={() => (busy ? player.stop() : void player.play(id, text, speed))}
-      aria-label={busy ? "Arrêter la lecture" : (label ?? `Écouter : ${text}`)}
+      aria-label={busy ? "Arrêter la lecture" : (label ?? `Écouter : ${stripBold(text)}`)}
       aria-pressed={state === "playing"}
       title={state === "error" ? (player.error ?? undefined) : undefined}
       className={cn(

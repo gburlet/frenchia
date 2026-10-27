@@ -7,12 +7,9 @@ import { useOpenTutor } from "@/components/layout/TutorDrawerContext";
 import { cn } from "@/lib/utils";
 import type { AttemptResult, PublicExercise, Verdict } from "@/lib/api/types";
 import { useDispute, useRegrade } from "./hooks";
-import { BoldText } from "@/features/lessons/BoldText";
+import { InlineText } from "@/features/lessons/InlineText";
 
-const VERDICT: Record<
-  Verdict | "pending",
-  { label: string; variant: "success" | "teal" | "failure" | "blocked" }
-> = {
+const VERDICT: Record<Verdict | "pending", { label: string; variant: "success" | "teal" | "failure" | "blocked" }> = {
   correct: { label: "Correct", variant: "success" },
   acceptable: { label: "Acceptable", variant: "teal" },
   incorrect: { label: "Incorrect", variant: "failure" },
@@ -20,11 +17,7 @@ const VERDICT: Record<
 };
 
 function HighlightedSpan({ text }: { text: string }) {
-  return (
-    <span className="rounded-sm bg-failure/20 px-1 font-bold text-error-text">
-      {text}
-    </span>
-  );
+  return <span className="rounded-sm bg-failure/20 px-1 font-bold text-error-text">{text}</span>;
 }
 
 function DisputeControl({ attemptId }: { attemptId: number }) {
@@ -37,12 +30,7 @@ function DisputeControl({ attemptId }: { attemptId: number }) {
   }
   if (!open) {
     return (
-      <Button
-        type="button"
-        variant="ghost"
-        className="h-8 px-3 text-xs"
-        onClick={() => setOpen(true)}
-      >
+      <Button type="button" variant="ghost" className="h-8 px-3 text-xs" onClick={() => setOpen(true)}>
         I think I’m right
       </Button>
     );
@@ -69,11 +57,7 @@ function DisputeControl({ attemptId }: { attemptId: number }) {
         <Button type="submit" variant="secondary" disabled={dispute.isPending}>
           Send for review
         </Button>
-        {dispute.isError && (
-          <span className="text-sm text-error-text">
-            Couldn’t send. Try again.
-          </span>
-        )}
+        {dispute.isError && <span className="text-sm text-error-text">Couldn’t send. Try again.</span>}
       </div>
     </form>
   );
@@ -87,26 +71,15 @@ interface ResultPanelProps {
   onRetry: () => void;
 }
 
-export function ResultPanel({
-  exercise,
-  result,
-  chosenIndex,
-  onChange,
-  onRetry,
-}: ResultPanelProps) {
+export function ResultPanel({ exercise, result, chosenIndex, onChange, onRetry }: ResultPanelProps) {
   const regrade = useRegrade();
   const openTutor = useOpenTutor();
-  const pending =
-    result.status === "pending" ||
-    result.grading === "pending" ||
-    result.verdict === null;
+  const pending = result.status === "pending" || result.grading === "pending" || result.verdict === null;
   const verdict = VERDICT[pending ? "pending" : result.verdict!];
   const { feedback } = result;
-  const isChoice =
-    exercise.type === "multiple_choice" || exercise.type === "comprehension";
+  const isChoice = exercise.type === "multiple_choice" || exercise.type === "comprehension";
   const frenchAnswer =
-    exercise.type === "fill_blank" ||
-    (exercise.type === "translate" && exercise.direction === "en_fr");
+    exercise.type === "fill_blank" || (exercise.type === "translate" && exercise.direction === "en_fr");
   const answerText = feedback.corrected ?? result.correct_answer;
   const accepted = result.accepted_answers;
   const otherAccepted = accepted.filter((a) => a !== answerText);
@@ -124,16 +97,12 @@ export function ResultPanel({
     >
       <div className="flex flex-wrap items-center gap-2">
         <Badge variant={verdict.variant}>{verdict.label}</Badge>
-        {result.score !== null && (
-          <span className="text-xs text-muted">{result.score}/100</span>
-        )}
+        {result.score !== null && <span className="text-xs text-muted">{result.score}/100</span>}
         {feedback.summary && <p className="text-heading">{feedback.summary}</p>}
       </div>
 
       {feedback.accent_only && (
-        <p className="text-sm text-warning-text">
-          Only the accents differ. Watch the accents (é, è, à, ç…).
-        </p>
+        <p className="text-sm text-warning-text">Only the accents differ. Watch the accents (é, è, à, ç…).</p>
       )}
 
       {feedback.errors.length > 0 && (
@@ -145,7 +114,7 @@ export function ResultPanel({
               </Badge>
               {error.span && <HighlightedSpan text={error.span} />}
               {error.span && " "}
-              <span className="text-detail">{error.explanation}</span>
+              <span className="text-detail"><InlineText text={error.explanation} /></span>
             </li>
           ))}
         </ul>
@@ -153,9 +122,7 @@ export function ResultPanel({
 
       {!pending && answerText && !isChoice && (
         <p className="flex flex-wrap items-center gap-1 text-heading">
-          <span className="text-sm text-detail">
-            {feedback.corrected ? "Corrected:" : "Answer:"}
-          </span>
+          <span className="text-sm text-detail">{feedback.corrected ? "Corrected:" : "Answer:"}</span>
           <span className="font-bold">{answerText}</span>
           {frenchAnswer && <SpeakButton text={answerText} />}
         </p>
@@ -165,8 +132,7 @@ export function ResultPanel({
         <div className="flex flex-col gap-2">
           {answerText && (
             <p className="text-sm text-detail">
-              Reference answer:{" "}
-              <span className="font-bold text-heading">{answerText}</span>
+              Reference answer: <span className="font-bold text-heading">{answerText}</span>
               {frenchAnswer && <SpeakButton text={answerText} />}
             </p>
           )}
@@ -182,20 +148,12 @@ export function ResultPanel({
               type="button"
               variant="secondary"
               disabled={regrade.isPending}
-              onClick={() =>
-                regrade.mutate(result.attempt_id, { onSuccess: onChange })
-              }
+              onClick={() => regrade.mutate(result.attempt_id, { onSuccess: onChange })}
             >
-              {regrade.isPending && (
-                <Loader2 aria-hidden className="size-4 animate-spin" />
-              )}
+              {regrade.isPending && <Loader2 aria-hidden className="size-4 animate-spin" />}
               Retry automatic feedback
             </Button>
-            {regrade.isError && (
-              <span className="text-sm text-error-text">
-                The tutor is still unavailable.
-              </span>
-            )}
+            {regrade.isError && <span className="text-sm text-error-text">The tutor is still unavailable.</span>}
           </div>
         </div>
       )}
@@ -205,9 +163,7 @@ export function ResultPanel({
       )}
       {!pending && accepted.length > 1 && (
         <details className="text-sm text-detail">
-          <summary className="cursor-pointer">
-            Accepted answers ({accepted.length})
-          </summary>
+          <summary className="cursor-pointer">Accepted answers ({accepted.length})</summary>
           <ul className="mt-1 list-disc pl-5">
             {accepted.map((a) => (
               <li key={a}>{a}</li>
@@ -227,12 +183,8 @@ export function ResultPanel({
                 data-correct={isCorrect || undefined}
                 className={cn(
                   "flex items-center gap-2 rounded-control border px-3 py-2 text-sm",
-                  isCorrect
-                    ? "border-success bg-success/15 text-kept"
-                    : "border-line",
-                  isChosen &&
-                    !isCorrect &&
-                    "border-failure bg-failure/15 text-error-text",
+                  isCorrect ? "border-success bg-success/15 text-kept" : "border-line",
+                  isChosen && !isCorrect && "border-failure bg-failure/15 text-error-text",
                 )}
               >
                 <span>{option}</span>
@@ -245,13 +197,11 @@ export function ResultPanel({
       )}
       {result.explanation && (
         <p className="text-sm text-detail">
-          <BoldText text={result.explanation} />
+          <InlineText text={result.explanation} />
         </p>
       )}
 
-      {feedback.register_note && (
-        <p className="text-sm text-muted">{feedback.register_note}</p>
-      )}
+      {feedback.register_note && <p className="text-sm text-muted">{feedback.register_note}</p>}
 
       <div className="flex flex-wrap items-center gap-3">
         {!pending && result.verdict === "incorrect" && (
@@ -267,21 +217,14 @@ export function ResultPanel({
             type="button"
             variant="ghost"
             onClick={() =>
-              openTutor({
-                prompt:
-                  result.verdict === "incorrect"
-                    ? "Why is my answer wrong?"
-                    : "Explain this point",
-              })
+              openTutor({ prompt: result.verdict === "incorrect" ? "Why is my answer wrong?" : "Explain this point" })
             }
           >
             Ask the tutor about this
           </Button>
         )}
       </div>
-      {result.grading === "llm" && (
-        <p className="text-xs text-muted">Feedback by the local AI tutor</p>
-      )}
+      {result.grading === "llm" && <p className="text-xs text-muted">Feedback by the local AI tutor</p>}
     </div>
   );
 }

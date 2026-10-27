@@ -27,3 +27,47 @@ describe("Markdown", () => {
     expect(screen.queryByText(/<br>/)).not.toBeInTheDocument();
   });
 });
+
+describe("generated Markdown that doesn't parse cleanly", () => {
+  it("breaks a body flattened onto one line despite newlines elsewhere", () => {
+    const body = "Intro line.\nIt means *will have*.  ## Formation  ### 1. Auxiliary  - avoir: aurai  - être: serai";
+    const { container } = render(<Markdown>{body}</Markdown>);
+    expect(container.textContent).not.toContain("##");
+    expect(container.querySelectorAll("li")).toHaveLength(2);
+  });
+
+  it("shows no asterisks when emphasis is nested around an apostrophe", () => {
+    const { container } = render(<Markdown>{"Example: *Je doute **qu'**il **ait fini** son travail.*"}</Markdown>);
+    expect(container.textContent).toBe("Example: Je doute qu'il ait fini son travail.");
+    expect([...container.querySelectorAll("strong")].map((s) => s.textContent)).toContain("ait fini");
+  });
+
+  it("renders a leftover **bold** Markdown could not close", () => {
+    const { container } = render(<Markdown>{"Il faut **qu'**il vienne."}</Markdown>);
+    expect(container.textContent).toBe("Il faut qu'il vienne.");
+    expect(container.querySelector("strong")?.textContent).toBe("qu'");
+  });
+});
+
+describe("breaks flattened with narrow no-break spaces", () => {
+  it("restores headings and lists", () => {
+    const body = "Intro.\nUse *will have*. \u202f##\u202fFormation \u202f- **avoir**: aurai \u202f- **être**: serai";
+    const { container } = render(<Markdown>{body}</Markdown>);
+    expect(container.textContent).not.toMatch(/#|\*/);
+    expect(container.querySelector("h3")?.textContent).toBe("Formation");
+    expect(container.querySelectorAll("li")).toHaveLength(2);
+  });
+});
+
+describe("headings and examples the model wrapped in other markup", () => {
+  it("unwraps bold around a heading, indented headings and text fences", () => {
+    const body = "**### The passive voice**\nIntro.\n\n    #### Simple sentences\n\n```text\nJe **mange**.\n```";
+    const { container } = render(<Markdown>{body}</Markdown>);
+    expect(container.textContent).not.toMatch(/#|\*/);
+    expect([...container.querySelectorAll("h4, h5")].map((h) => h.textContent)).toEqual([
+      "The passive voice",
+      "Simple sentences",
+    ]);
+    expect(container.querySelector("strong")?.textContent).toBe("mange");
+  });
+});

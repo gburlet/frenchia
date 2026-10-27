@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { GenderChip, UsageBadges } from "./components";
 import { formatInterval } from "./format";
 import { useVocabSets, vocabKeys } from "./hooks";
+import { InlineText } from "@/features/lessons/InlineText";
 
 const RATINGS: { value: Rating; label: string }[] = [
   { value: 1, label: "Again" },
@@ -54,10 +55,10 @@ function Example({ card }: { card: ReviewCard }) {
         <p className="flex flex-wrap items-center gap-1 text-sm">
           <span lang="fr" className="text-heading">{lexeme.example_fr}</span>
           <SpeakButton text={lexeme.example_fr} className="size-7" />
-          {lexeme.example_en && <span className="basis-full text-muted">{lexeme.example_en}</span>}
+          {lexeme.example_en && <span className="basis-full text-muted"><InlineText text={lexeme.example_en} /></span>}
         </p>
       )}
-      {lexeme.note && <p className="text-sm text-muted">{lexeme.note}</p>}
+      {lexeme.note && <p className="text-sm text-muted"><InlineText text={lexeme.note} /></p>}
     </>
   );
 }

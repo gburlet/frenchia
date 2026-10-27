@@ -8,6 +8,7 @@ import { ApiError } from "@/lib/api/client";
 import type { Lexeme, VocabStatus } from "@/lib/api/vocab";
 import { GenderChip, StatusPill, UsageBadges } from "./components";
 import { useLearnSet, useVocabSet } from "./hooks";
+import { InlineText } from "@/features/lessons/InlineText";
 
 function WordRow({ word }: { word: Lexeme & { status: VocabStatus } }) {
   return (
@@ -35,10 +36,10 @@ function WordRow({ word }: { word: Lexeme & { status: VocabStatus } }) {
         <p className="flex flex-wrap items-center gap-1 text-sm">
           <span lang="fr" className="text-heading">{word.example_fr}</span>
           <SpeakButton text={word.example_fr} className="size-7" />
-          {word.example_en && <span className="basis-full text-muted">{word.example_en}</span>}
+          {word.example_en && <span className="basis-full text-muted"><InlineText text={word.example_en} /></span>}
         </p>
       )}
-      {word.note && <p className="text-sm text-muted">{word.note}</p>}
+      {word.note && <p className="text-sm text-muted"><InlineText text={word.note} /></p>}
     </li>
   );
 }

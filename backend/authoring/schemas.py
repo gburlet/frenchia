@@ -169,6 +169,12 @@ _MANGLED_BREAK = re.compile("[ \u202f\u00a0]*n[\u200b-\u200d\u2060\ufeff]n")
 _HEADING_MARK = re.compile(r"^\s*(?:#{1,6}\s*|Lesson\s*:\s*)")  # « ## », « Lesson : »
 _LEVEL_LABEL_IN_TEXT = re.compile(r"[ \t]*\((?:A1|A2|B1|B2)\s*[–-][^)\n]{0,30}\)")
 _LANGUAGE_LABEL = re.compile(r"^\s*(?:French|English|Français|Anglais)\s*:\s*", re.I)
+_FLAT_BLOCK = re.compile(
+    r"(\S)[ \t\u00a0\u202f\u200b-\u200d\u2060\ufeff]{2,}(?=#{1,6}[ \u00a0\u202f]|[-*] |\d+\. )"
+)
+_HEADING_AFTER_SENTENCE = re.compile(
+    r"([.!?…:]\*{0,3})[ \u00a0\u202f]\*{0,3}(?=#{2,6}[ \u00a0\u202f])"
+)
 _BARE_N_BREAK = re.compile(r"(?<=[.:!?*)])n(?=[-#|]|[A-Z])")
 # « Accents (A1 – Pronunciation) », « Exemples (B2 – Grammar) »: the brief, not the title.
 _LEVEL_LABEL = re.compile(r"\s*\((?:A1|A2|B1|B2)\b[^)]{0,30}\)")
@@ -233,6 +239,14 @@ def unflatten_markdown(body: str) -> str:
         body = re.sub(r" {2,}", "\n\n", body)
     body = re.sub(r"\*{5,}", "**", body)  # « *****Heading** »: a rule run into a bold heading
     body = _TABLE_GAP.sub("\n", body)  # blank lines between table rows end the table
+    # The same repairs the frontend applies to lessons published before them (cleanMarkdown.ts).
+    body = re.sub(r"(\S)\*{4}(?=\S)", r"\1", body)  # « je parler****ai »
+    body = _FLAT_BLOCK.sub("\\1\n\n", body)  # « travail.  ## Formation  - avoir »
+    body = _HEADING_AFTER_SENTENCE.sub("\\1\n\n", body)  # « viendras… ### Quick tip »
+    body = re.sub(r"^(#{1,6})[\u00a0\u202f]+", r"\1 ", body, flags=re.M)
+    body = re.sub(r"^\*{2,3}[ \t]*(#{1,6} .*?)[ \t]*\*{0,3}[ \t]*$", r"\1", body, flags=re.M)
+    body = re.sub(r"^[ \t]{4,}(?=#{1,6} |[-*] |\d+\. )", "", body, flags=re.M)  # not code
+    body = re.sub(r"^[ \t]*```[\w-]*[ \t]*$", "", body, flags=re.M)  # lessons hold no code
     body = _LEVEL_LABEL_IN_TEXT.sub("", body)  # « ### Les mots interrogatifs (A1 – Grammar) »
     body = _BARE_N_BREAK.sub("\n", body)  # « gender:n- **un** »: a « \\n » that lost its backslash
     return "\n".join(_split_table(line) for line in body.split("\n"))

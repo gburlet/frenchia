@@ -1,5 +1,6 @@
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { remarkLeftoverEmphasis } from "@/lib/remarkLeftoverEmphasis";
 import { cn } from "@/lib/utils";
 import { cleanMarkdown } from "./cleanMarkdown";
 
@@ -29,7 +30,7 @@ const components: Components = {
 export function Markdown({ children, className }: { children: string; className?: string }) {
   return (
     <div className={cn("max-w-[70ch]", className)}>
-      <ReactMarkdown components={components} remarkPlugins={[remarkGfm]}>
+      <ReactMarkdown components={components} remarkPlugins={[remarkGfm, remarkLeftoverEmphasis]}>
         {cleanMarkdown(children)}
       </ReactMarkdown>
     </div>

@@ -1,42 +1,9 @@
 const SPACE = /[\s\u00a0\u202f]/;
 const CLOSERS = new Set(["»", "”", '"', ")", "’", "'"]);
 const ABBREVIATIONS = new Set([
-  "m",
-  "mm",
-  "mme",
-  "mmes",
-  "mlle",
-  "mlles",
-  "dr",
-  "dre",
-  "pr",
-  "me",
-  "st",
-  "ste",
-  "sr",
-  "jr",
-  "p",
-  "pp",
-  "ex",
-  "etc",
-  "cf",
-  "env",
-  "no",
-  "n",
-  "vol",
-  "chap",
-  "fig",
-  "av",
-  "apr",
-  "boul",
-  "c.-à-d",
-  "p. ex",
-  "vs",
-  "ch",
-  "tél",
-  "min",
-  "max",
-  "rés",
+  "m", "mm", "mme", "mmes", "mlle", "mlles", "dr", "dre", "pr", "me", "st", "ste", "sr", "jr",
+  "p", "pp", "ex", "etc", "cf", "env", "no", "n", "vol", "chap", "fig", "av", "apr", "boul",
+  "c.-à-d", "p. ex", "vs", "ch", "tél", "min", "max", "rés",
 ]);
 
 function isAbbreviation(before: string): boolean {
@@ -65,11 +32,7 @@ function splitParagraph(text: string): string[] {
     // Optional closing guillemet/quote, possibly after a (narrow) space: « Bonjour ! »
     let j = end;
     while (j < text.length && SPACE.test(text[j]!)) j++;
-    if (
-      j < text.length &&
-      CLOSERS.has(text[j]!) &&
-      (j === end || text[j] === "»")
-    ) {
+    if (j < text.length && CLOSERS.has(text[j]!) && (j === end || text[j] === "»")) {
       end = j + 1;
       closed = true;
       while (end < text.length && CLOSERS.has(text[end]!)) end++;
@@ -112,18 +75,10 @@ export function splitSentences(text: string): string[] {
 }
 
 /** "un"/"une"/"l'" prefix for a noun, based on gender and the first letter. */
-export function withArticle(
-  word: string,
-  gender: "m" | "f" | null | undefined,
-  isNoun: boolean,
-): string {
+export function withArticle(word: string, gender: "m" | "f" | null | undefined, isNoun: boolean): string {
   // Proper nouns (le Vieux-Québec) don't take un/une; the gender pill still shows the gender.
   if (!isNoun || !gender || /^\p{Lu}/u.test(word)) return word;
-  const first = word
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .charAt(0)
-    .toLowerCase();
+  const first = word.normalize("NFD").replace(/[̀-ͯ]/g, "").charAt(0).toLowerCase();
   // Mute h can't be told from aspirated h without a dictionary, so h-words get un/une.
   if ("aeiou".includes(first)) return `l’${word}`;
   return `${gender === "f" ? "une" : "un"} ${word}`;
