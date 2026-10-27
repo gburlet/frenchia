@@ -167,6 +167,8 @@ _ZERO_WIDTH = re.compile("[\u200b-\u200d\u2060\ufeff]")
 # « \\n\\n » that lost its backslashes and gained a zero-width space: « n\u200bn ».
 _MANGLED_BREAK = re.compile("[ \u202f\u00a0]*n[\u200b-\u200d\u2060\ufeff]n")
 _HEADING_MARK = re.compile(r"^\s*#{1,6}\s*")
+# « Accents (A1 – Pronunciation) », « Exemples (B2 – Grammar) »: the brief, not the title.
+_LEVEL_LABEL = re.compile(r"\s*\((?:A1|A2|B1|B2)\b[^)]{0,30}\)")
 _TABLE_GAP = re.compile(r"(?<=\|)[ \t]*\n(?:[ \t]*\n)+(?=[ \t]*\|)")
 # A schema value copied into prose: « tout va bien aller. *(region qc)* – Don't worry ».
 _REGION_TAG = re.compile(r"[ \u00a0]*\*?\(region:? ?(?:qc|fr|common)\)\*?", re.I)
@@ -233,8 +235,8 @@ def tidy(value: object, key: str = "", *, quebec_spacing: bool = True) -> object
         value = _HTML_COMMENT.sub("", _LINE_BREAK.sub("\n", value))
         value = _ZERO_WIDTH.sub("", _MANGLED_BREAK.sub("\n\n", value))
         value = _STRAY_THIN_SPACE.sub(" ", _REGION_TAG.sub("", value))
-        if key in ("heading", "title"):  # a plain-text field, rendered as a heading already
-            value = _HEADING_MARK.sub("", value)
+        if key in ("heading", "title", "title_en"):  # plain text, rendered as a heading already
+            value = _LEVEL_LABEL.sub("", _HEADING_MARK.sub("", value))
         return unflatten_markdown(value) if key == "body" else value
     if isinstance(value, list):
         return [tidy(v, key, quebec_spacing=quebec_spacing) for v in value]

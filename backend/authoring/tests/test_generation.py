@@ -694,3 +694,8 @@ def test_tidy_joins_table_rows_split_by_blank_lines() -> None:
     assert tidy({"body": body}) == {
         "body": "Lettres:\n\n| Lettre | Nom |\n| --- | --- |\n| A | a |\n\nFin !"
     }
+
+
+def test_tidy_drops_level_labels_from_titles() -> None:
+    data = {"title_en": "French Accents (A1 – Pronunciation)", "heading": "Exemples (B2 – Grammar)"}
+    assert tidy(data) == {"title_en": "French Accents", "heading": "Exemples"}
