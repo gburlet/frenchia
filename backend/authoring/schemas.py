@@ -168,6 +168,7 @@ _ZERO_WIDTH = re.compile("[\u200b-\u200d\u2060\ufeff]")
 _MANGLED_BREAK = re.compile("[ \u202f\u00a0]*n[\u200b-\u200d\u2060\ufeff]n")
 _HEADING_MARK = re.compile(r"^\s*(?:#{1,6}\s*|Lesson\s*:\s*)")  # « ## », « Lesson : »
 _LEVEL_LABEL_IN_TEXT = re.compile(r"[ \t]*\((?:A1|A2|B1|B2)\s*[–-][^)\n]{0,30}\)")
+_LANGUAGE_LABEL = re.compile(r"^\s*(?:French|English|Français|Anglais)\s*:\s*", re.I)
 _BARE_N_BREAK = re.compile(r"(?<=[.:!?*)])n(?=[-#|]|[A-Z])")
 # « Accents (A1 – Pronunciation) », « Exemples (B2 – Grammar) »: the brief, not the title.
 _LEVEL_LABEL = re.compile(r"\s*\((?:A1|A2|B1|B2)\b[^)]{0,30}\)")
@@ -239,6 +240,8 @@ def tidy(value: object, key: str = "", *, quebec_spacing: bool = True) -> object
         value = _HTML_COMMENT.sub("", _LINE_BREAK.sub("\n", value))
         value = _ZERO_WIDTH.sub("", _MANGLED_BREAK.sub("\n\n", value))
         value = _STRAY_THIN_SPACE.sub(" ", _REGION_TAG.sub("", value))
+        if key in ("prompt", "question"):  # « French : Il est huit heures. »
+            value = _LANGUAGE_LABEL.sub("", value)
         if key in ("heading", "title", "title_en"):  # plain text, rendered as a heading already
             value = _LEVEL_LABEL.sub("", _HEADING_MARK.sub("", value))
         return unflatten_markdown(value) if key == "body" else value

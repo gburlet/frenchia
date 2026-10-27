@@ -722,3 +722,7 @@ def test_tidy_drops_a_lesson_prefix_from_headings() -> None:
 def test_tidy_takes_the_hint_out_of_the_sentence() -> None:
     item = {"sentence": "Je ___ (manger) une pomme.", "answers": ["mange"], "hint": "(manger)"}
     assert tidy(item)["sentence"] == "Je ___ une pomme."  # type: ignore[index]
+
+
+def test_tidy_drops_a_language_label_from_prompts() -> None:
+    assert tidy({"prompt": "French : Il est huit heures."}) == {"prompt": "Il est huit heures."}

@@ -229,6 +229,7 @@ _FRANCE_FORMS = [
         "Québec usage is « magasiner »",
     ),
     (re.compile(r"\be-?mails?\b", re.I), "Québec usage is « un courriel »"),
+    (re.compile(r"\b(?:le|au|du|de|joue[a-z]*) foot\b", re.I), "Québec usage is « le soccer »"),
 ]
 
 
@@ -273,7 +274,10 @@ _DOUBLE_ARTICLE = re.compile(r"\b(du|au|aux) (?:(le|la|les)\b|l['’])", re.I)
 # "Québec : J'ai fini." — a variant label in an answer key can never match what a learner types.
 _ANSWER_LABEL = re.compile(r"\s*(?:Québec|Quebec|France|QC|FR|Standard|Formal|Informal)\s*:", re.I)
 _QUOTES_A_MISTAKE = re.compile(
-    r"\b(?:wrong|incorrect|ungrammatical|mistake|not correct|avoid)\b|✗|❌|\*\*Not\b", re.I
+    r"\b(?:wrong|incorrect|ungrammatical|mistake|not correct|avoid|faux|fautif|incorrecte?)\b"
+    r"|\bon (?:ne dit|n['’]écrit) pas\b|\bn['’](?:écrivez|écris) pas\b|\bne (?:dites|dis) pas\b"
+    r"|✗|❌|\*\*Not\b",
+    re.I,
 )
 _PROMPT_LEAK = re.compile(
     r"verified (list|lexicon|usage)|\bthe lexicon\b|\bJSON\b|≤\s*\d+ char"

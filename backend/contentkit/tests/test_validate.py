@@ -515,6 +515,7 @@ def test_en_after_the_auxiliary_is_an_error() -> None:
 def test_a_pitfall_may_quote_the_mistake_and_hints_may_say_what_is_not_needed() -> None:
     data = lesson_data()
     data["sections"][0]["body"] += "\n\n- « Je en sors » is ungrammatical: say « J'en sors »."
+    data["sections"][0]["body"] += "\n\nOn n'écrit pas « parce que il » : on écrit « parce qu'il »."
     data["exercises"][1]["hint"] = "Use s'en aller. No « de + event » is needed here."
     found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
     assert not any("elision" in m or "generation instructions" in m for m in found), found
@@ -546,3 +547,10 @@ def test_a_negated_verb_form_is_a_form_of_the_verb() -> None:
     for answer in ("ne mange", "n'a", "ne vas pas", "n'achetons"):
         assert _is_verb_form(answer, forms), answer
     assert not _is_verb_form("ne", forms)
+
+
+def test_le_foot_is_adapted_to_québec_usage() -> None:
+    data = lesson_data()
+    data["exercises"][1]["accepted_answers"] = ["Mon fils joue au foot.", "Non."]
+    found = messages(check_lesson_quality(Lesson.model_validate(data), reference()))
+    assert any("« le soccer »" in m for m in found), found
