@@ -141,11 +141,29 @@ def test_verb_bank_subject_must_match_the_person_and_meals_their_québec_names()
             "infinitive": "rester",
             "en": "to stay",
             "sentences": [
-                sentence(subjunctive, "il", "Il faut que je reste calme.", "reste", "I must stay calm."),
-                sentence(subjunctive, "il", "Il faut qu'elle reste ici.", "reste", "She must stay here."),
-                sentence(present, "il", "Mon frère ne le reste pas.", "reste", "My brother doesn't."),
-                sentence(present, "je", "Je reste au bureau avant le dîner.", "reste", "I stay at the office before supper."),
-                sentence(present, "nous", "Nous restons après le souper.", "restons", "We stay after dinner."),
+                sentence(
+                    subjunctive, "il", "Il faut que je reste calme.", "reste", "I must stay calm."
+                ),
+                sentence(
+                    subjunctive, "il", "Il faut qu'elle reste ici.", "reste", "She must stay here."
+                ),
+                sentence(
+                    present, "il", "Mon frère ne le reste pas.", "reste", "My brother doesn't."
+                ),
+                sentence(
+                    present,
+                    "je",
+                    "Je reste au bureau avant le dîner.",
+                    "reste",
+                    "I stay at the office before supper.",
+                ),
+                sentence(
+                    present,
+                    "nous",
+                    "Nous restons après le souper.",
+                    "restons",
+                    "We stay after dinner.",
+                ),
             ],
         }
     )

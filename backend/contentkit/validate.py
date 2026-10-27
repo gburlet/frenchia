@@ -206,7 +206,10 @@ _ABOUT_FRANCE = re.compile(r"\bFrance\b|\beurop", re.I)
 # Other France forms the model keeps using where Québec has its own default.
 _FRANCE_FORMS = [
     (_WEEK_END, "Québec usage is « la fin de semaine »"),
-    (re.compile(r"\bpetits?[- ]d[ée]jeuners?\b", re.I), "the Québec morning meal is « le déjeuner »"),
+    (
+        re.compile(r"\bpetits?[- ]d[ée]jeuners?\b", re.I),
+        "the Québec morning meal is « le déjeuner »",
+    ),
     (
         re.compile(r"\b(?:fai[a-z]*|fera[a-z]*|fit|fai[st]) du shopping\b", re.I),
         "Québec usage is « magasiner »",
@@ -234,6 +237,8 @@ def _france_form(text: str) -> str | None:
             if not re.search(r"\bmidi\b|\bsoup", sentence, re.I):
                 return f"« {m.group(0)} » in the evening: the Québec evening meal is « le souper »"
     return None
+
+
 _FRENCH_FIELDS = {"fr", "passage_fr", "example_fr", "sentence", "answers"}
 # « loin du le centre-ville », « grâce au le beau temps » (a filled blank or an answer key).
 # « loin de le centre-ville »: after a compound preposition de + le/les must contract. (Before a

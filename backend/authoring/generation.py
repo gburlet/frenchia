@@ -114,6 +114,21 @@ SECTION_STEPS: dict[str, type[BaseModel]] = {
 MAX_TOKENS = 1800
 OPTIONAL_SECTIONS = {"table"}
 
+# Québec emblems read as local colour unless the lesson's outline is about what they belong to.
+_FOOD = r"cuisin|nourriture|aliment|repas|food|meal|fête|tradition"
+QUEBEC_EMBLEMS: dict[str, tuple[str, str]] = {
+    "dépanneur": (r"\bdépanneurs?\b", r"magasin|commerce|course|achat|shopping|store|quartier"),
+    "poutine": (r"\bpoutines?\b", _FOOD),
+    "tourtière": (r"\btourtières?\b", _FOOD),
+    "fèves au lard": (r"\bfèves au lard\b", _FOOD),
+    "fromage en grains": (r"\bfromage en grains\b", _FOOD),
+    "érable": (r"\bérables?\b|\bérablières?\b", _FOOD + r"|printemps|spring"),
+    "cabane à sucre": (r"\bcabanes? à sucre\b", _FOOD + r"|printemps|spring"),
+    "hockey": (r"\bhockey\b", r"sport|loisir|hobb|hiver|winter"),
+}
+# A Québec word in more French sentences than this, off-topic, crowds out other vocabulary.
+QUEBEC_TERM_MAX_SENTENCES = 3
+
 SECTION_TYPES: dict[str, type[BaseModel]] = {
     "explanation": ExplanationSection,
     "examples": ExamplesSection,
@@ -192,6 +207,8 @@ class LessonGenerator:
         sections: list[Any] = []
         title_en = brief.outline.title
         for step in plan.sections:
+            if step == "regional_note" and not brief.outline.quebec_focus:
+                continue  # a Québec/France note on a topic without one invites filler
             self.progress(f"Writing {step.replace('_', ' ')}")
             section, extra = self._section(step, brief, context, sections)
             if section is not None:
@@ -407,7 +424,7 @@ class LessonGenerator:
             f"{i.path.split(':', 1)[1]}: {i.message}"
             for i in check_lesson_quality(partial, self.ref)
             if i.severity == "error"
-        ]
+        ] + gratuitous_quebec(brief, sections, exercises, self.ref)
 
     # --- context -----------------------------------------------------------------------------
 
@@ -435,7 +452,7 @@ class LessonGenerator:
             objectives="\n".join(f"- {x}" for x in o.objectives),
             topics=", ".join(brief.topic_titles) or "none",
             theme=o.vocabulary_theme or "none",
-            quebec_focus=o.quebec_focus or "Québec forms where they come up; no special focus",
+            quebec_focus=f"Québec angle: {o.quebec_focus}\n" if o.quebec_focus else "",
             prerequisites=", ".join(brief.prerequisite_titles) or "nothing specific",
             lexicon=lexicon,
         )
@@ -738,6 +755,66 @@ def plain_item(value: Any, key: str = "") -> Any:
 def plain_exercises(data: Any) -> Any:
     data["exercises"] = [plain_item(e) for e in data["exercises"]]
     return data
+
+
+def french_sentences(sections: Sequence[Any], exercises: Sequence[Any]) -> list[str]:
+    """The French a learner reads in the lesson: examples, vocabulary, reading and exercise
+    keys (not the English explanations, which quote French to teach it)."""
+    out: list[str] = []
+    for s in sections:
+        if isinstance(s, ExamplesSection):
+            out += [e.fr for e in s.examples]
+        elif isinstance(s, VocabularySection):
+            out += [i.example_fr or "" for i in s.items]
+        elif isinstance(s, ReadingSection):
+            out += re.split(r"(?<=[.!?])\s+", s.passage_fr)
+    for e in exercises:
+        data = e.model_dump()
+        if data.get("type") == "fill_blank":
+            out.append(data["sentence"].replace("___", data["answers"][0]))
+        elif data.get("type") == "translate":
+            out += (
+                data["accepted_answers"][:1] if data["direction"] == "en_fr" else [data["prompt"]]
+            )
+        elif data.get("type") == "comprehension":
+            out += data["options"]
+    return [t for t in out if t.strip()]
+
+
+def gratuitous_quebec(
+    brief: LessonBrief, sections: Sequence[Any], exercises: Sequence[Any], ref: Reference
+) -> list[str]:
+    """Québec words brought in for their own sake: an emblem the outline isn't about, or one
+    Québec term repeated across the lesson instead of varied vocabulary."""
+    o = brief.outline
+    about = " ".join(
+        [
+            o.title,
+            o.quebec_focus or "",
+            o.vocabulary_theme or "",
+            *o.objectives,
+            *brief.topic_titles,
+        ]
+    ).lower()
+    texts = french_sentences(sections, exercises)
+    problems = []
+    for name, (pattern, topic) in QUEBEC_EMBLEMS.items():
+        hits = [t for t in texts if re.search(pattern, t, re.IGNORECASE)]
+        if hits and not re.search(pattern, about, re.IGNORECASE) and not re.search(topic, about):
+            problems.append(
+                f"« {name} » is used as Québec local colour ({hits[0]!r}) but this lesson is not "
+                "about it: choose a setting and words that fit the topic"
+            )
+    if o.vocabulary_theme:
+        return problems
+    for term in ref.quebec:
+        uses = sum(1 for t in texts if any(re.search(p, t, re.IGNORECASE) for p in term.match))
+        if uses > QUEBEC_TERM_MAX_SENTENCES and not re.search(re.escape(term.term), about, re.I):
+            problems.append(
+                f"« {term.term} » appears in {uses} French sentences; use it at most "
+                f"{QUEBEC_TERM_MAX_SENTENCES} times and vary the vocabulary instead"
+            )
+    return problems
 
 
 def verify_regions(data: Any, ref: Reference) -> Any:

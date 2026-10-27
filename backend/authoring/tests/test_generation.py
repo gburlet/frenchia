@@ -1,10 +1,17 @@
 import json
+from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
-from authoring.generation import LessonBrief, LessonGenerator, LessonReviser, verify_regions
+from authoring.generation import (
+    LessonBrief,
+    LessonGenerator,
+    LessonReviser,
+    gratuitous_quebec,
+    verify_regions,
+)
 from authoring.schemas import tidy
-from contentkit.models import FillBlankExercise, Lesson, LessonOutline
+from contentkit.models import Example, ExamplesSection, FillBlankExercise, Lesson, LessonOutline
 from contentkit.reference import QuebecTerm, Reference
 from contentkit.yamlio import content_hash
 from inference.llm import Completion
@@ -454,7 +461,9 @@ def test_tidy_turns_html_breaks_and_stray_symbols_into_newlines() -> None:
 
 
 def test_tidy_restores_line_breaks_in_a_flattened_body_only() -> None:
-    flat = "### Forms  Intro text.  | Verb | Form | |---|---| | parler | parlé | | finir | fini |  - a"
+    flat = (
+        "### Forms  Intro text.  | Verb | Form | |---|---| | parler | parlé | | finir | fini |  - a"
+    )
     assert tidy({"body": flat, "fr": "Il  pleut."}) == {
         "body": "### Forms\n\nIntro text.\n\n| Verb | Form |\n| --- | --- |\n"
         "| parler | parlé |\n| finir | fini |\n\n- a",
@@ -549,3 +558,46 @@ def test_gender_notation_in_answers_becomes_two_answers() -> None:
 
     data = {"accepted_answers": ["Tu serais allé(e) hier.", "Tu serais allé hier."]}
     assert plain_item(data)["accepted_answers"] == ["Tu serais allé hier.", "Tu serais allée hier."]
+
+
+def plain_brief(**outline: Any) -> LessonBrief:
+    """A brief without a Québec angle (most lessons)."""
+    base = brief()
+    fields = {**base.outline.model_dump(), "quebec_focus": None, **outline}
+    return replace(base, outline=LessonOutline(**fields))
+
+
+def test_lessons_without_a_quebec_angle_get_no_regional_note() -> None:
+    chat = ScriptedChat()
+    lesson = (
+        LessonGenerator(chat, reference())
+        .generate(plain_brief(), content_version=1, job_id=None)
+        .lesson
+    )
+    assert "regional_note" not in [s.type for s in lesson.sections]
+    assert "Québec angle" not in chat.calls[0][1][1].content
+
+
+def examples(*sentences: str) -> ExamplesSection:
+    return ExamplesSection(
+        type="examples",
+        id="examples",
+        heading="Exemples",
+        examples=[Example(fr=s, en="x") for s in sentences],
+    )
+
+
+def test_quebec_emblems_off_topic_are_problems() -> None:
+    section = examples("Il aurait acheté du lait au dépanneur.", "Nous aurions vu le match.")
+    [problem] = gratuitous_quebec(plain_brief(), [section], [], reference())
+    assert "dépanneur" in problem and "local colour" in problem
+    shopping = plain_brief(objectives=["Talk about shopping in your quartier"])
+    assert gratuitous_quebec(shopping, [section], [], reference()) == []
+
+
+def test_one_quebec_term_repeated_across_the_lesson_is_a_problem() -> None:
+    section = examples(*(f"Elle magasine le {d}." for d in ("lundi", "mardi", "jeudi", "samedi")))
+    [problem] = gratuitous_quebec(plain_brief(), [section], [], reference())
+    assert "magasiner" in problem and "4 French sentences" in problem
+    three = examples(*(e.fr for e in section.examples[:3]))
+    assert gratuitous_quebec(plain_brief(), [three], [], reference()) == []

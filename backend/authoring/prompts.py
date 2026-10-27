@@ -2,8 +2,8 @@
 changes: jobs record the versions they used (GenerationJob.prompts, lesson provenance)."""
 
 PROMPT_VERSIONS = {
-    "author.system": "5",
-    "author.steps": "5",
+    "author.system": "6",
+    "author.steps": "6",
     "author.revise": "1",
     "author.critic": "4",
     "author.practice": "2",
@@ -14,19 +14,17 @@ PROMPT_VERSIONS = {
 
 SYSTEM = """\
 You write original lessons for Frenchia, a French course for an English-speaking adult who is \
-progressing from A1 to B2 and is learning Québec French.
+progressing from A1 to B2 and lives in Québec.
 Rules:
-- Québec usage is the default form, not the subject: when a word or phrase has a Québec form, \
-use it (the evening meal is « le souper », the weekend « la fin de semaine ») and mention the \
-European French equivalent where it differs. Do not go out of your way to bring in \
-Québec-specific words, places or situations: choose vocabulary and settings for the lesson's \
-topic, vary them, and let Québec forms appear only where they come up naturally. Québec \
-emblems (sirop d'érable, poutine, fromage en grains, fèves au lard, tourtière, cabane à sucre, \
-dépanneur, hockey) belong only in lessons about them, not as local colour elsewhere.
+- Choose settings, people and vocabulary for the lesson's topic alone, and vary them: work, \
+studies, health, travel, housing, family, nature, culture, technology, news, money, \
+relationships… Never pick a word, place, food or custom because it is Québécois, and do not \
+mention Québec unless the lesson is about it.
+- Where a word you need has a distinct Québec form, use that form: if a sentence names a meal, \
+déjeuner = breakfast, dîner = lunch, souper = supper; the weekend is « la fin de semaine », \
+not « le week-end ».
 - Teach a broad, useful vocabulary for the learner's level: vary the nouns, verbs and \
 situations across examples, readings and exercises instead of reusing the same few words.
-- Québec meals: déjeuner = breakfast, dîner = lunch, souper = supper. Say « la fin de semaine », \
-not « le week-end ».
 - Use standard language; mark familiar usage as familiar. Never use swear words or sacres.
 - Write explanations in clear, friendly English with French examples. Keep French at or slightly \
 below the lesson's CEFR level.
@@ -42,8 +40,7 @@ Learning objectives:
 {objectives}
 Grammar topics: {topics}
 Vocabulary theme: {theme}
-Québec angle: {quebec_focus}
-Builds on: {prerequisites}
+{quebec_focus}Builds on: {prerequisites}
 {lexicon}"""
 
 LEXICON = """\
@@ -83,8 +80,8 @@ examples actually use: never list general Québec words (dépanneur, souper, mag
 lesson does not need. If there is no real difference for this topic, say so in one or two \
 sentences and list no variants.""",
     "reading": """\
-Write an original French reading passage of {words} words (Québec French; any everyday setting \
-that suits the topic, not built around Québec-specific words) that naturally uses the \
+Write an original French reading passage of {words} words (a setting that suits the topic and \
+differs from the examples) that naturally uses the \
 lesson's grammar and vocabulary, an English translation, and a glossary of 3-8 harder words. \
 Write at CEFR {level}.""",
     "fill_blank": """\
@@ -97,7 +94,7 @@ Write {count} short English sentences to translate into French, practising the o
 each, give 2-4 different correct French translations (include the natural Québec wording and a \
 standard one when they differ) and a short hint.""",
     "translate_fr_en": """\
-Write {count} short French sentences (natural Québec French) to translate into English, \
+Write {count} short, natural French sentences to translate into English, \
 practising the objectives. For each, give 2-4 correct English translations and a short hint.""",
     "multiple_choice": """\
 Write {count} multiple-choice questions (3-4 options, exactly one correct) testing the \

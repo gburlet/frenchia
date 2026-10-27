@@ -57,7 +57,8 @@ naturalness;
 - answer keys: each fill-in-the-blank must be fully correct once filled, and must not have \
 another equally correct answer that is not listed (e.g. any pronoun fits « Je ___ dis la \
 vérité »). A blank lists at most 4 answers: when more than 4 fit (synonymous connectors), \
-report that the sentence or hint is too open, not a list of answers to add; each multiple-choice question must have exactly one correct option (work it out \
+report that the sentence or hint is too open, not a list of answers to add; each \
+multiple-choice question must have exactly one correct option (work it out \
 yourself before reading answer_index; an option that is the right answer with different \
 punctuation is also correct); an answer must not repeat an object already replaced by a \
 pronoun (« Je lui parle à Marie »); a fill-in-the-blank hint must not contain the answer. \
