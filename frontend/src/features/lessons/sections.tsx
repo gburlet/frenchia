@@ -55,7 +55,7 @@ function Examples({ section }: { section: ExamplesSection }) {
           <li key={i} className="flex items-start gap-2 px-4 py-3">
             <div className="min-w-0 flex-1">
               <p lang="fr" className="flex flex-wrap items-center gap-2 font-bold text-heading">
-                <InlineText text={ex.fr} />
+                <span><InlineText text={ex.fr} /></span>
                 {ex.region === "qc" && <QcPill />}
               </p>
               <p className="text-body"><InlineText text={ex.en} /></p>
