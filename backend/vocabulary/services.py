@@ -246,32 +246,78 @@ def review(
     }
 
 
+def _word_key(fr: str, pos: str) -> tuple[str, str]:
+    return normalize(fr), pos
+
+
+def _deck_keys(cards: Any) -> set[tuple[str, str]]:
+    return {_word_key(fr, pos) for fr, pos in cards.values_list("lexeme__fr", "lexeme__pos")}
+
+
+def _put_in_deck(user: User, lexeme: Lexeme, now: datetime, *, has_cards: bool) -> None:
+    """Resume a removed word's cards, or create both directions for a new one."""
+    if has_cards:
+        VocabCard.objects.filter(user=user, lexeme=lexeme).update(suspended=False)
+        return
+    for direction in VocabCard.Direction.values:
+        VocabCard.objects.create(
+            user=user,
+            lexeme=lexeme,
+            direction=direction,
+            fsrs=Card(due=now).to_dict(),
+            due=now,
+        )
+
+
 @transaction.atomic
 def learn_set(user: User, vocab_set: VocabSet) -> dict[str, int]:
     """Add a set's words to the learner's deck (both directions). Words already in the deck
-    from another set (same French word and part of speech) are skipped."""
+    from another set (same French word and part of speech) are skipped. Words removed earlier
+    come back with their review history."""
     now = timezone.now()
-    known = {
-        (normalize(fr), pos)
-        for fr, pos in VocabCard.objects.filter(user=user).values_list("lexeme__fr", "lexeme__pos")
-    }
+    known = _deck_keys(VocabCard.objects.filter(user=user, suspended=False))
+    removed = set(
+        VocabCard.objects.filter(
+            user=user, lexeme__vocab_set=vocab_set, suspended=True
+        ).values_list("lexeme_id", flat=True)
+    )
     added = skipped = 0
     for lexeme in vocab_set.lexemes.filter(retired=False):
-        key = (normalize(lexeme.fr), lexeme.pos)
+        key = _word_key(lexeme.fr, lexeme.pos)
         if key in known:
             skipped += 1
             continue
         known.add(key)
-        for direction in VocabCard.Direction.values:
-            VocabCard.objects.create(
-                user=user,
-                lexeme=lexeme,
-                direction=direction,
-                fsrs=Card(due=now).to_dict(),
-                due=now,
-            )
         added += 1
+        _put_in_deck(user, lexeme, now, has_cards=lexeme.pk in removed)
     return {"added": added, "skipped": skipped}
+
+
+@transaction.atomic
+def add_word(user: User, lexeme: Lexeme) -> dict[str, Any]:
+    """Add one word to the learner's deck, unless it is already there (from any set)."""
+    known = _deck_keys(VocabCard.objects.filter(user=user, suspended=False))
+    if _word_key(lexeme.fr, lexeme.pos) in known:
+        return {"lexeme": lexeme.pk, "added": False}
+    has_cards = VocabCard.objects.filter(user=user, lexeme=lexeme).exists()
+    _put_in_deck(user, lexeme, timezone.now(), has_cards=has_cards)
+    return {"lexeme": lexeme.pk, "added": True}
+
+
+def remove_set(user: User, vocab_set: VocabSet) -> dict[str, int]:
+    """Take a set's words out of the learner's reviews. The cards are suspended, not deleted,
+    so adding the set again resumes their schedule."""
+    cards = VocabCard.objects.filter(user=user, lexeme__vocab_set=vocab_set, suspended=False)
+    removed = cards.values("lexeme").distinct().count()
+    cards.update(suspended=True)
+    return {"removed": removed}
+
+
+def remove_word(user: User, lexeme_id: int, *, removed: bool = True) -> dict[str, Any]:
+    """Take a word out of the learner's reviews (both directions), or bring it back. Like
+    remove_set, the cards are suspended so their schedule survives."""
+    VocabCard.objects.filter(user=user, lexeme=lexeme_id).update(suspended=removed)
+    return {"lexeme": lexeme_id, "removed": removed}
 
 
 def set_summaries(user: User) -> list[dict[str, Any]]:
@@ -310,14 +356,18 @@ def set_summaries(user: User) -> list[dict[str, Any]]:
 
 def set_detail(user: User, vocab_set: VocabSet) -> dict[str, Any]:
     now = timezone.now()
+    active = VocabCard.objects.filter(user=user, suspended=False)
     cards: dict[int, list[VocabCard]] = {}
-    for card in VocabCard.objects.filter(user=user, lexeme__vocab_set=vocab_set):
+    for card in active.filter(lexeme__vocab_set=vocab_set):
         cards.setdefault(card.lexeme_id, []).append(card)
+    elsewhere = _deck_keys(active.exclude(lexeme__vocab_set=vocab_set))
     words = []
     for lexeme in vocab_set.lexemes.filter(retired=False):
         own = cards.get(lexeme.pk, [])
         status = (
-            "not_started"
+            "elsewhere"
+            if not own and _word_key(lexeme.fr, lexeme.pos) in elsewhere
+            else "not_started"
             if not own
             else "new"
             if all(c.reps == 0 for c in own)
@@ -341,6 +391,8 @@ def stats(user: User) -> dict[str, Any]:
     now = timezone.now()
     cards = _active(user)
     reviews_today = VocabReview.objects.filter(card__user=user, reviewed_at__gte=_start_of_day(now))
+    new_waiting = cards.filter(reps=0).count()
+    remaining = new_remaining(user, now)
     return {
         "cards": cards.count(),
         "words": cards.values("lexeme").distinct().count(),
@@ -348,8 +400,11 @@ def stats(user: User) -> dict[str, Any]:
         "due_today": cards.filter(
             reps__gt=0, due__lt=_start_of_day(now) + timedelta(days=1)
         ).count(),
-        "new_waiting": cards.filter(reps=0).count(),
-        "new_remaining_today": new_remaining(user, now),
+        "new_waiting": new_waiting,
+        "new_remaining_today": remaining,
+        # new cards a review session can actually show today: the daily allowance, capped by
+        # the unseen cards in the deck
+        "new_today": min(remaining, new_waiting),
         "reviews_today": reviews_today.count(),
         "mature": sum(
             1 for c in cards.filter(reps__gt=0).only("fsrs") if (c.fsrs.get("stability") or 0) >= 21

@@ -60,7 +60,7 @@ export function VocabPage() {
   }
 
   const { sets, stats } = data;
-  const waiting = stats.due_now + stats.new_remaining_today;
+  const waiting = stats.due_now + stats.new_today;
   const themes = sets.filter((s) => s.kind !== "lesson");
   const lessonSets = sets.filter((s) => s.kind === "lesson");
   const levels: string[] = [];
@@ -73,7 +73,7 @@ export function VocabPage() {
       <section aria-label="Your progress" className="flex flex-col gap-4">
         <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <Stat label="Due now" value={stats.due_now} />
-          <Stat label="New cards left today" value={stats.new_remaining_today} />
+          <Stat label="New cards today" value={stats.new_today} />
           <Stat label="Reviews today" value={stats.reviews_today} />
           <Stat label="Words in deck" value={stats.words} />
         </dl>
@@ -87,12 +87,15 @@ export function VocabPage() {
                 <Link to="/practice/vocab/review">Review now</Link>
               </Button>
             </>
+          ) : stats.words === 0 ? (
+            <>
+              <p className="text-xl font-bold text-heading">Your deck is empty</p>
+              <p className="text-detail">Open a word set below and add its words to your reviews to start.</p>
+            </>
           ) : (
             <>
               <p className="text-xl font-bold text-heading">All caught up</p>
-              <p className="text-detail">
-                {stats.words === 0 ? "Add a word set below to start reviewing." : "Nothing is due right now."}
-              </p>
+              <p className="text-detail">Nothing is due right now.</p>
               <Button asChild variant="ghost">
                 <Link to="/practice/vocab/review">Check for more</Link>
               </Button>

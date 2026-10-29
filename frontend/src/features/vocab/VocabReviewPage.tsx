@@ -9,6 +9,7 @@ import { SpeakButton } from "@/features/audio/SpeakButton";
 import {
   checkVocabCard,
   fetchVocabReview,
+  removeVocabWord,
   reviewVocabCard,
   type CheckResponse,
   type Rating,
@@ -45,6 +46,7 @@ function isTyping(target: EventTarget | null) {
 interface CardProps {
   card: ReviewCard;
   onRated: (rating: Rating) => void;
+  onRemoved: () => void;
 }
 
 function Example({ card }: { card: ReviewCard }) {
@@ -63,7 +65,7 @@ function Example({ card }: { card: ReviewCard }) {
   );
 }
 
-function ReviewCardView({ card, onRated }: CardProps) {
+function ReviewCardView({ card, onRated, onRemoved }: CardProps) {
   const { lexeme } = card;
   const recall = card.direction === "recall";
   const [shownAt] = useState(() => Date.now());
@@ -90,6 +92,14 @@ function ReviewCardView({ card, onRated }: CardProps) {
         ...(recall && checked ? { answer: answer.trim(), check_result: checked.result } : {}),
       }),
     onSuccess: (_d, rating) => onRated(rating),
+    onSettled: () => {
+      lock.current = false;
+    },
+  });
+
+  const remove = useMutation({
+    mutationFn: () => removeVocabWord(card.id),
+    onSuccess: () => onRemoved(),
     onSettled: () => {
       lock.current = false;
     },
@@ -149,6 +159,20 @@ function ReviewCardView({ card, onRated }: CardProps) {
             <UsageBadges lexeme={lexeme} />
           </>
         )}
+        <Button
+          type="button"
+          variant="ghost"
+          className="ml-auto"
+          title="Stop reviewing this word, in both directions"
+          disabled={remove.isPending || rate.isPending}
+          onClick={() => {
+            if (lock.current) return;
+            lock.current = true;
+            remove.mutate();
+          }}
+        >
+          Remove this word
+        </Button>
       </div>
 
       {recall ? (
@@ -254,6 +278,7 @@ function ReviewCardView({ card, onRated }: CardProps) {
         </div>
       )}
       {rate.isError && <p className="text-sm text-error-text">Couldn’t save your rating: {rate.error.message}. Try again.</p>}
+      {remove.isError && <p className="text-sm text-error-text">Couldn’t remove the word: {remove.error.message}</p>}
     </div>
   );
 }
@@ -264,6 +289,9 @@ export function VocabReviewPage() {
   const [index, setIndex] = useState(0);
   const [done, setDone] = useState(0);
   const [again, setAgain] = useState(0);
+  // Words removed this session; the batch may still hold their other direction.
+  const [removed, setRemoved] = useState<ReadonlySet<number>>(new Set());
+  const [lastRemoved, setLastRemoved] = useState<ReviewCard | null>(null);
 
   const query = useQuery({
     queryKey: vocabKeys.review(batch, ahead),
@@ -278,16 +306,55 @@ export function VocabReviewPage() {
   const empty = !!data && data.cards.length === 0;
   const sets = useVocabSets(empty);
 
-  function onRated(rating: Rating) {
-    setDone((d) => d + 1);
-    if (rating === 1) setAgain((a) => a + 1);
-    if (data && index + 1 >= data.cards.length) {
+  const undo = useMutation({
+    mutationFn: (card: ReviewCard) => removeVocabWord(card.id, false),
+    onSuccess: (_d, card) => {
+      setRemoved((prev) => new Set([...prev].filter((id) => id !== card.lexeme.id)));
+      setLastRemoved(null);
+      if (empty) {
+        setIndex(0);
+        setBatch((b) => b + 1);
+      }
+    },
+  });
+
+  function advance(skip: ReadonlySet<number>) {
+    if (!data) return;
+    let next = index + 1;
+    while (next < data.cards.length && skip.has(data.cards[next]?.lexeme.id ?? -1)) next++;
+    if (next >= data.cards.length) {
       setIndex(0);
       setBatch((b) => b + 1);
     } else {
-      setIndex((i) => i + 1);
+      setIndex(next);
     }
   }
+
+  function onRated(rating: Rating) {
+    setDone((d) => d + 1);
+    if (rating === 1) setAgain((a) => a + 1);
+    advance(removed);
+  }
+
+  function onRemoved(card: ReviewCard) {
+    const skip = new Set(removed).add(card.lexeme.id);
+    setRemoved(skip);
+    setLastRemoved(card);
+    undo.reset();
+    advance(skip);
+  }
+
+  const notice = lastRemoved && (
+    <div className="flex flex-wrap items-center gap-3 rounded-card bg-surface px-4 py-3 text-detail" role="status">
+      <span>
+        Removed <span lang="fr" className="font-bold text-heading">{lastRemoved.lexeme.display}</span> from your reviews.
+      </span>
+      <Button type="button" variant="ghost" disabled={undo.isPending} onClick={() => undo.mutate(lastRemoved)}>
+        Undo
+      </Button>
+      {undo.isError && <span className="text-error-text">Couldn’t undo: {undo.error.message}</span>}
+    </div>
+  );
 
   const header = (
     <div className="flex flex-wrap items-center justify-between gap-2">
@@ -325,11 +392,18 @@ export function VocabReviewPage() {
     return (
       <div className="mx-auto flex max-w-2xl flex-col gap-4">
         {header}
+        {notice}
         <div className="flex flex-col items-start gap-3 rounded-card bg-surface p-6">
           <h2 className="text-2xl">All caught up</h2>
           <p className="text-detail">
             This session: {done} {done === 1 ? "card" : "cards"} reviewed{done > 0 ? `, ${again} to repeat` : ""}.
           </p>
+          {sets.data?.stats.words === 0 && (
+            <p className="text-detail">
+              Your deck is empty. Open a word set at the{" "}
+              <Link to="/practice/vocab" className="text-teal underline">Vocabulary Station</Link> and add its words to your reviews.
+            </p>
+          )}
           {limitReached && (
             <p className="text-detail">You’ve reached today’s limit of new cards. More will be available tomorrow.</p>
           )}
@@ -359,13 +433,15 @@ export function VocabReviewPage() {
 
   const card = data.cards[index];
   if (!card) return null;
+  const left = data.cards.slice(index).filter((c) => !removed.has(c.lexeme.id)).length;
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-4">
       {header}
+      {notice}
       <p className="text-sm text-detail" aria-live="polite">
-        Done this session: {done} · {data.cards.length - index} left in this batch · {data.due_count} due
+        Done this session: {done} · {left} left in this batch · {data.due_count} due
       </p>
-      <ReviewCardView key={`${batch}-${card.id}`} card={card} onRated={onRated} />
+      <ReviewCardView key={`${batch}-${card.id}`} card={card} onRated={onRated} onRemoved={() => onRemoved(card)} />
     </div>
   );
 }

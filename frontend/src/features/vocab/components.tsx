@@ -38,7 +38,8 @@ export function UsageBadges({ lexeme }: { lexeme: Pick<Lexeme, "region" | "forma
 }
 
 const STATUS: Record<VocabStatus, { label: string; variant: "outline" | "teal" | "warning" | "failure" }> = {
-  not_started: { label: "Not started", variant: "outline" },
+  not_started: { label: "Not in deck", variant: "outline" },
+  elsewhere: { label: "In deck via another set", variant: "outline" },
   new: { label: "New", variant: "teal" },
   learning: { label: "Learning", variant: "warning" },
   due: { label: "Due", variant: "failure" },

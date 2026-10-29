@@ -29,7 +29,7 @@ function Tile({ label, value, detail, to }: { label: string; value: string; deta
 
 function Tiles({ data }: { data: DashboardData }) {
   const { streak, minutes, accuracy_week: accuracy, vocab } = data;
-  const due = vocab.due_now + vocab.new_remaining_today;
+  const due = vocab.due_now + vocab.new_today;
   return (
     <section aria-label="Today at a glance" className="grid grid-cols-2 gap-4 md:grid-cols-4">
       <div className="relative">
@@ -55,7 +55,7 @@ function Tiles({ data }: { data: DashboardData }) {
       <Tile
         label="vocabulary cards to review"
         value={String(due)}
-        detail={`${vocab.due_now} due, ${vocab.new_remaining_today} new`}
+        detail={`${vocab.due_now} due, ${vocab.new_today} new`}
         to="/practice/vocab/review"
       />
     </section>

@@ -139,7 +139,7 @@ export function dashboardFixture(overrides: Partial<Dashboard> = {}): Dashboard 
     history,
     lessons: { published: 6, completed: 2 },
     vocab: {
-      cards: 40, words: 20, due_now: 5, due_today: 8, new_waiting: 10,
+      cards: 40, words: 20, due_now: 5, due_today: 8, new_waiting: 10, new_today: 10,
       new_remaining_today: 10, reviews_today: 3, mature: 2,
     },
     topics: [

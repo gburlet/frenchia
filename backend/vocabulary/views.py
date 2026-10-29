@@ -11,7 +11,7 @@ from rest_framework.views import APIView
 from accounts.models import User
 
 from . import services
-from .models import VocabCard, VocabSet
+from .models import Lexeme, VocabCard, VocabSet
 
 
 def _user(request: Request) -> User:
@@ -40,6 +40,15 @@ class LearnSetView(APIView):
     def post(self, request: Request, slug: str) -> Response:
         vocab_set = get_object_or_404(VocabSet, slug=slug)
         return Response(services.learn_set(_user(request), vocab_set))
+
+
+class RemoveSetView(APIView):
+    @extend_schema(
+        operation_id="vocab_set_remove", request=None, responses={200: OpenApiTypes.OBJECT}
+    )
+    def post(self, request: Request, slug: str) -> Response:
+        vocab_set = get_object_or_404(VocabSet, slug=slug)
+        return Response(services.remove_set(_user(request), vocab_set))
 
 
 class QueueView(APIView):
@@ -75,6 +84,44 @@ class CheckView(APIView):
         data = CheckInput(data=request.data)
         data.is_valid(raise_exception=True)
         return Response(services.check_recall(card.lexeme, data.validated_data["answer"]))
+
+
+class RemoveWordInput(serializers.Serializer[dict[str, Any]]):
+    removed = serializers.BooleanField(default=True)
+
+
+class RemoveWordView(APIView):
+    @extend_schema(
+        operation_id="vocab_card_remove",
+        request=RemoveWordInput,
+        responses={200: OpenApiTypes.OBJECT},
+    )
+    def post(self, request: Request, card_id: int) -> Response:
+        user = _user(request)
+        card = get_object_or_404(VocabCard, pk=card_id, user=user)
+        data = RemoveWordInput(data=request.data)
+        data.is_valid(raise_exception=True)
+        return Response(
+            services.remove_word(user, card.lexeme_id, removed=data.validated_data["removed"])
+        )
+
+
+class AddWordView(APIView):
+    @extend_schema(
+        operation_id="vocab_word_add", request=None, responses={200: OpenApiTypes.OBJECT}
+    )
+    def post(self, request: Request, lexeme_id: int) -> Response:
+        lexeme = get_object_or_404(Lexeme, pk=lexeme_id, retired=False)
+        return Response(services.add_word(_user(request), lexeme))
+
+
+class RemoveLexemeView(APIView):
+    @extend_schema(
+        operation_id="vocab_word_remove", request=None, responses={200: OpenApiTypes.OBJECT}
+    )
+    def post(self, request: Request, lexeme_id: int) -> Response:
+        lexeme = get_object_or_404(Lexeme, pk=lexeme_id)
+        return Response(services.remove_word(_user(request), lexeme.pk))
 
 
 class ReviewInput(serializers.Serializer[dict[str, Any]]):

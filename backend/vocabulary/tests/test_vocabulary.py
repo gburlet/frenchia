@@ -179,7 +179,9 @@ def test_queue_limits_new_cards_and_gates_recall(repo: Path, learner: tuple[Clie
     profile = LearnerProfile.for_user(user)
     profile.daily_new_cards = 3
     profile.save()
+    assert client.get("/api/vocab/sets").json()["stats"]["new_today"] == 0  # empty deck
     client.post("/api/vocab/sets/a2-vetements/learn")
+    assert client.get("/api/vocab/sets").json()["stats"]["new_today"] == 3
     body = client.get("/api/vocab/review").json()
     assert body["new_remaining_today"] == 3
     cards = body["cards"]
@@ -235,3 +237,88 @@ def test_set_detail_reports_word_status(repo: Path, learner: tuple[Client, User]
     words = client.get("/api/vocab/sets/a2-vetements").json()["words"]
     assert {w["status"] for w in words} == {"new"}
     assert words[0]["display"] == "la tuque" and words[0]["region"] == "qc"
+
+
+def test_remove_word_suspends_both_directions_and_undo_restores(
+    repo: Path, learner: tuple[Client, User]
+) -> None:
+    client, user = learner
+    import_content(repo, publish=True)
+    client.post("/api/vocab/sets/a2-vetements/learn")
+    card = client.get("/api/vocab/review").json()["cards"][0]
+    assert card["lexeme"]["display"] == "la tuque"
+
+    client.post(f"/api/vocab/cards/{card['id']}/remove")
+    assert VocabCard.objects.filter(user=user, suspended=True).count() == 2
+    displays = [c["lexeme"]["display"] for c in client.get("/api/vocab/review").json()["cards"]]
+    assert "la tuque" not in displays
+    words = client.get("/api/vocab/sets/a2-vetements").json()["words"]
+    assert words[0]["status"] == "not_started" and words[1]["status"] == "new"
+
+    client.post(
+        f"/api/vocab/cards/{card['id']}/remove", {"removed": False}, content_type="application/json"
+    )
+    assert not VocabCard.objects.filter(user=user, suspended=True).exists()
+
+
+def test_add_and_remove_a_single_word_from_the_set_page(
+    repo: Path, learner: tuple[Client, User]
+) -> None:
+    client, user = learner
+    import_content(repo, publish=True)
+    words = client.get("/api/vocab/sets/a2-vetements").json()["words"]
+    tuque = words[0]["id"]
+
+    assert client.post(f"/api/vocab/words/{tuque}/add").json() == {"lexeme": tuque, "added": True}
+    assert VocabCard.objects.filter(user=user).count() == 2
+    statuses = [w["status"] for w in client.get("/api/vocab/sets/a2-vetements").json()["words"]]
+    assert statuses[0] == "new" and set(statuses[1:]) == {"not_started"}
+    # adding again is a no-op
+    assert client.post(f"/api/vocab/words/{tuque}/add").json()["added"] is False
+    assert VocabCard.objects.filter(user=user).count() == 2
+
+    client.post(f"/api/vocab/words/{tuque}/remove")
+    assert VocabCard.objects.filter(user=user, suspended=True).count() == 2
+    client.post(f"/api/vocab/words/{tuque}/add")
+    assert VocabCard.objects.filter(user=user, suspended=False).count() == 2
+
+
+def test_word_in_deck_through_another_set_is_reported_elsewhere(
+    repo: Path, learner: tuple[Client, User]
+) -> None:
+    client, _ = learner
+    import_content(repo, publish=True)
+    client.post("/api/vocab/sets/a2-vetements/learn")
+    words = client.get("/api/vocab/sets/lesson-a2-passe-compose-er").json()["words"]
+    manteau = next(w for w in words if w["fr"] == "manteau")
+    assert manteau["status"] == "elsewhere"
+    assert client.post(f"/api/vocab/words/{manteau['id']}/add").json()["added"] is False
+
+
+def test_remove_set_suspends_cards_and_re_adding_resumes_them(
+    repo: Path, learner: tuple[Client, User]
+) -> None:
+    client, user = learner
+    import_content(repo, publish=True)
+    client.post("/api/vocab/sets/a2-vetements/learn")
+    card = client.get("/api/vocab/review").json()["cards"][0]
+    client.post(
+        f"/api/vocab/cards/{card['id']}/review", {"rating": 3}, content_type="application/json"
+    )
+
+    assert client.post("/api/vocab/sets/a2-vetements/remove").json() == {"removed": 6}
+    assert client.get("/api/vocab/review").json()["cards"] == []
+    stats = client.get("/api/vocab/sets").json()["stats"]
+    assert stats["words"] == 0 and stats["new_today"] == 0
+    words = client.get("/api/vocab/sets/a2-vetements").json()["words"]
+    assert {w["status"] for w in words} == {"not_started"}
+
+    # manteau is shared with the lesson set; it is no longer in the deck, so that set adds it
+    assert client.post("/api/vocab/sets/lesson-a2-passe-compose-er/learn").json() == {
+        "added": 3,
+        "skipped": 0,
+    }
+    # re-adding resumes the reviewed card and skips manteau, now in the deck via the lesson set
+    assert client.post("/api/vocab/sets/a2-vetements/learn").json() == {"added": 5, "skipped": 1}
+    assert VocabCard.objects.get(pk=card["id"]).reps == 1
+    assert VocabCard.objects.filter(user=user, suspended=False).count() == 16

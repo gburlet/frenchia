@@ -1,7 +1,7 @@
 import { api } from "./client";
 
 export type VocabPos = "noun" | "verb" | "adjective" | "adverb" | "expression" | "other";
-export type VocabStatus = "not_started" | "new" | "learning" | "due";
+export type VocabStatus = "not_started" | "elsewhere" | "new" | "learning" | "due";
 export type CheckResult = "correct" | "accent" | "article" | "gender" | "incorrect";
 export type Rating = 1 | 2 | 3 | 4;
 
@@ -42,6 +42,7 @@ export interface VocabStats {
   due_today: number;
   new_waiting: number;
   new_remaining_today: number;
+  new_today: number;
   reviews_today: number;
   mature: number;
 }
@@ -97,9 +98,17 @@ export const fetchVocabSet = (slug: string, signal?: AbortSignal) =>
   api.get<VocabSetDetail>(`/api/vocab/sets/${encodeURIComponent(slug)}`, signal);
 export const learnVocabSet = (slug: string) =>
   api.post<{ added: number; skipped: number }>(`/api/vocab/sets/${encodeURIComponent(slug)}/learn`);
+export const removeVocabSet = (slug: string) =>
+  api.post<{ removed: number }>(`/api/vocab/sets/${encodeURIComponent(slug)}/remove`);
+export const addVocabWord = (lexemeId: number) =>
+  api.post<{ lexeme: number; added: boolean }>(`/api/vocab/words/${lexemeId}/add`);
+export const removeVocabLexeme = (lexemeId: number) =>
+  api.post<{ lexeme: number; removed: boolean }>(`/api/vocab/words/${lexemeId}/remove`);
 export const fetchVocabReview = (ahead: boolean, signal?: AbortSignal, limit = 20) =>
   api.get<ReviewBatch>(`/api/vocab/review?limit=${limit}${ahead ? "&ahead=1" : ""}`, signal);
 export const checkVocabCard = (id: number, answer: string) =>
   api.post<CheckResponse>(`/api/vocab/cards/${id}/check`, { answer });
+export const removeVocabWord = (id: number, removed = true) =>
+  api.post<{ lexeme: number; removed: boolean }>(`/api/vocab/cards/${id}/remove`, { removed });
 export const reviewVocabCard = (id: number, payload: ReviewPayload) =>
   api.post<{ id: number; due: string; interval_seconds: number }>(`/api/vocab/cards/${id}/review`, payload);
