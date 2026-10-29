@@ -63,6 +63,24 @@ describe("Curriculum browser", () => {
     expect(await screen.findByRole("tab", { name: "A2" })).toHaveAttribute("aria-selected", "true");
   });
 
+  it("defaults to the level of the furthest completed lesson", async () => {
+    const copy = structuredClone(curriculumFixture);
+    const done = structuredClone(copy.levels[1]!.units[0]!.lessons[1]!);
+    copy.levels[2]!.units = [{ id: "b1-u01", title: "Donner son avis", objectives: [], lessons: [done] }];
+    setup(copy);
+    renderApp("/curriculum");
+    expect(await screen.findByRole("tab", { name: "B1" })).toHaveAttribute("aria-selected", "true");
+  });
+
+  it("the header Curriculum link returns to the learner's level", async () => {
+    setup();
+    renderApp("/curriculum?level=B2");
+    const user = userEvent.setup();
+    expect(await screen.findByRole("tab", { name: "B2" })).toHaveAttribute("aria-selected", "true");
+    await user.click(within(screen.getByRole("navigation", { name: "Primary" })).getByRole("link", { name: "Curriculum" }));
+    expect(screen.getByRole("tab", { name: "A2" })).toHaveAttribute("aria-selected", "true");
+  });
+
   it("defaults to A2 when nothing is in progress", async () => {
     const copy = structuredClone(curriculumFixture);
     copy.levels[1]!.units[0]!.lessons[0]!.progress.status = "not_started";

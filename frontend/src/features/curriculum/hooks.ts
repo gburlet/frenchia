@@ -31,3 +31,14 @@ export function findContinueLesson(
   }
   return firstNew;
 }
+
+/** Level of the furthest completed lesson in curriculum order, or null if none is completed. */
+export function findLastCompletedLevel(curriculum: Curriculum): string | null {
+  let found: string | null = null;
+  for (const level of curriculum.levels) {
+    for (const unit of level.units) {
+      if (unit.lessons.some((lesson) => lesson.progress.status === "completed")) found = level.level;
+    }
+  }
+  return found;
+}

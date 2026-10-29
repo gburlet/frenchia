@@ -5,12 +5,15 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { Curriculum, CurriculumLesson } from "@/lib/api/types";
-import { findContinueLesson, useCurriculum } from "./hooks";
+import { findContinueLesson, findLastCompletedLevel, useCurriculum } from "./hooks";
 import { StatusPill } from "./StatusPill";
 
 const DEFAULT_LEVEL = "A2";
 
+// Where the learner is: the level of their furthest completed lesson, else the in-progress one.
 function defaultLevel(curriculum: Curriculum): string {
+  const completed = findLastCompletedLevel(curriculum);
+  if (completed) return completed;
   const found = findContinueLesson(curriculum);
   if (found?.inProgress) return found.level;
   return curriculum.levels.some((l) => l.level === DEFAULT_LEVEL)
